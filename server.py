@@ -21,8 +21,11 @@ form = 'utf-8'
 
 # function definitions
 def who_plays_next(currentPlayer, numPlayers):
-    # if currentPlayer==0:
-    #     return 1
+    if currentPlayer==0:
+        return 1
+    print("WHO PLAYS NEXT FUNCTION")
+    print(currentPlayer + 1)
+    print(numPlayers)
     if currentPlayer==numPlayers:
         return 1
     return currentPlayer+1
@@ -63,10 +66,14 @@ ACCUSATION_MSG = "accuse"
 END_MSG = "end"
 gameOn = True
 
+lastMove = ""
+
 while gameOn:
     # when client connects
     c, addr = s.accept()
     clients.append(c)
+    print("PRINTING CLIENTS LIST BELOW")
+    print(clients)
     addresses.append(addr)
     print("Connection from: ", str(addr))
     numPlayers = numPlayers+1
@@ -126,9 +133,7 @@ while gameOn:
             testCounter = testCounter+1 # delete this when while loop implemented properly
             print("current player: ", currentPlayer)
             msg = "Next Turn: Player "+str(currentPlayer)+"."
-
-            for i in clients:
-                i.send(msg.encode(form))
+            send_message(msg, clients)
 
             playerTurn = True
             while playerTurn:
@@ -137,6 +142,8 @@ while gameOn:
                 playerMoveMsg = str(currentPlayer) + moveMsg.decode(form)
                 print("................")
                 # send_message(playerMoveMsg, clients)
+
+
 
                 # wait to receive messages from clients          
                 # msg = clients[currentPlayer-1].recv(1024)
@@ -147,52 +154,110 @@ while gameOn:
                 if MOVE_MSG in playerMoveMsg:
                     print("INSIDE MOVE MESSAGE")
                     print(playerMoveMsg)
+                    #/////////////////////////////////////////
                     send_message(playerMoveMsg,clients)
                     moveChoice = clients[currentPlayer-1].recv(1024).decode()
                     print("RECEIVING NEXT MESSAGE")
                     print(moveChoice)
                     moveMessage = "Player " + str(currentPlayer) + " is moving to " + moveChoice;
+                    #/////////////////////////////////////////
                     send_message(moveMessage, clients)
                     msg = clients[currentPlayer-1].recv(1024).decode()
                     print("RECEIVING NEXT MESSAGE")
                     print(msg)
                     print("^^^^^^^^^^^^^^^^^^")
+                    playerTurn = False
+                    currentPlayer = currentPlayer
+                    # nextMoveMessage = "Player can make another move" 
+                    # send_message(nextMoveMessage, clients)
                     
                 if SUGGESTION_MSG in playerMoveMsg:
                     print("INSIDE SUGGESTION MESSAGE")
                     print(playerMoveMsg)
+                    #/////////////////////////////////////////
                     send_message(playerMoveMsg,clients)
                     suggestionMessage = clients[currentPlayer-1].recv(1024).decode()
+                    if "cannot" in suggestionMessage:
+                        falseSuggestion = "Player cannot make a suggestion \n"
+                        send_message(falseSuggestion, clients)
+                        # falseSuggestionMessage = clients[currentPlayer-1].recv(1024).decode()
+                        # print(falseSuggestion)
+                        currentPlayer = currentPlayer
+                        playerTurn = False
                     # roomSuggest = clients[currentPlayer-1].recv(1024).decode()
                     # weaponSuggest = clients[currentPlayer-1].recv(1024).decode()
-                    suggestion = suggestionMessage.split(",")
-                    person = suggestion[0]
-                    room = roomsToNames.get(suggestion[1])
-                    weapon = suggestion[2]
-                    print("RECEIVING SUGGESTION MESSAGE")
-                    print(person)
-                    print(solutionName)
-                    print(room)
-                    print(solutionLocation)
-                    print(weapon)
-                    print(solutionWeapon)
-                    print("///////////////////////")
-                    suggestion = person + " in the " + room + " with the " + weapon
-                    suggestionMessage = "Player " + str(currentPlayer) + " is suggesting " + suggestion + " \n";
-                    send_message(suggestionMessage, clients)
-                    msg = clients[currentPlayer-1].recv(1024).decode()
-                    print("RECEIVING NEXT MESSAGE")
-                    print(msg)
-                    # send_message(msg, clients)
-                    print("^$$$$$$$$$$$$$$")
+                    else:
+                        goodSuggestion = "Player is able to make a suggestion \n"
+                        clientsToValidate = clients
+                        clientsToValidate.pop(currentPlayer-1)
+                        send_message(goodSuggestion, clientsToValidate)
+                        suggestion = suggestionMessage.split(",")
+                        print(suggestion)
+                        person = suggestion[0]
+                        room = roomsToNames.get(suggestion[1])
+                        weapon = suggestion[2]
+                        print("RECEIVING SUGGESTION MESSAGE")
+                        print(person)
+                        print(solutionName)
+                        print(room)
+                        print(solutionLocation)
+                        print(weapon)
+                        print(solutionWeapon)
+                        print(str(who_plays_next(currentPlayer, numPlayers)))
+                        print(currentPlayer)
+                        print(numPlayers)
+                        playerToPass = who_plays_next(currentPlayer, numPlayers)
+                        print("PLAYER TO PASS BELOW")
+                        print(playerToPass)
+                        print("///////////////////////")
+                        suggestion = person + " in the " + room + " with the " + weapon
+                        suggestionMessage = "Player " + str(currentPlayer) + " is suggesting " + suggestion + ".\n ///"
+                        fullSuggestion = person + "," + room + "," + weapon + "," + str(playerToPass)
+                        #/////////////////////////////////////////
+                        send_message(suggestionMessage + fullSuggestion, clients)
+                        # send_message(fullSuggestion, clients)
+                        print("PRINTING CURRENT PLAYER HERE FOR CLIENT HELP")
+                        print(str(currentPlayer))
+                        if(currentPlayer == numPlayers): 
+                            suggestionHelp = clients[0].recv(1024).decode()
+                        else:
+                            suggestionHelp = clients[currentPlayer].recv(1024).decode()
+                        print("SUGGESTION HELP MESSAGE")
+                        print(suggestionHelp)
+                        if "No matches" in suggestionHelp:
+                            print("No Matches for this client")
+
+                        else:
+                            print(suggestionHelp)
+                            print("IN THIS IF STATEMENT")
+                            clientToSend = []
+                            clientToSend.append(clients[currentPlayer-1])
+                            print(clientToSend)
+                            #/////////////////////////////////////////
+                            send_message(suggestionHelp + " ///", clientToSend)
+                        # print(type(list(clients.index(currentPlayer-1))))
+                        # print(list(clients[currentPlayer-1]))
+                        
+                        
+
+                        # msg = clients[currentPlayer-1].recv(1024).decode()
+                        # print("RECEIVING NEXT MESSAGE")
+                        # print(msg)
+                        # send_message(msg, clients)
+                        print("^$$$$$$$$$$$$$$")
+                        currentPlayer = currentPlayer
+                        playerTurn = False
 
                 if ACCUSATION_MSG in playerMoveMsg:
                     print("INSIDE ACCUSATION MESSAGE")
                     print(playerMoveMsg)
+                    #/////////////////////////////////////////
                     send_message(playerMoveMsg,clients)
-                    personAccuse = clients[currentPlayer-1].recv(1024).decode()
-                    roomAccuse = clients[currentPlayer-1].recv(1024).decode()
-                    weaponAccuse = clients[currentPlayer-1].recv(1024).decode()
+                    accusationClientMesssage = clients[currentPlayer-1].recv(1024).decode()
+                    accuse = accusationClientMesssage.split(",")
+                    personAccuse = accuse[0]
+                    roomAccuse = accuse[1]
+                    weaponAccuse = accuse[2]
                     print("RECEIVING ACCUSATION MESSAGE")
                     print(personAccuse)
                     print(solutionName)
@@ -202,14 +267,17 @@ while gameOn:
                     print(solutionWeapon)
                     print("///////////////////////")
                     accusation = personAccuse + " in the " + roomAccuse + " with the " + weaponAccuse
-                    accusationMessage = "Player " + str(currentPlayer) + " is accusing " + accusation + " \n";
+                    accusationMessage = "Player " + str(currentPlayer) + " is accusing " + accusation + " \n"
+                    #/////////////////////////////////////////
                     send_message(accusationMessage, clients)
-                    time.sleep(3)
+                    time.sleep(1.5)
                     if((personAccuse == solutionName) and (roomAccuse == solutionLocation) and (weaponAccuse == solutionWeapon)):
                         wonMessage = "Player " + str(currentPlayer) + " won! \n"
+                        #/////////////////////////////////////////
                         send_message(wonMessage, clients)
                     else:
                         lostMessage = "Player " + str(currentPlayer) + " lost the game. \n"
+                        #/////////////////////////////////////////
                         send_message(lostMessage, clients)
                     msg = clients[currentPlayer-1].recv(1024).decode()
                     print("RECEIVING NEXT MESSAGE")
@@ -232,12 +300,15 @@ while gameOn:
                     print("IN END MESSAGE")
                     print("!!!!!!!!!!!!!!!!!!!!")
                     print(playerMoveMsg)
+                    #/////////////////////////////////////////
                     send_message(playerMoveMsg,clients)
                     msg = clients[currentPlayer-1].recv(1024).decode()
                     print("+++++++++++++++++++++")
                     print(msg)
-                    playerTurn = False
+                    print(currentPlayer)
                     currentPlayer = who_plays_next(currentPlayer, numPlayers)
+                    print(currentPlayer)
+                    playerTurn = False
                     # endMessage = clients[currentPlayer-1].recv(1024).decode()
                     # print(endMessage)
                 
