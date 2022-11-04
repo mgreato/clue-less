@@ -19,14 +19,30 @@ def is_in_hallway(locationIndex):
     return false
 
 def can_take_secret_passage(locationIndex):
-    if locationIndex==1-1 or locationIndex ==7-1 or locationIndex==3-1 or locationIndex==9-1:
-        return true
-    return false
+    boolean = False
+    diagonal_room_index = -1
+    if locationIndex==1-1:
+        diagonal_room_index = 9-1
+        diagonal_room_name = roomsToNames[locations[diagonal_room_index]]
+        boolean = True
+    if locationIndex ==7-1:
+        diagonal_room_index = 3-1
+        diagonal_room_name = roomsToNames[locations[diagonal_room_index]]
+        boolean = True
+    if locationIndex==3-1:
+        diagonal_room_index = 7-1
+        diagonal_room_name = roomsToNames[locations[diagonal_room_index]]
+        boolean = True
+    if locationIndex==9-1:
+        diagonal_room_index = 1-1
+        diagonal_room_name = roomsToNames[locations[diagonal_room_index]]
+        boolean = True
+    return boolean, diagonal_room_name, locations[diagonal_room_index]
 
 def movePlayer(p):
     if(p.playerLocation.__contains__("hallway")):
-        # print("player is in a hallway")
-        # print(p.playerLocation)
+        print("player is in a hallway")
+        print(p.playerLocation)
         hallwayRooms = p.playerLocation.split("hallway")[1]
         roomChoices = list(hallwayRooms)
         roomChoice1 = "room" + roomChoices[0]
@@ -34,20 +50,25 @@ def movePlayer(p):
         possibleRooms = []
         possibleRooms.append(roomChoice1)
         possibleRooms.append(roomChoice2)
-        # print(possibleRooms)
+        print(possibleRooms)
         print("Where would you like to move? Your choices are: " + str(possibleRooms))
     if(p.playerLocation.__contains__("room")):
-        # print("player is in a room")
-        # print(p.playerLocation)
+        print("player is in a room")
+        print(p.playerLocation)
         roomNumber = p.playerLocation.split("room")[1]
         possibleHallways = [h for h in locations if (("hallway" and roomNumber in h) and ("room" not in h))]
-        # NEED TO ADD IN SUPPORT FOR DIAGONAL ROOMS
-        print("Where would you like to move? Your choices are: " + str(possibleHallways))
+        
+        #Check diagonal room option
+        check_diagonal_result = can_take_secret_passage(p.locationIndex)
+        if check_diagonal_result[0] == True:
+            print("Where would you like to move? Your hallway choices are: " + str(possibleHallways) + ". Your diagonal room choice is: " + check_diagonal_result[2])
+        else:
+            print("Where would you like to move? Your choices are: " + str(possibleHallways))
     moveInput = input("->")
     s.send(moveInput.encode())
     clientsMessage = s.recv(1024).decode()
-    # print("CLIENTS MESSAGE BELOW")
-    # print(clientsMessage)
+    print("CLIENTS MESSAGE BELOW")
+    print(clientsMessage)
     return moveInput
 
 def makeAccusation():
