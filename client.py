@@ -25,8 +25,8 @@ def can_take_secret_passage(locationIndex):
 
 def movePlayer(p):
     if(p.playerLocation.__contains__("hallway")):
-        print("player is in a hallway")
-        print(p.playerLocation)
+        # print("player is in a hallway")
+        # print(p.playerLocation)
         hallwayRooms = p.playerLocation.split("hallway")[1]
         roomChoices = list(hallwayRooms)
         roomChoice1 = "room" + roomChoices[0]
@@ -34,11 +34,11 @@ def movePlayer(p):
         possibleRooms = []
         possibleRooms.append(roomChoice1)
         possibleRooms.append(roomChoice2)
-        print(possibleRooms)
+        # print(possibleRooms)
         print("Where would you like to move? Your choices are: " + str(possibleRooms))
     if(p.playerLocation.__contains__("room")):
-        print("player is in a room")
-        print(p.playerLocation)
+        # print("player is in a room")
+        # print(p.playerLocation)
         roomNumber = p.playerLocation.split("room")[1]
         possibleHallways = [h for h in locations if (("hallway" and roomNumber in h) and ("room" not in h))]
         # NEED TO ADD IN SUPPORT FOR DIAGONAL ROOMS
@@ -46,8 +46,8 @@ def movePlayer(p):
     moveInput = input("->")
     s.send(moveInput.encode())
     clientsMessage = s.recv(1024).decode()
-    print("CLIENTS MESSAGE BELOW")
-    print(clientsMessage)
+    # print("CLIENTS MESSAGE BELOW")
+    # print(clientsMessage)
     return moveInput
 
 def makeAccusation():
@@ -60,14 +60,14 @@ def makeAccusation():
     allAccusations = accusePersonInput + "," + accuseRoomInput + "," + accuseWeaponInput
     s.send(allAccusations.encode())
     clientsMessage = s.recv(1024).decode()
-    print("CLIENTS MESSAGE BELOW")
-    print(clientsMessage)
+    # print("CLIENTS MESSAGE BELOW")
+    # print(clientsMessage)
     # accusationMessage = s.recv(1024).decode()
     # print("accusationMessage BELOW")
     # print(accusationMessage)
     wonLostMessage = s.recv(1024).decode()
-    print("9120389883013890101203818301")
-    print(wonLostMessage)
+    # print("9120389883013890101203818301")
+    # print(wonLostMessage)
     if "won" in wonLostMessage:
         print("You Won!")
         msg = "endConnection for all"
@@ -102,6 +102,7 @@ CONNECTED_MSG = "Connection established"
 BEGINNING_MSG = "Game is beginning"
 TURN_MSG = "Next Turn"
 MOVE_MSG = "another"
+SUGGESTION = "is suggesting "
 CARDS_MSG = "Your cards are"
 WIN_MSG = "You Win"
 LOSE_MSG = "You Lose"
@@ -111,21 +112,25 @@ currentPlayer = 0
 while True:
     msg = s.recv(1024)
     readmsg = msg.decode(form)
-    print("PRINTiNG READ MESSAGE HERE")
-    print(readmsg)
+    # print("PRINTiNG READ MESSAGE HERE")
+    # print(readmsg)
     if CONNECTED_MSG in readmsg:
-        print(readmsg, "\n")
+        # print(readmsg, "\n")
         myNumber = int(readmsg[39])
     if BEGINNING_MSG in readmsg:
-        print(readmsg)
+        # print(readmsg)
         totalPlayers = int(readmsg[23])
         g = Game(totalPlayers)
         cards = readmsg.split("Your cards are: ")[1]
         p = Player(myNumber,names[myNumber],locations[myNumber], cards)
-        print(p)
+        # print(p)
     # if CARDS_MSG in readmsg:
     #     print(readmsg, "\n")
-    if (TURN_MSG or MOVE_MSG) in readmsg:
+    print(readmsg)
+    print(SUGGESTION)
+    print(SUGGESTION in readmsg)
+    if ((TURN_MSG or MOVE_MSG) in readmsg) or (SUGGESTION in readmsg):
+        print("HERE!!!")
         suggestionValidation = None
         print("WE ARE IN THIS SPOT IN THE CODE!!!!!!!")
         print(readmsg)
@@ -152,9 +157,12 @@ while True:
                 # player_choice = "end" #dummy options right now are move, suggest, accuse, end
                 if player_choice == "move":
                     moveInput = movePlayer(p)
+                    print("IN MOVE AND HERE IS MOVE INPUT")
+                    print(moveInput)
                     # NEED TO ADD VALIDATION FOR IF A HALLWAY IS OPEN
                     p.playerLocation = moveInput
-                    msg = "\n MOVE " + p.playerName + " to " + p.playerLocation
+                    msg = "\nMOVE " + p.playerName + " to " + p.playerLocation
+                    print(msg)
                     s.send(msg.encode(form))
                     playerMoveActive = False
 
@@ -175,18 +183,37 @@ while True:
                         all = suggestPersonInput + "," + suggestRoomInput + "," + suggestWeaponInput
                         print("HERE MAKING ALL MESSAGE")
                         s.send(all.encode())
-                        # clientsMessage = s.recv(1024).decode().split("///")[0]
-                        # print("CLIENTS MESSAGE BELOW")
-                        # print(clientsMessage)
+                        empty = True
+                        while empty == True:
+                            clientsMessage = s.recv(1024).decode().split("///")[0]
+                            # print("CLIENTS MESSAGE BELOW")
+                            # print(clientsMessage)
+                            if(clientsMessage != ""):
+                                empty = False
 
-                        suggestionHelpMessage = s.recv(1024).decode()
-                        suggestion = suggestionHelpMessage.split(" ///")[0]
-                        print("SUGGESTION HELP MESSAGE BELOW")
-                        print(suggestionHelpMessage)
-                        print("Another player is suggesting that [" + suggestion + "] is not in the solution")
+                    # elif player_choice == "suggestHelp":
+                        print("Waiting for suggestion help")
+                        # suggestionHelpMessage = s.recv(1024).decode()
+                        again = True
+                        print(again)
+                        while (again == True) and (clientsMessage != "No Matches for this client"):
+                            suggestionHelpMessage = s.recv(1024).decode()
+                            if((suggestionHelpMessage != "") or (suggestionHelpMessage != None)) and ("is suggesting" not in suggestionHelpMessage) and (("Next" not in suggestionHelpMessage)):
+                                print(suggestionHelpMessage)
+                                again = False
+                        if(" ///" in suggestionHelpMessage):
+                            suggestion = suggestionHelpMessage.split(" ///")[0]
+                            print("SUGGESTION HELP MESSAGE BELOW")
+                            print(suggestionHelpMessage)
+                            print("Another player is suggesting that [" + suggestion + "] is not in the solution")
+                        else:
+                            suggestion = suggestionHelpMessage
+                            print("SUGGESTION HELP MESSAGE BELOW")
+                            print(suggestionHelpMessage)
+                            print("No players had cards that matched your suggestion")
                         playerMoveActive = False
-                        # msg = "\n SUGGEST " + suggestPersonInput + " in the " + roomsToNames.get(suggestRoomInput) + " with the " + suggestWeaponInput + "\n"
-                        # s.send(msg.encode(form))
+                        msg = "\n SUGGEST " + suggestPersonInput + " in the " + roomsToNames.get(suggestRoomInput) + " with the " + suggestWeaponInput + "\n"
+                        s.send(msg.encode(form))
                     else:
                         print("You are not in a room so you cannot make a suggestion \n")
                         suggestionError = "Player cannot make a suggestion!!!! \n"
@@ -197,6 +224,7 @@ while True:
                         # message = s.recv(1024).decode()
                         # print("THIS IS A TEST #2")
                         # print(message)
+                        # s.send("suggestionOver".encode(form))
                         playerMoveActive = False
 
                 elif player_choice == "accuse":
@@ -208,14 +236,17 @@ while True:
                     s.send(msg.encode(form))
                     playerMoveActive = False
                 print("&&&&&&&&&&&&&&&&&&&")
-                # print(playerMoveActive)
+                print(playerMoveActive)
                 # print(msg)
         else:
-            message = s.recv(1024).decode()
-            playerNum = list(message)
-            playerMoveChoice = message[1:]
-            print("Player " + playerNum[0] + " chose to " + playerMoveChoice + "\n")
-            print(playerMoveChoice)
+            if("is suggesting" in readmsg):
+                playerMoveChoice = "nextSuggest"
+            else:
+                message = s.recv(1024).decode()
+                playerNum = list(message)
+                playerMoveChoice = message[1:]
+                print("Player " + playerNum[0] + " chose to " + playerMoveChoice + "\n")
+                print(playerMoveChoice)
             if(playerMoveChoice == "move"):
                 clientsMessage = s.recv(1024).decode()
                 print("OTHER PLAYERS MESSAGE BELOW")
@@ -233,10 +264,18 @@ while True:
                     print("Player " + playerNum + " lost the game \n")
             print("#########################################")
             print(suggestionValidation)
-            if(playerMoveChoice == "suggest"):
-                validationMessage = s.recv(1024).decode()
-                print("OTHER PLAYERS VALIDATION MESSAGE")
-                print(validationMessage)
+            print(playerMoveChoice)
+            print(playerMoveChoice == "nextSuggest")
+            if(playerMoveChoice == "suggest") or (playerMoveChoice == "nextSuggest"):
+                if(playerMoveChoice == "suggest"):
+                    validationMessage = s.recv(1024).decode()
+                    print("OTHER PLAYERS VALIDATION MESSAGE")
+                    print(validationMessage)
+                else: 
+                    print("IN THE ELSE STATEMENT")
+                    print(readmsg)
+                    validationMessage = readmsg
+                    print(validationMessage)
                 if("cannot") in validationMessage:
                     print("Player " + playerNum[0] + " is not in a location to suggest \n")
                     playerMoveActive = False
@@ -244,10 +283,10 @@ while True:
                     print("THIS IS A TEST")
                     print(message)
                     # suggestions = s.recv(1024).decode()
-                    # print(suggestions)
-                if("able to") in validationMessage: 
+                print("suggesting" in validationMessage)
+                if("able to" in validationMessage) or ("suggesting" in validationMessage): 
                     print("INSIDE THIS IF STATEMENT")
-                    
+                    print(validationMessage)
                     # print(clientsMessage)
                     clientsMessage = ""
                     if("///" in validationMessage):
@@ -286,10 +325,14 @@ while True:
                             print("Your options to show player " +str(playerNum[0]) + " are " + str(matches))
                             print("Which would you like to show?")
                             message = input(" -> ")  # take input
+                            print("PlAYER SUGGESTION HELP MESSAGE HERE")
+                            print(message)
                             s.send(message.encode())
                         else:
                             count += 1
                             message = "No matches please move to next player"
+                            print(message)
+                            print("INSIDE HERE AND AM SENDING THE NO MATCHES MESSAGE")
                             s.send(message.encode())
                     playerMoveActive = False
             
