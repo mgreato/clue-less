@@ -19,6 +19,10 @@ clients = []
 addresses = []
 form = 'utf-8'
 
+def goto(linenum):
+    global line
+    line = linenum
+
 # function definitions
 def who_plays_next(currentPlayer, numPlayers):
     if currentPlayer==0:
@@ -42,6 +46,7 @@ roomsToNames = {"room1": "study","room2": "hall","room3": "lounge", "room4": "di
             "room5": "kitchen", "room6": "ballroom", "room7": "conservatory", "room8": "library", "room9": "billiard room"}
 rooms = ["study","hall","lounge","dining room","kitchen", "ballroom", "conservatory", "library", "billiard room"]
 weapons = ["rope", "candlestick", "dagger", "wrench", "lead pipe", "revolver"]
+
 cards = names + rooms + weapons
 solution = []
 solutionName = random.choice(names)
@@ -50,7 +55,7 @@ solutionLocation = random.choice(rooms)
 solution.append(solutionLocation)
 solutionWeapon = random.choice(weapons)
 solution.append(solutionWeapon)
-# print(solution)
+print(solution)
 
 cards.remove(solutionName)
 cards.remove(solutionLocation)
@@ -62,6 +67,7 @@ SUGGESTION_MSG = "suggest"
 ACCUSATION_MSG = "accuse"
 END_MSG = "end"
 gameOn = True
+g = Game(0)
 
 lastMove = ""
 
@@ -73,12 +79,24 @@ while gameOn:
     print("Connection from: ", str(addr))
     numPlayers = numPlayers+1
     print("Number of Players: ", numPlayers,"\n")
-    msg = "Connection established. You are Player "+str(numPlayers)+"."
-    c.send(msg.encode(form))
+    g.numPlayers = numPlayers
+    msg = "\nConnection established. You are Player "+str(numPlayers)
+    # c.send(msg.encode(form))
+    availablePlayers = [name for name in g.playerNames if name not in g.chosenPlayers]
+    playerChoice = msg + ".\nWhat player would you like to be? Your choices are " + str(availablePlayers)
+    c.send(playerChoice.encode(form))
+    playerInfo = c.recv(1024).decode().split(",")
+    players = g.chosenPlayers
+    players.append(playerInfo[0])
+    g.chosenPlayers = players
+    initialMessage = ("\nYour are " + playerInfo[0] + " and you are starting the game in " + playerInfo[1])
+    c.send(initialMessage.encode(form))
+    
     
     # when all clients are connected, the game begins
     if numPlayers>=3: # need to update this so numPlayers == 6 or some timeout function
 
+        print("INSIDE HERE")
         #also, need to send each client what their cards are
         #so logic here to shuffle & divide cards, then send cards to client
         random.shuffle(cards)
@@ -92,12 +110,12 @@ while gameOn:
 
         playersCount = 0
         for i in clients:
-            msg = "Game is beginning with "+str(numPlayers)+" players. \n \nYour cards are: " + str(hands[playersCount]) + "\n"
+            msg = "\nGame is beginning with "+str(numPlayers)+" players. \n \nYour cards are: " + str(hands[playersCount]) + "\n"
             playersCount += 1
             i.send(msg.encode(form))
         # send_message("Game is beginning with "+str(numPlayers)+" players.  \n",clients)
 
-
+        print("ALL THE WAY DOWN HERE HERE")
 
         # for y in clients:
         #     cardsMessage = "Your cards are: " + str(hands[playersCount]) + "\n"
@@ -111,10 +129,13 @@ while gameOn:
             testCounter = testCounter+1 # delete this when while loop implemented properly
             print("current player: ", currentPlayer)
             msg = "Next Turn: Player "+str(currentPlayer)+"."
+            # print("SENDING THIS MESSAGE")
+            # print(msg)
             send_message(msg, clients)
 
             playerTurn = True
             while playerTurn:
+                print("INSIDE HERE")
                 moveMsg = clients[currentPlayer-1].recv(1024)
                 playerMoveMsg = str(currentPlayer) + moveMsg.decode(form)
 
@@ -132,20 +153,31 @@ while gameOn:
                     #/////////////////////////////////////////
                     send_message(playerMoveMsg,clients)
                     moveChoice = clients[currentPlayer-1].recv(1024).decode()
+
+                    # print(moveChoice)
                     # print("RECEIVING NEXT MESSAGE")
                     # print(moveChoice)
-                    moveMessage = "Player " + str(currentPlayer) + " is moving to " + moveChoice;
+                    if("You can only move once per turn" in moveChoice):
+                        moveMessage = "Player cannot move again"
+                    else:
+                        moveMessage = "Player " + str(currentPlayer) + " is moving to " + moveChoice;
                     #/////////////////////////////////////////
                     send_message(moveMessage, clients)
+                    # print("MAKING IT HERE")
                     msg = clients[currentPlayer-1].recv(1024).decode()
                     # print("RECEIVING NEXT MESSAGE")
-                    # print(msg)
+                    print(msg)
+
                     # print("^^^^^^^^^^^^^^^^^^")
                     # print("PRINTING WINNER HERE $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
                     # print(winner)
                     currentPlayer = currentPlayer
                     # print(currentPlayer)
                     playerTurn = False
+
+                    # if(msg == "Player must now suggest"):
+                    #     # playerMoveMsg = "suggest"
+                    #     goto(125)
                     # nextMoveMessage = "Player can make another move" 
                     # send_message(nextMoveMessage, clients)
                     
@@ -156,7 +188,7 @@ while gameOn:
                     send_message(playerMoveMsg,clients)
                     suggestionMessage = clients[currentPlayer-1].recv(1024).decode()
                     if "cannot" in suggestionMessage:
-                        falseSuggestion = "Player cannot make a suggestion \n"
+                        falseSuggestion = "You are not in a room so you cannot make a suggestion \n"
                         send_message(falseSuggestion, clients)
                         # falseSuggestionMessage = clients[currentPlayer-1].recv(1024).decode()
                         # print(falseSuggestion)
@@ -340,17 +372,42 @@ while gameOn:
                     currentPlayer = who_plays_next(currentPlayer, numPlayers)
                 if (END_MSG in playerMoveMsg) and ("end connection" not in playerMoveMsg):
                     # print("IN END MESSAGE")
-                    # print("!!!!!!!!!!!!!!!!!!!!")
-                    # print(playerMoveMsg)
-                    #/////////////////////////////////////////
+                    print("!!!!!!!!!!!!!!!!!!!!")
+                    print(playerMoveMsg)
+                    
+                    # print(validation)
+                    # if validation[1] == True:
                     send_message(playerMoveMsg,clients)
                     msg = clients[currentPlayer-1].recv(1024).decode()
-                    # print("+++++++++++++++++++++")
-                    # print(msg)
-                    # print(currentPlayer)
-                    currentPlayer = who_plays_next(currentPlayer, numPlayers)
-                    # print(currentPlayer)
-                    playerTurn = False
+                    print("+++++++++++++++++++++")
+                    validation = msg.split("&& ")
+                    # print(validation)
+                    print(validation[1])
+                    print(eval(validation[1]))
+                    print(bool(validation[1]))
+                    print(currentPlayer)
+                    if(eval(validation[1]) == True):
+                        print("GOING IN TO THE TRUE VALIDATION")
+                        currentPlayer = who_plays_next(currentPlayer, numPlayers)
+                            # print(currentPlayer)
+                        playerTurn = False
+                    elif(eval(validation[1]) == False):
+                        print("GOING IN HERE")
+                        print(currentPlayer)
+                        currentPlayer = currentPlayer
+                        print(currentPlayer)
+                        playerTurn = False
+                        #/////////////////////////////////////////
+                    # else:
+                    #     send_message(validation[0],clients)
+                    #     msg = clients[currentPlayer-1].recv(1024).decode()
+                    #     # print("+++++++++++++++++++++")
+                    #     # print(msg)
+                    #     # print(currentPlayer)
+                    #     currentPlayer = currentPlayer
+                    #     # print(currentPlayer)
+                    #     playerTurn = False
+                    
                     # endMessage = clients[currentPlayer-1].recv(1024).decode()
                     # print(endMessage)
                 
