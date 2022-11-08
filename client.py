@@ -3,6 +3,7 @@ import pygame
 import socket
 from game import Game
 from player import Player  
+import ast
 
 # possible messages from server
 CONNECTED_MSG = "Connection established"
@@ -32,21 +33,6 @@ s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 s.connect((socket.gethostname(), port))
 form = 'utf-8'
 playerChosen = False
-# p = Player
-
-# function definitions
-def is_move_valid(): # dummy function for now
-    pass
-
-# def is_in_room(locationIndex):
-#     if locationIndex > 0 and locationIndex < 9:
-#         return true
-#     return false
-
-# def is_in_hallway(locationIndex):
-#     if locationIndex > 8:
-#         return true
-#     return false
 
 def can_take_secret_passage(playerRoom):
     boolean = False
@@ -65,12 +51,35 @@ def can_take_secret_passage(playerRoom):
         boolean = True
     return boolean, diagonal_room_name
 
-def movePlayer(p):
+def movePlayer(p, otherPlayerLocations):
+    # print("INSIDE MOVE PLAYER")
+    # print(otherPlayerLocations)
+    # print(p.hasMoved)
+    otherPlayerLocationsList = [h for h in ast.literal_eval(otherPlayerLocations) if ("room" not in h)]
+    # print(otherPlayerLocationsList)
+    playerInRoom = p.playerLocation.__contains__("room")
+    if(playerInRoom):
+        roomNumber = p.playerLocation.split("room")[1]
+        possibleHallways = [h for h in locations if (("hallway" and roomNumber in h) and ("room" not in h) and (h not in otherPlayerLocationsList))]
+        # print("HERE ARE THE POSSIBLE HALLWAYS")
+        # print(possibleHallways)
+        # print(len(possibleHallways))
+        check_diagonal_result = can_take_secret_passage(p.playerLocation)
+        # print(check_diagonal_result)
     if(p.hasMoved == True):
         moveInput = "You can only move once per turn"
         print(moveInput)
         s.send(moveInput.encode())
         clientsMessage = s.recv(1024).decode()
+        # print("CLIENTS MESSAGE IN MOVE PLAYER")
+        # print(clientsMessage)
+    elif(playerInRoom) and (len(possibleHallways) == 0) and (check_diagonal_result[0] == False):
+        moveInput = "Your move options are all blocked. You can either make an accusation or end your turn."
+        print(moveInput)
+        s.send(moveInput.encode())
+        clientsMessage = s.recv(1024).decode()
+        print("CLIENTS MESSAGE IN MOVE PLAYER")
+        print(clientsMessage)
     else:
         if(p.playerLocation.__contains__("hallway")):
             hallwayRooms = p.playerLocation.split("hallway")[1]
@@ -81,19 +90,26 @@ def movePlayer(p):
             possibleRooms.append(roomChoice1)
             possibleRooms.append(roomChoice2)
             print("Where would you like to move? Your choices are: " + str(possibleRooms))
-        if(p.playerLocation.__contains__("room")):
-            roomNumber = p.playerLocation.split("room")[1]
-            possibleHallways = [h for h in locations if (("hallway" and roomNumber in h) and ("room" not in h))]
-            check_diagonal_result = can_take_secret_passage(p.playerLocation)
+        if(playerInRoom):
             if check_diagonal_result[0] == True:
-                print("Where would you like to move? Your hallway choices are: " + str(possibleHallways) + ". Your diagonal room choice is: " + check_diagonal_result[1])
+                if(len(possibleHallways) == 0):
+                    print("Where would you like to move? Your only option is:  " + check_diagonal_result[1])
+                else:
+                    print("Where would you like to move? Your hallway choices are: " + str(possibleHallways) + ". Your diagonal room choice is: " + check_diagonal_result[1])
             else:
                 print("Where would you like to move? Your choices are: " + str(possibleHallways))
-        moveInput = input("->")
+        validMove = False
+        while validMove == False:
+            moveInput = input("->")
+            if(moveInput not in otherPlayerLocationsList):
+                validMove = True
+            else:
+                print("That room is already occupied, please enter another choice.")
         if("room" not in moveInput):
             p.hasSuggested = True   
             p.canEndTurn = True 
-        s.send(moveInput.encode())
+        moveMessage = moveInput + "," + p.playerName
+        s.send(moveMessage.encode())
         clientsMessage = s.recv(1024).decode()
         p.hasMoved = True
     return moveInput
@@ -125,6 +141,7 @@ def handleSuggestion():
     msg = "\n SUGGEST " + suggestPersonInput + " in the " + roomsToNames.get(suggestRoomInput) + " with the " + suggestWeaponInput + "\n"
     s.send(msg.encode(form))
     p.hasSuggested = True
+    p.hasMoved = True
     p.canEndTurn = True
 
 def makeAccusation():
@@ -145,13 +162,17 @@ def makeAccusation():
     return msg
 
 def validateSuggestion(p):
-    if (roomsToNames.get(p.playerLocation) != None) and (p.hasSuggested == False):
+    # print("INSIDE VALIDATE SUGGESTION")
+    # print(p.canSuggest)
+    if (roomsToNames.get(p.playerLocation) != None) and (p.hasSuggested == False) and (p.canSuggest == True):
+        p.canSuggest = False
         return True
     else:
         return False
 
 def validateEndTurn(p):
     if(p.canEndTurn == True):
+        p.canSuggest = False
         return True
     else:
         return False
@@ -166,29 +187,37 @@ def validateEndTurn(p):
 while True:
     msg = s.recv(1024)
     readmsg = msg.decode(form)
-    print("PRINTING READ MESSAGE HERE")
-    print(readmsg)
+    if("CLOSE ALL CONNECTION" in readmsg):
+        s.close()
+    # print("PRINTING READ MESSAGE HERE")
+    # print(readmsg)
     if CONNECTED_MSG in readmsg:
         print(readmsg, "\n")
         myNumber = readmsg.split("You are Player ")[1].split(".")[0]
         # while playerChosen == False:
         message = input(" -> ")
         playerLocation = Game.playerStartLocations.get(message)
-        p = Player(myNumber, message, playerLocation, None, False, False, False)
+        p = Player(myNumber, message, playerLocation, None, False, False, False, False)
         # p.playerName, p.playerLocation, True
         # playerName, playerLocation, validatePlayer = validatePlayer(message, myNumber, None)
         sendMessage = p.playerName + "," + playerLocation
         s.send(sendMessage.encode())
         playerMessage = s.recv(1024).decode()
-        print("PRINTING")
+        # print("PRINTING")
         print(playerMessage)
         readmsg = playerMessage
     if BEGINNING_MSG in readmsg:
-        print("IN BEGIN MESSAGE")
+        # print("IN BEGIN MESSAGE")
         print(readmsg)
         cards = readmsg.split("Your cards are: ")[1]
-        setattr(p, 'cards', cards)
-        print(p.cards)
+        # print(cards)
+        if("Next Turn" in cards):
+            # print("INSIDE THE NEXT TURN PART")
+            cards = cards.split("N")[0]
+            print(cards)
+        # print(cards)
+        setattr(p, 'cards', ast.literal_eval(cards))
+        # print(p.cards)
     if ((TURN_MSG or MOVE_MSG) in readmsg) or (SUGGESTION in readmsg):
         suggestionValidation = None
         if "Player "+str(p.playerNumber) in readmsg:
@@ -198,24 +227,39 @@ while True:
                 msg = "Please enter your move: "
                 print(msg)
                 message = input(" -> ")
+                # print("PRINTING MESSAGE HERE")
+                # print(message)
                 s.send(message.encode())
 
-                choice = s.recv(1024).decode()
+                choiceInput = s.recv(1024).decode().split("//")
+                choice = choiceInput[0]
+                # print("CHOICE HERE")
+                # print(choice)
                 player_choice = choice[1:]
                 if player_choice == "move":
-                    moveInput = movePlayer(p)
-                    if(moveInput != "You can only move once per turn") and ("room" not in moveInput):
+                    moveInput = movePlayer(p, choiceInput[1])
+                    # print("PRINTING MOVE INPUT HERE")
+                    # print(moveInput)
+                    blockedOptions = (moveInput == "Your move options are all blocked. You can either make an accusation or end your turn.")
+                    # print(blockedOptions)
+                    if(moveInput != "You can only move once per turn") and ("room" not in moveInput) and (blockedOptions == False):
                         p.playerLocation = moveInput
                         msg = "\nMOVE " + p.playerName + " to " + p.playerLocation
+                        print(msg)
                     elif("room" in moveInput):
                         p.playerLocation = moveInput
                         print("\nMOVE " + p.playerName + " to " + p.playerLocation)
                         msg = "Player must now suggest"
                         p.canEndTurn = False
                         p.hasSuggested = False
-                    else:
+                        p.canSuggest = True
+                        print(msg)
+                    elif(moveInput != "You can only move once per turn") and (blockedOptions == False):
                         msg = "Player cannot move again"
-                    print(msg)
+                    elif(blockedOptions):
+                        print("GETTING INSIDE OF HERE")
+                        msg = moveInput
+                        print(msg)
                     s.send(msg.encode(form))
                     playerMoveActive = False
 
@@ -233,15 +277,18 @@ while True:
                 if player_choice == "accuse":
                     msg = makeAccusation()
                     s.send(msg.encode())
+                    if(msg == "endConnection for all"):
+                        s.close()
                     playerMoveActive = False
                 if player_choice == "end":
                     canTurnEnd = validateEndTurn(p)
                     if(canTurnEnd == True):
-                        msg = "\n Turn Over. && " + str(p.canEndTurn)
+                        msg = "\nTurn Over. && " + str(p.canEndTurn)
                         s.send(msg.encode(form))
                         playerMoveActive = False
                     else:
-                        msg = "\n You must either move or suggest. && " + str(p.canEndTurn)
+                        msg = "\nYou must either move or suggest. && " + str(p.canEndTurn)
+                        print(msg.split(" &&")[0])
                         s.send(msg.encode(form))
                         playerMoveActive = False
         else:
@@ -249,7 +296,12 @@ while True:
                 playerMoveChoice = "nextSuggest"
             else:
                 message = s.recv(1024).decode()
+                # print("PRINTING MESSAGE HERE")
+                # print(message)
                 playerNum = list(message)
+                if("// in message"):
+                    message = message.split("//")[0]
+                    # print(message)
                 playerMoveChoice = message[1:]
                 print("Player " + playerNum[0] + " chose to " + playerMoveChoice + "\n")
             if(playerMoveChoice == "move"):
@@ -259,17 +311,18 @@ while True:
                 p.hasMoved = False
             if(playerMoveChoice == "accuse"):
                 clientsMessage = s.recv(1024).decode()
-                print("OTHER PLAYERS CLIENT MESSAGE")
-                print(clientsMessage)
                 wonLostMessage = s.recv(1024).decode()
                 playerNum = wonLostMessage.split("Player ")[1]
+                # print("OTHER PLAYERS CLIENT MESSAGE")
+                # print(clientsMessage)
                 if "won" in wonLostMessage:
-                    print("Player " + playerNum + " won the game \n")
+                    print("Player " + playerNum + "\n")
+                    s.close()
                 if "lost" in wonLostMessage:
-                    print("Player " + playerNum + " lost the game \n")
+                    print("Player " + playerNum + "\n")
             if(playerMoveChoice == "suggest") or (playerMoveChoice == "nextSuggest"):
                 # p.hasSuggested = False
-                print("THERE WAS A SUGGESTION")
+                # print("THERE WAS A SUGGESTION")
                 if(playerMoveChoice == "suggest"):
                     validationMessage = s.recv(1024).decode()
                 else: 
@@ -279,44 +332,58 @@ while True:
                     playerMoveActive = False
                     message = s.recv(1024).decode()
                 if("able to" in validationMessage) or ("suggesting" in validationMessage): 
-                    print("INSIDE THIS IF STATEMENT")
-                    print(validationMessage)
+                    # print("INSIDE THIS IF STATEMENT")
+                    # print(validationMessage)
                     # print(clientsMessage)
-                    clientsMessage = ""
+                    # clientsMessage = ""
                     if("///" in validationMessage):
                         clientsMessage = validationMessage
                     else:
                         clientsMessage = s.recv(1024).decode()
                     # print(clientsMessage)
-                    print("OTHER PLAYERS CLIENT MESSAGE")
+                    # print("OTHER PLAYERS CLIENT MESSAGE")
                     clientsMessageSplit = clientsMessage.split("///")
                     # print("THIS IS A TEST TO SEE WHAT THIS IS")
                     # print(clientsMessageSplit)
                     print(clientsMessageSplit[0])
                     suggestions = clientsMessageSplit[1].split(",")
+                    # print("PLAYER TO MOVE HERE")
+                    # print(suggestions)
+                    # print(suggestions[0])
                     # print(suggestions)
                     # print("PLAYER NUMBER MESSAGE")
                     # print(p.playerNumber)
                     # currentPlayerNum = readmsg.split("Next Turn: Player ")[1].split(".")[0]
                     nextPlayer = int(suggestions[3])
-                    print("NEXT PLAYER")
-                    print(nextPlayer)
+                    # print(p.playerLocation)
+                    # print("NEXT PLAYER")
+                    if(p.playerName == suggestions[0]):
+                        keys = [k for k, v in roomsToNames.items() if v == suggestions[1]]
+                        # print("INSIDE CHECKING FOR LOCATION")
+                        # print(keys[0])
+                        p.playerLocation = keys[0]
+                        p.canSuggest = True
+                    # print(nextPlayer)
+                    # print(p.playerLocation)
                     # nextPlayer = int(currentPlayerNum) + 1
                     # print(nextPlayer)
-                    print(p.playerNumber)
+                    # print(p.playerNumber)
                     count = 0
                     if(int(p.playerNumber) == nextPlayer):
-                        print("IN THIS IF STATEMENT")
-                        print(p.cards)
-                        print(suggestions[0])
-                        print(suggestions[1])
-                        print(suggestions[2])
+                        # print("IN THIS IF STATEMENT")
+                        # print(p.cards)
+                        # print(suggestions[0])
+                        # print(suggestions[1])
+                        # print(suggestions[2])
+
                         matches = []
-                        print(p.cards)
+                        # print(p.cards)
+                        # print("PLAYER CARDS ABOVE")
                         # print(Player.cards)
                         playerCards = getattr(p, 'cards')
-                        print("PRINTING PLAYER CARDS")
-                        print(playerCards)
+                        # print("PRINTING PLAYER CARDS")
+                        # print(playerCards)
+                        # print("CARDS CARDS CARDS")
                         if((suggestions[0] in p.cards) or (suggestions[1] in p.cards) or (suggestions[2] in p.cards)):
                             count += 1
                             for i in suggestions:
@@ -338,8 +405,8 @@ while True:
                             # print("INSIDE HERE AND AM SENDING THE NO MATCHES MESSAGE")
                             s.send(message.encode())
                     playerMoveActive = False
-                p.hasSuggested = False
-                p.hasMoved = False
+            p.hasSuggested = False
+            p.hasMoved = False
 
             # print("not my turn!")
     if WIN_MSG in readmsg:

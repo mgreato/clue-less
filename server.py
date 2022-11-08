@@ -13,24 +13,50 @@ s.bind((socket.gethostbyname(socket.gethostname()),port))
 s.listen(6) # this sets the max number of players
 print("Server Started. Waiting for a connection.")
 numPlayers = 0 # this is the current number of players
+print(numPlayers)
 currentPlayer = 0
 winner = 0
 clients = []
 addresses = []
 form = 'utf-8'
+activePlayerNumbers = []
+numberOfPlayers = 10000
 
 def goto(linenum):
     global line
     line = linenum
 
 # function definitions
-def who_plays_next(currentPlayer, numPlayers):
-    if currentPlayer==0:
-        return 1
-    if currentPlayer==numPlayers:
-        return 1
-    return currentPlayer+1
-    
+def who_plays_next(currentPlayer, allPlayers):
+    print("INSIDE HERE")
+    if(len(activePlayerNumbers) == 0):
+        print("Game is over for all players")
+    else:
+        print(activePlayerNumbers[-1])
+        if allPlayers:
+            if currentPlayer==0:
+                print("THIS ONE")
+                return 1
+            elif currentPlayer == numPlayers:
+                print("NEXT OPTION")
+                return 1
+            return currentPlayer+1
+        else:
+            if currentPlayer==0:
+                print("THIS ONE")
+                return 1
+            if currentPlayer == activePlayerNumbers[-1]:
+                print("INSIDE THE ELSE ")
+                return activePlayerNumbers[0]
+            else:
+                print("THE OTHER ELSE!!!! ")
+                print(currentPlayer)
+                index = activePlayerNumbers.index(currentPlayer)
+                print("INDEX BELOW")
+                print(index)
+                return activePlayerNumbers[index+1]
+
+
 def send_message(msg,clients): # sends to ALL clients
     for i in clients:
         # print("INSIDE SEND_MESSAGE")
@@ -81,6 +107,12 @@ while gameOn:
     print("Number of Players: ", numPlayers,"\n")
     g.numPlayers = numPlayers
     msg = "\nConnection established. You are Player "+str(numPlayers)
+    # if(numPlayers == 1):
+    #     print("How many players are going to be playing in the game?")
+    #     numberOfPlayers = input("->")
+    activePlayerNumbers.append(numPlayers)
+    print("ACTIVE PLAYER NUMBERS")
+    print(activePlayerNumbers)
     # c.send(msg.encode(form))
     availablePlayers = [name for name in g.playerNames if name not in g.chosenPlayers]
     playerChoice = msg + ".\nWhat player would you like to be? Your choices are " + str(availablePlayers)
@@ -94,7 +126,7 @@ while gameOn:
     
     
     # when all clients are connected, the game begins
-    if numPlayers>=3: # need to update this so numPlayers == 6 or some timeout function
+    if numPlayers >= 3: # need to update this so numPlayers == 6 or some timeout function
 
         print("INSIDE HERE")
         #also, need to send each client what their cards are
@@ -124,7 +156,7 @@ while gameOn:
         
         testCounter = 0 # delete this when while loop implemented properly
         numTurnsTested = 9 # delete this when while loop implemented properly
-        currentPlayer = who_plays_next(currentPlayer, numPlayers)
+        currentPlayer = who_plays_next(currentPlayer, False)
         while winner==0:
             testCounter = testCounter+1 # delete this when while loop implemented properly
             print("current player: ", currentPlayer)
@@ -137,7 +169,9 @@ while gameOn:
             while playerTurn:
                 print("INSIDE HERE")
                 moveMsg = clients[currentPlayer-1].recv(1024)
-                playerMoveMsg = str(currentPlayer) + moveMsg.decode(form)
+                print(g.playerLocations.values)
+                print(list(g.playerLocations.values()))
+                playerMoveMsg = str(currentPlayer) + moveMsg.decode(form) + "//" + str(list(g.playerLocations.values()))
 
 
 
@@ -149,18 +183,29 @@ while gameOn:
                 # message received from client, now must be sent to all clients or handled
                 if MOVE_MSG in playerMoveMsg:
                     # print("INSIDE MOVE MESSAGE")
-                    # print(playerMoveMsg)
-                    #/////////////////////////////////////////
+                    print(playerMoveMsg)
+                    print("/////////////////////////////////////////")
                     send_message(playerMoveMsg,clients)
-                    moveChoice = clients[currentPlayer-1].recv(1024).decode()
+                    moveMessage = clients[currentPlayer-1].recv(1024).decode()
 
-                    # print(moveChoice)
+                    print(moveMessage)
+
+                    if("," in moveMessage):
+                        moveOptions = moveMessage.split(",")
+                        moveChoice = moveOptions[0]
+                        movePlayer = moveOptions[1]
+                    else:
+                        moveOptions == moveMessage
+
+                    print(moveOptions)
                     # print("RECEIVING NEXT MESSAGE")
                     # print(moveChoice)
                     if("You can only move once per turn" in moveChoice):
                         moveMessage = "Player cannot move again"
                     else:
                         moveMessage = "Player " + str(currentPlayer) + " is moving to " + moveChoice;
+                    
+
                     #/////////////////////////////////////////
                     send_message(moveMessage, clients)
                     # print("MAKING IT HERE")
@@ -168,6 +213,10 @@ while gameOn:
                     # print("RECEIVING NEXT MESSAGE")
                     print(msg)
 
+                    print("PRINTING PLAYER LOCATIONS HERE IN MOVE")
+                    print(g.playerLocations)
+                    g.playerLocations[movePlayer] = moveChoice
+                    print(g.playerLocations)
                     # print("^^^^^^^^^^^^^^^^^^")
                     # print("PRINTING WINNER HERE $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
                     # print(winner)
@@ -226,7 +275,7 @@ while gameOn:
                         # print(str(who_plays_next(currentPlayer, numPlayers)))
                         # print(currentPlayer)
                         # print(numPlayers)
-                        playerToPass = who_plays_next(currentPlayer, numPlayers)
+                        playerToPass = who_plays_next(currentPlayer, True)
                         # print("PLAYER TO PASS BELOW")
                         # print(playerToPass)
                         # print("///////////////////////")
@@ -244,6 +293,11 @@ while gameOn:
                                 fullSuggestion = person + "," + room + "," + weapon + "," + str(playerSuggest+1)
                             #/////////////////////////////////////////
                             send_message(suggestionMessage + fullSuggestion, clients)
+
+                            print("PRINTING PLAYER LOCATIONS HERE IN SUGGEST")
+                            print(g.playerLocations)
+                            g.playerLocations[person] = suggestion[1]
+                            print(g.playerLocations)
                             # send_message(fullSuggestion, clients)
                             # print("PRINTING CURRENT PLAYER HERE FOR CLIENT HELP")
                             # print(str(currentPlayer))
@@ -282,7 +336,7 @@ while gameOn:
                         # print(suggestionHelp)
                             if "No matches" in suggestionHelp:
                                 print("No Matches for this client")
-                                playerSuggest = who_plays_next(playerSuggest, numPlayers)
+                                playerSuggest = who_plays_next(playerSuggest, True)
                                 print(playerSuggest)
                                 suggestCheckCount = suggestCheckCount + 1
                                 
@@ -344,7 +398,7 @@ while gameOn:
                     accusationMessage = "Player " + str(currentPlayer) + " is accusing " + accusation + " \n"
                     #/////////////////////////////////////////
                     send_message(accusationMessage, clients)
-                    time.sleep(1.5)
+                    time.sleep(1)
                     if((personAccuse == solutionName) and (roomAccuse == solutionLocation) and (weaponAccuse == solutionWeapon)):
                         wonMessage = "Player " + str(currentPlayer) + " won! \n"
                         #/////////////////////////////////////////
@@ -357,19 +411,31 @@ while gameOn:
                     # print("RECEIVING NEXT MESSAGE")
                     # print(msg)
                     # send_message(msg, clients)
-                    # print("@@@@@@@@@@@@@@@@@@")
+                    print("@@@@@@@@@@@@@@@@@@")
+                    print(msg)
                     if "player" in msg:
+                        playerToEnd = currentPlayer
                         print("PLAYER CONNECTION SHOULD BE ENDED")
+                        currentPlayer = who_plays_next(currentPlayer, False)
+                        print("ACTIVE PLAYERS LIST HERE")
+                        print(activePlayerNumbers)
+                        activePlayerNumbers.remove(playerToEnd)
+                        print(activePlayerNumbers)
                         # NEED TO FIGURE OUT HOW TO DROP CONNECTION
                         # c.shutdown()
                         # numPlayers -= 1
                     if "all" in msg:
                         print("CONNECTION SHOULD BE ENDED FOR ALL")
+                        print(activePlayerNumbers)
+                        activePlayerNumbers.clear()
+                        print(activePlayerNumbers)
+                        currentPlayer = who_plays_next(currentPlayer, False)
+                        send_message("CLOSE ALL CONNECTION", clients)
+                        s.close()
                         # NEED TO FIGURE OUT HOW TO DROP CONNECTION
                         # c.shutdown()
                         # s.close()
                     playerTurn = False
-                    currentPlayer = who_plays_next(currentPlayer, numPlayers)
                 if (END_MSG in playerMoveMsg) and ("end connection" not in playerMoveMsg):
                     # print("IN END MESSAGE")
                     print("!!!!!!!!!!!!!!!!!!!!")
@@ -388,7 +454,7 @@ while gameOn:
                     print(currentPlayer)
                     if(eval(validation[1]) == True):
                         print("GOING IN TO THE TRUE VALIDATION")
-                        currentPlayer = who_plays_next(currentPlayer, numPlayers)
+                        currentPlayer = who_plays_next(currentPlayer, False)
                             # print(currentPlayer)
                         playerTurn = False
                     elif(eval(validation[1]) == False):
