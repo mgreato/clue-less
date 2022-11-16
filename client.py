@@ -115,6 +115,7 @@ def handleSuggestion():
     suggestWeaponInput = input("weapon ->")
     all = suggestPersonInput + "," + suggestRoomInput + "," + suggestWeaponInput
     s.send(all.encode())
+    print("Move " + suggestPersonInput + " to " + suggestRoomInput + ".\n")
     empty = True
     while empty == True:
         clientsMessage = s.recv(1024).decode().split("///")[0]
@@ -266,11 +267,22 @@ while True:
                     if(canTurnEnd == True):
                         msg = "\nTurn Over. && " + str(p.canEndTurn)
                         s.send(msg.encode(form))
+                        end = s.recv(1024).decode()
+                        s.send("END".encode(form))
                         playerMoveActive = False
                     else:
-                        msg = "\nYou must either move or suggest. && " + str(p.canEndTurn)
+                        if(p.canSuggest and not p.hasMoved):
+                            msg = "\nYou must either move or make a suggestion. && " + str(p.canEndTurn)
+                        if(p.canSuggest and p.hasMoved):
+                            msg = "\nYou must make a suggestion. && " + str(p.canEndTurn)
+                        if(not p.canSuggest and p.hasMoved):
+                            msg = "\nYou must move to a new location. && " + str(p.canEndTurn)
+                        if(not p.canSuggest and not p.hasMoved):
+                            msg = "\nYou must move to a new location. && " + str(p.canEndTurn)
                         print(msg.split(" &&")[0])
                         s.send(msg.encode(form))
+                        end = s.recv(1024).decode()
+                        s.send("END".encode(form))
                         playerMoveActive = False
 
         else:
@@ -338,10 +350,14 @@ while True:
                             count += 1
                             message = "No matches please move to next player"
                             s.send(message.encode())
+                    nextMessage = "Move " + suggestions[0] + " to " + suggestions[1] + ".\n"
+                    print(nextMessage)
                     playerMoveActive = False
             if(playerMoveChoice == "end"):
                 player = message.split("//")[0].split(",")[1]
-                print("Player " + player + " chose to end their turn.")
+                message = s.recv(1024).decode()
+                if(message == "True"):
+                    print("Player " + player + " chose to end their turn.")
                 playerMoveActive = False
             p.hasSuggested = False
             p.hasMoved = False
