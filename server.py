@@ -187,7 +187,9 @@ while gameOn:
                         suggestCheckCount = 0
                         while (suggestionHelpMade != True):
                             suggestionPass = person + " in the " + room + " with the " + weapon
-                            suggestionMessage = "Player " + str(currentPlayer) + " is suggesting " + suggestionPass + ".\n ///"
+                            printMessage = "Player " + str(currentPlayer) + " is suggesting " + suggestionPass + ".\n"
+                            print(printMessage)
+                            suggestionMessage = printMessage + " ///"
                             if(playerSuggest == numPlayers):
                                 fullSuggestion = person + "," + room + "," + weapon + "," + str(1)
                             else:
@@ -199,6 +201,7 @@ while gameOn:
                             else:
                                 if(suggestCheckCount == numPlayers-1):
                                     noSuggestionsMessage = "No player has cards that match your suggestion"
+                                    print("No player had cards that matched the suggestion.")
                                     clientToSend = []
                                     clientToSend.append(clients[currentPlayer-1])
                                     send_message(noSuggestionsMessage, clientToSend)
@@ -214,8 +217,14 @@ while gameOn:
                                 clientToSend = []
                                 clientToSend.append(clients[currentPlayer-1])
                                 send_message(suggestionHelp + " ///\n", clientToSend)
+                                if(playerSuggest == numPlayers):
+                                    print("Player 1 is showing [" + suggestionHelp + "] to disprove the suggestion.")
+                                else:
+                                    print("Player " + str(playerSuggest+1) + " is showing [" + suggestionHelp + "] to disprove the suggestion.")
                                 msg = clients[currentPlayer-1].recv(1024).decode()
                                 suggestionHelpMade = True
+                        nextMessage = "Move " + person + " to " + room + ".\n"
+                        print(nextMessage)
                         currentPlayer = currentPlayer
                         playerTurn = False
 
@@ -262,8 +271,12 @@ while gameOn:
                     validation = msg.split("&& ")
                     if(eval(validation[1]) == True):
                         print("Player " + str(currentPlayer) + " chose to end their turn.")
+                        send_message(validation[1], clients)
+                        msg = clients[currentPlayer-1].recv(1024).decode()
                         currentPlayer = who_plays_next(currentPlayer, False)
                         playerTurn = False
                     elif(eval(validation[1]) == False):
                         currentPlayer = currentPlayer
+                        send_message(validation[1], clients)
+                        msg = clients[currentPlayer-1].recv(1024).decode()
                         playerTurn = False 
