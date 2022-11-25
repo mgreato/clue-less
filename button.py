@@ -29,3 +29,24 @@ class Button():
             self.text = self.font.render(self.text_input, True, self.hovering_color)
         else:
             self.text = self.font.render(self.text_input, True, self.base_color)
+          
+# below shows how button can be used
+button_surface = pygame.image.load("button.png")
+button_surface = pygame.transform.scale(button_surface, (400, 150))
+
+button = Button(button_surface, 400, 300, "Button")
+
+while True:
+	for event in pygame.event.get():
+		if event.type == pygame.QUIT:
+			pygame.quit()
+			sys.exit()
+		if event.type == pygame.MOUSEBUTTONDOWN:
+			button.checkForInput(pygame.mouse.get_pos())
+
+	screen.fill("white")
+
+	button.update()
+	button.changeColor(pygame.mouse.get_pos())
+
+	pygame.display.update()
