@@ -34,7 +34,13 @@ class Button():
 button_surface = pygame.image.load("button.png")
 button_surface = pygame.transform.scale(button_surface, (400, 150))
 
-button = Button(button_surface, 400, 300, "Button")
+#added definitions for function call to work
+font1 = pygame.font.SysFont('Calibri', 25, True, False)
+WHITE = (255, 255, 255)
+
+button = Button(button_surface, (900, 25), "Button", font1, WHITE, WHITE)
+## added definitions of font1 and WHITE above -JM. commented out below funciton call that didn't work
+#button = Button(button_surface, 400, 300, "Button")
 
 while True:
 	for event in pygame.event.get():
