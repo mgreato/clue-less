@@ -94,6 +94,7 @@ while gameOn:
     if(numPlayers == 1):
         c.send(msg.encode(form))
         numPlayersExpected = int(c.recv(1024).decode())
+        print(numPlayersExpected)
         availablePlayers = [name for name in g.playerNames if name not in g.chosenPlayers]
         playerChoice = "\nWhat player would you like to be? Your choices are " + str(availablePlayers)
     else: 

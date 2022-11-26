@@ -2,7 +2,9 @@ from operator import truediv
 import pygame
 import socket
 from game import Game
-from player import Player  
+from player import Player
+from StartUI import *
+from button import *
 import ast
 
 # possible messages from server
@@ -170,7 +172,35 @@ def validateEndTurn(p):
     else:
         return False
 
-while True:
+
+# initialize menu UI screen
+button_surface = pygame.image.load("button.png")
+button_surface = pygame.transform.scale(button_surface, (200, 50))
+main_menu_setup()
+
+MENU_MOUSE_POS = pygame.mouse.get_pos()
+
+# quit button
+quit_btn = Button(image=button_surface, pos=(650, 700),
+                  text_input="Quit", font=get_font(15), base_color="#d7fcd4", hovering_color="White")
+quit_btn.changeColor(MENU_MOUSE_POS)
+quit_btn.update(SCREEN)
+
+# options to choose number of players
+numPlayer_btn = menu_buttons("numPlayer")
+for button in numPlayer_btn:
+    button.changeColor(MENU_MOUSE_POS)
+    button.update(SCREEN)
+
+while True: # can add check if anyone losing connection
+
+    # options to choose characters
+    # character_btn = menu_buttons("character")
+    # for button in character_btn:
+    #     # if button.text in message
+    #     button.changeColor(MENU_MOUSE_POS)
+    #     button.update(SCREEN)
+
     msg = s.recv(1024)
     readmsg = msg.decode(form)
     if("CLOSE ALL CONNECTION" in readmsg):
@@ -179,15 +209,55 @@ while True:
         if(readmsg[1]) and (int(readmsg[1]) == int(p.playerNumber)):
             print(readmsg[2])
         s.close()
+        # need to add losing connection page
 
     if CONNECTED_MSG in readmsg:
         myNumber = readmsg.split("You are Player ")[1].split(".")[0]
+
         if(int(myNumber) == 1):
             print(readmsg)
             print("How many players are going to be playing in the game?")
-            numberOfPlayers = input("->")
-            s.send(numberOfPlayers.encode())
-            readmsg = s.recv(1024).decode()
+            # show number choice, send to server
+            # receive available characters from server, show character choice, send to server
+            # activate start game button
+            # show waiting message, waiting for x players to start, game will auto start once all members join
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if numPlayer_btn[0].checkForInput(MENU_MOUSE_POS):
+                        number_of_players = 3
+                        numberOfPlayers = number_of_players
+                        s.send(str(numberOfPlayers).encode())
+                    if numPlayer_btn[1].checkForInput(MENU_MOUSE_POS):
+                        number_of_players = 4
+                        numberOfPlayers = number_of_players
+                        s.send(str(numberOfPlayers).encode())
+                    if numPlayer_btn[2].checkForInput(MENU_MOUSE_POS):
+                        number_of_players = 5
+                        numberOfPlayers = number_of_players
+                        s.send(str(numberOfPlayers).encode())
+                    if numPlayer_btn[3].checkForInput(MENU_MOUSE_POS):
+                        number_of_players = 6
+                        numberOfPlayers = number_of_players
+                        s.send(str(numberOfPlayers).encode())
+                    # get available character from server
+
+                    if quit_btn.checkForInput(MENU_MOUSE_POS):
+                        pygame.quit()
+                        sys.exit()
+
+                    # numberOfPlayers = number_of_players
+
+            pygame.display.update()
+
+            readmsg = s.recv(1024).decode() # choose player
+        else:
+            # show alternative menu screen without number choice
+            # receive available characters from server, show character choice, send to server
+            pass
+
         print(readmsg, "\n")
         message = input(" -> ")
         playerLocation = Game.playerStartLocations.get(message)
@@ -197,6 +267,34 @@ while True:
         playerMessage = s.recv(1024).decode()
         print(playerMessage)
         readmsg = playerMessage
+
+    # for event in pygame.event.get():
+    #     if event.type == pygame.QUIT:
+    #         pygame.quit()
+    #         sys.exit()
+    #     if event.type == pygame.MOUSEBUTTONDOWN:
+    #         if numPlayer_btn[0].checkForInput(MENU_MOUSE_POS):
+    #             number_of_players = 3
+    #         if numPlayer_btn[1].checkForInput(MENU_MOUSE_POS):
+    #             number_of_players = 4
+    #         if numPlayer_btn[2].checkForInput(MENU_MOUSE_POS):
+    #             number_of_players = 5
+    #         if numPlayer_btn[3].checkForInput(MENU_MOUSE_POS):
+    #             number_of_players = 6
+    #
+    #         # get available character from server
+    #
+    #         if numPlayer_btn[3].checkForInput(MENU_MOUSE_POS):
+    #             pass
+    #         if quit_btn.checkForInput(MENU_MOUSE_POS):
+    #             pygame.quit()
+    #             sys.exit()
+
+    # pygame.display.update()
+
+
+
+
 
     if BEGINNING_MSG in readmsg:
         print(readmsg)
