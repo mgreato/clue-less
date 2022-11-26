@@ -1,3 +1,6 @@
+import pygame
+import sys
+
 class Button():
     def __init__(self, image, pos, text_input, font, base_color, hovering_color):
         self.image = image
@@ -29,30 +32,34 @@ class Button():
             self.text = self.font.render(self.text_input, True, self.hovering_color)
         else:
             self.text = self.font.render(self.text_input, True, self.base_color)
-          
+
+
 # below shows how button can be used
+pygame.init()
+screen = pygame.display.set_mode((800, 800))
+pygame.display.set_caption("Button!")
+main_font = pygame.font.SysFont("cambria", 50)
+
+SCREEN = pygame.display.set_mode((1100, 1100))
+
 button_surface = pygame.image.load("button.png")
 button_surface = pygame.transform.scale(button_surface, (400, 150))
-
-#added definitions for function call to work
-font1 = pygame.font.SysFont('Calibri', 25, True, False)
-WHITE = (255, 255, 255)
-
-button = Button(button_surface, (900, 25), "Button", font1, WHITE, WHITE)
-## added definitions of font1 and WHITE above -JM. commented out below funciton call that didn't work
-#button = Button(button_surface, 400, 300, "Button")
+button = Button(image=button_surface, pos=(650, 700),
+                  text_input="Quit", font=main_font, base_color="#d7fcd4", hovering_color="White")
 
 while True:
-	for event in pygame.event.get():
-		if event.type == pygame.QUIT:
-			pygame.quit()
-			sys.exit()
-		if event.type == pygame.MOUSEBUTTONDOWN:
-			button.checkForInput(pygame.mouse.get_pos())
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            button.checkForInput(pygame.mouse.get_pos())
+            pygame.quit()
+            sys.exit()
 
-	screen.fill("white")
+    screen.fill("white")
 
-	button.update()
-	button.changeColor(pygame.mouse.get_pos())
+    button.update(screen)
+    button.changeColor(pygame.mouse.get_pos())
 
-	pygame.display.update()
+    pygame.display.update()
