@@ -415,13 +415,11 @@ while not done:
             if b_end.isOver(pos, button_width_2, button_height):
                 print('ending')
         
-        # code below would enable buttons changing color when hovered over
-        # doesn't work now since buttons are an image, not a color
-        #if event.type == pygame.MOUSEMOTION:
-        #    if b_move.isOver(pos, button_width_1, button_height):
-        #        b_move.color = button_greyed_color
-        #    else:
-        #        b_move.color = button_color
+        if event.type == pygame.MOUSEMOTION:
+            if b_move.isOver(pos, button_width_1, button_height):
+                b_move.color = button_greyed_color
+            else:
+                b_move.color = button_color
 	
 	################################ 
     # Update buttons, dropdowns, and text boxes
