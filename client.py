@@ -187,14 +187,20 @@ def movePlayer(p, otherPlayerLocations, screen):
             possibleRooms.append(roomChoice1)
             possibleRooms.append(roomChoice2)
             print("Where would you like to move? Your choices are: " + str(possibleRooms))
+            return possibleRooms
         if(playerInRoom):
             if check_diagonal_result[0] == True:
                 if(len(possibleHallways) == 0):
                     print("Where would you like to move? Your only option is:  " + check_diagonal_result[1])
+                    return [check_diagonal_result[1]]
                 else:
                     print("Where would you like to move? Your hallway choices are: " + str(possibleHallways) + ". Your diagonal room choice is: " + check_diagonal_result[1])
+                    possible = possibleHallways
+                    possible.append(check_diagonal_result[1])
+                    return possible
             else:
                 print("Where would you like to move? Your choices are: " + str(possibleHallways))
+                return possibleHallways
         validMove = False
         while validMove == False:
             moveInput = input("->")
@@ -654,7 +660,7 @@ t_y_cards = t_y + notification_y_shift
 t_cards = Text((t_x_cards, t_y_cards), "initial", notification_font, info_font_bold, notification_color, notification_color)
 t_cards.update(screen)
 
-# display current notification
+# # display current notification
 t_x_notification = t_x
 t_y_notification = t_y + 2*notification_y_shift
 t_notification= Text((t_x_notification, t_y_notification), "Initial", notification_font, info_font_bold, notification_color, notification_color)
@@ -746,19 +752,31 @@ while True:
         pygame.draw.rect(screen, GREEN, [vertical, 0, width, hRight], 2) #Information Panel
         pygame.draw.rect(screen, RED, [0, hLeft, vertical, height], 2) #notification Panel
         pygame.draw.rect(screen, BLUE, [vertical, hRight, width, height], 2) #Action Panel
-       
+
 
     if ((TURN_MSG or MOVE_MSG) in readmsg) or (SUGGESTION in readmsg):
         suggestionValidation = None
+        # display current notification
+        t_x_notification = t_x
+        t_y_notification = t_y + 2*notification_y_shift
+        print(str(p.playerNumber))
+        print("||||||||||||||||")
+        if("Next Turn" in readmsg):
+            playerTurn = readmsg.split(":")
+            t_message = playerTurn[1].split(".")[0] + "'s Turn"
+            pygame.draw.rect(screen, WHITE, [0, hLeft, vertical, height])
+            pygame.draw.rect(screen, RED, [0, hLeft, vertical, height], 2)
+            t_notification= Text((t_x_notification, t_y_notification), t_message , notification_font, info_font_bold, notification_color, notification_color)
+            t_notification.update(screen)
         if "Player "+str(p.playerNumber) in readmsg:
+            print("INSIDE PLAYER NUMBER MATCH")
+            print(readmsg)
             playerMoveActive = True
             done = False
             clock = pygame.time.Clock()
             while not done: # used to be while playerMoveActive
                 currentPlayer = p.playerNumber
             ## JUST ADDED THIS
-
-
                 for event in pygame.event.get():  # User did something
                     if event.type == pygame.QUIT:  # If user closes windo
                         done = True  # Flag to exit the loop
@@ -796,6 +814,7 @@ while True:
                                     if event.type == pygame.MOUSEBUTTONDOWN:
                                         print("INSIDE HERE")
                                         print(event)
+                                        ### NEED TO FIGURE OUT HOW TO MAKE MULTIPLE BUTTONS APPEAR ####
                                         if buttonList[0].isOver(pos, buttonList[0].x_pos, buttonList[0].y_pos):
                                             print("PRINTING BUTTON TEXT INPUT")
                                             print(buttonList[0].text_input)
@@ -831,6 +850,10 @@ while True:
                             playerMoveActive = False
                             print("IS PLAYER MOVE ACTIVE")
                             print(playerMoveActive)
+                            pygame.draw.rect(screen, WHITE, [913, 516, 350, 201])
+                            pygame.display.update()
+                            
+                            # pygame.draw.rect(screen, WHITE, [0, hLeft, vertical, height])
                             done = True
                             
                             
@@ -903,12 +926,15 @@ while True:
 
                             # if player_choice == "end":
                             canTurnEnd = validateEndTurn(p)
+                            print("CAN PLAYER END TURN?")
+                            print(canTurnEnd)
                             if(canTurnEnd == True):
                                 msg = "\nTurn Over. && " + str(p.canEndTurn)
                                 s.send(msg.encode(form))
                                 end = s.recv(1024).decode()
                                 s.send("END".encode(form))
                                 playerMoveActive = False
+                                done = True
                             else:
                                 if(p.canSuggest and not p.hasMoved):
                                     msg = "\nYou must either move or make a suggestion. && " + str(p.canEndTurn)
@@ -923,6 +949,8 @@ while True:
                                 end = s.recv(1024).decode()
                                 s.send("END".encode(form))
                                 playerMoveActive = False
+                                print("//////////")
+                                done = True
 
                             
                             # msg = "\nTurn Over. && " + str(p.canEndTurn)
