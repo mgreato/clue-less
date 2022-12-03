@@ -267,6 +267,8 @@ while gameOn:
                 if (END_MSG in playerMoveMsg) and ("end connection" not in playerMoveMsg):
                     playerMoveMsg = str(currentPlayer) + moveMsg.decode(form) + ","+ str(currentPlayer)+ "//" + str(list(g.playerLocations.values()))
                     send_message(playerMoveMsg,clients)
+                    print("PRINTING THIS NOW22222222")
+                    print(playerMoveMsg)
                     msg = clients[currentPlayer-1].recv(1024).decode()
                     print("PRINTING VALIDATION HERE")
                     print(msg)
@@ -274,12 +276,14 @@ while gameOn:
                     if(eval(validation[1]) == True):
                         print("Player " + str(currentPlayer) + " chose to end their turn.")
                         send_message(validation[1], clients)
-                        msg = clients[currentPlayer-1].recv(1024).decode()
+                        print("&&&&&&&&&&&&&&&&")
+                        # msg = clients[currentPlayer-1].recv(1024).decode()
+                        print("WAITING OR NOT")
                         currentPlayer = who_plays_next(currentPlayer, False)
                         playerTurn = False
                     elif(eval(validation[1]) == False):
                         currentPlayer = currentPlayer
                         send_message(validation[1], clients)
-                        msg = clients[currentPlayer-1].recv(1024).decode()
+                        # msg = clients[currentPlayer-1].recv(1024).decode()
                         playerTurn = False 
 s.close()

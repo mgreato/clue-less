@@ -4,12 +4,13 @@ import socket
 from game import Game
 from player import Player  
 import ast
-pygame.init()
 import enum
 import threading
 import select
 import queue
+
 pygame.init()
+pygame.event.clear()
 
 class DropDown():
     def __init__(self, x, y, w, h, color, highlight_color, font, option_list, selected = 0):
@@ -80,6 +81,7 @@ SUGGESTION = "is suggesting "
 CARDS_MSG = "Your cards are"
 WIN_MSG = "You Win"
 LOSE_MSG = "You Lose"
+PLAYER_CHOICE_MESSAGE = "What player would you like to be?"
 currentPlayer = 0
 
 # names, locations, and weapons that can be indexed. This code is identical in the server.py file
@@ -106,17 +108,17 @@ playerChosen = False
 SERVER_MESSAGE = pygame.USEREVENT+1
 class SocketListener(threading.Thread):
     def __init__(self, sock, queue):
-         threading.Thread.__init__(self)
-         self.daemon = True
-         self.socket = sock
-         self.queue = queue
+        threading.Thread.__init__(self)
+        self.daemon = True
+        self.socket = sock
+        self.queue = queue
     def run(self):
-         while True:
-             msg = self.socket.recv(1024)
-             readmsg = msg.decode(form)
-             #self.queue.put(msg)
-             new_event = pygame.event.Event(SERVER_MESSAGE, {"message": readmsg})
-             pygame.event.post(new_event)
+        while True:
+            msg = self.socket.recv(1024)
+            readmsg = msg.decode(form)
+            #self.queue.put(msg)
+            new_event = pygame.event.Event(SERVER_MESSAGE, {"message": readmsg})
+            pygame.event.post(new_event)
 q = queue.Queue()
 SocketListener(s,q).start()
 
@@ -141,13 +143,34 @@ def moveOptionButtons(moveOptions):
     print("SHOULD DRAW RECTANGLE NOW")
     # Drawing Rectangle
     # textBox = pygame.draw.rect(screen, BLUE, [925, 525, 160, 40], 2)
+    size = (150, 75)
     font = pygame.font.SysFont('Calibri', 16, True, False)
-    buttonType = pygame.transform.scale(button_image, button_size_1) #transform size
+    buttonType = pygame.transform.scale(button_image, size) #transform size
     buttonList = []
+    x = 250
+    y = 250
+    buttonCount = 1
     for option in moveOptions:
-        option = Button(buttonType, (1100, 600), option, font, (0,255,255), (0,50,50))
-        buttonList.append(option)
-        option.update(screen)
+        print("PRINTING OPTION")
+        print(option)
+        if buttonCount % 2 == 1:
+            print("ODD")
+            print(x)
+            print(y)
+            option = Button(buttonType, (750+x, 315+y), option, font, (0,255,255), (0,50,50))
+            buttonList.append(option)
+            option.update(screen)
+            x += 170
+            buttonCount += 1
+        else:
+            print("EVEN")
+            print(x)
+            print(y)
+            option = Button(buttonType, (750+x, 315+y), option, font, (0,255,255), (0,50,50))
+            buttonList.append(option)
+            option.update(screen)
+            y += 250
+            buttonCount += 1
         pygame.display.update()
     return buttonList
     # if dropDown.isOver(mpos, dropDown.rect.topleft[0], dropDown.rect.topleft[1]):
@@ -418,14 +441,12 @@ class Button():
         screen.blit(self.text, self.text_rect)
 
     def checkForInput(self, position):
-        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top,
-                                                                                          self.rect.bottom):
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top,self.rect.bottom):
             return True
         return False
 
     def changeColor(self, position):
-        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top,
-                                                                                          self.rect.bottom):
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top,self.rect.bottom):
             self.text = self.font.render(self.text_input, True, self.hovering_color)
         else:
             self.text = self.font.render(self.text_input, True, self.base_color)
@@ -772,6 +793,7 @@ moveChoiceMade = False
 currentButtons = []
 buttonsClicked = False
 clickedButton = ""
+myNumber = 0
 
 canClickButtons = False
 done = False
@@ -806,12 +828,14 @@ while not done:
                     print(readmsg)
                     updateNotifications(readmsg[1:]+".", "", "", "")
                     print("How many players are going to be playing in the game?")
-                    #numberOfPlayers = input("->")
-                    numberOfPlayers = "2" #dummy for now
+                    numberOfPlayers = input("->")
+                    # numberOfPlayers = "2" #dummy for now
                     s.send(numberOfPlayers.encode())
-                    #readmsg = s.recv(1024).decode() # NEED TO GET RID OF THIS
+
+            if PLAYER_CHOICE_MESSAGE in readmsg:
+                #readmsg = s.recv(1024).decode() # NEED TO GET RID OF THIS
                 print(readmsg, "\n")
-                #message = input(" -> ")
+                # message = input(" -> ")
                 if int(myNumber) == 1: # dummy for now
                     message = "Mrs. White"
                 else:
@@ -853,6 +877,13 @@ while not done:
                 else:
                     canClickButtons = False
                     playerMoveActive = False
+                    p.hasSuggested = False
+                    p.hasMoved = False
+                    choiceInput = ""
+                    moveChoiceMade = False
+                    clickedButton = ""
+                    buttonsClicked = False
+                    currentButtons = []
             
             if "move" in readmsg and canClickButtons:
                 choiceInput = readmsg.split("//")
@@ -873,14 +904,40 @@ while not done:
                         print(buttonList)
                         currentButtons = buttonList
             
-            if "end" in readmsg and canClickButtons:
-                choiceInput = s.recv(1024).decode().split("//")
-                print("***********")
-                print(choiceInput)
-                choice = choiceInput[0]
-                player_choice = choice[1:]
-                if("," in player_choice):
-                    player_choice = player_choice.split(",")[0]
+            if "end" in readmsg and canClickButtons and ("rend" not in readmsg):
+                print("PRINTING END HERE!!!!")
+                # end = s.recv(1024).decode()
+                print("PRINTING END HERE!!!!")
+                # print(end)
+                msg = "\nTurn Over. && " + str(p.canEndTurn)
+                print("<<<<!!!!!!!!!!!!<<<<<<<<<<<<<")
+                print(msg)
+                s.send(msg.encode(form))
+                # s.send("END".encode(form))
+                print("^^^^^^^^^^^^^^^^^^^^^^^^")
+                # if "//" in end:
+                #     choiceInput = end
+                # else:
+                # choiceInput = s.recv(1024).decode().split("//")
+                # print("***********")
+                # playerMoveActive = False
+                # print(choiceInput)
+                # choice = choiceInput[0]
+                # player_choice = choice[1:]
+                # if("," in player_choice):
+                #     player_choice = player_choice.split(",")[0]
+                print("HERE AT THE BOTTOM OF END")
+                # s.send("END".encode(form))
+                # end = s.recv(1024).decode()
+            
+            if "end" in readmsg and (not canClickButtons) and ("rend" not in readmsg):
+                player = readmsg.split("//")[0].split(",")[1]
+                print("($#*@!(*(*!$(*$(!$)!@*($!@$#@")
+                print(player)
+                # message = s.recv(1024).decode()
+                if(message == "True"):
+                    print("Player " + player + " chose to end their turn.")
+                playerMoveActive = False
 
 
         
@@ -924,6 +981,7 @@ while not done:
                         ### NEED TO FIGURE OUT HOW TO MAKE MULTIPLE BUTTONS APPEAR ####
                         print("PRINTING BUTTON TEXT INPUT")
                         print(clickedButton.text_input)
+                        print(choiceInput)
                         moveInput = whereToMove(p, clickedButton.text_input, choiceInput[1])
                         print(moveInput)
 
@@ -1039,9 +1097,11 @@ while not done:
                     if(canTurnEnd == True):
                         msg = "\nTurn Over. && " + str(p.canEndTurn)
                         print("<<<<!!!!!!!!!!!!<<<<<<<<<<<<<")
+                        print(msg)
                         s.send(msg.encode(form))
                         print("<<<<<<<<<<<<<<<<<")
                         # end = s.recv(1024).decode()
+                        # print(end)
                         # s.send("END".encode(form))
                         # playerMoveActive = False
                         # done = True
@@ -1060,7 +1120,7 @@ while not done:
                         # s.send("END".encode(form))
                         playerMoveActive = False
                         print("//////////")
-                        done = True
+                        # done = True
 
                     
                     # msg = "\nTurn Over. && " + str(p.canEndTurn)
@@ -1069,6 +1129,7 @@ while not done:
                     # s.send("END".encode(form))
                     # playerMoveActive = False
                     # done = True
+    pygame.event.clear()    
 
 pygame.quit()
 s.close() 
