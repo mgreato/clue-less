@@ -675,7 +675,6 @@ while not done:
                 cardText = cardText.replace('[','')
                 cardText = cardText.replace(']','')
                 cardText = cardText.replace('\'','')
-                cardText = cardText+"."
                 updateNotifications(playerText, cardText, readmsg[1:34], "")
 
             if WIN_MSG in readmsg:
