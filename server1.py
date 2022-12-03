@@ -268,6 +268,8 @@ while gameOn:
                     playerMoveMsg = str(currentPlayer) + moveMsg.decode(form) + ","+ str(currentPlayer)+ "//" + str(list(g.playerLocations.values()))
                     send_message(playerMoveMsg,clients)
                     msg = clients[currentPlayer-1].recv(1024).decode()
+                    print("PRINTING VALIDATION HERE")
+                    print(msg)
                     validation = msg.split("&& ")
                     if(eval(validation[1]) == True):
                         print("Player " + str(currentPlayer) + " chose to end their turn.")
