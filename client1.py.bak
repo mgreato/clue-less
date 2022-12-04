@@ -159,7 +159,7 @@ def moveOptionButtons(moveOptions):
             print("ODD")
             print(x)
             print(y)
-            option = Button(buttonType, (850+x, 315+y), option, font, (0,255,255), (0,50,50))
+            option = Button(buttonType, (750+x, 315+y), option, font, (0,255,255), (0,50,50))
             buttonList.append(option)
             option.update(screen)
             x += 170
@@ -168,7 +168,7 @@ def moveOptionButtons(moveOptions):
             print("EVEN")
             print(x)
             print(y)
-            option = Button(buttonType, (850+x, 315+y), option, font, (0,255,255), (0,50,50))
+            option = Button(buttonType, (750+x, 315+y), option, font, (0,255,255), (0,50,50))
             buttonList.append(option)
             option.update(screen)
             y += 250
@@ -219,7 +219,7 @@ def movePlayer(p, otherPlayerLocations, screen):
         moveInput = "You can only move once per turn."
         print(moveInput)
         s.send(moveInput.encode())
-        # clientsMessage = s.recv(1024).decode()
+        clientsMessage = s.recv(1024).decode()
     elif(playerInRoom) and (len(possibleHallways) == 0) and (check_diagonal_result[0] == False):
         moveInput = "Your move options are all blocked. You can either make an accusation or end your turn."
         print(moveInput)
@@ -321,104 +321,36 @@ def movePlayer(p, otherPlayerLocations, screen):
     #     p.hasMoved = True
     # return moveInput #actual moving of player happens later - this just gets a VALID move from player, which it returns
 
-def printPlayerButtons():
-    info_font = pygame.font.SysFont('Calibri', 14, False, False)
-    info_font_bold = pygame.font.SysFont('Calibri', 14, True, True)
-    who = Text((1075, 525), "Who would you like to suggest?", info_font, info_font_bold, (0,0,0), info_greyed_color)
-    who.update(screen)
-
-    size = (100, 50)
-    positions = [(1075, 575), (1190, 575), (1305, 575), (1075, 650), (1190, 650), (1305, 650)]
-    font = pygame.font.SysFont('Calibri', 16, True, False)
-    buttonType = pygame.transform.scale(button_image, size) #transform size
-
-    playerButtons = []
-    for i in range(0,len(names)):
-        print("SIZES")
-        print(positions[i][0])
-        print(names[i])
-        playerButton = Button(buttonType, (positions[i]), names[i], font, (0,255,255), (0,50,50))
-        playerButtons.append(playerButton)
-        playerButton.update(screen)
-    pygame.display.update()
-    return playerButtons
-
-def printWeaponButtons():
-    info_font = pygame.font.SysFont('Calibri', 14, False, False)
-    info_font_bold = pygame.font.SysFont('Calibri', 14, True, True)
-    who = Text((1075, 525), "What weapon would you like to suggest?", info_font, info_font_bold, (0,0,0), info_greyed_color)
-    who.update(screen)
-
-    size = (100, 50)
-    positions = [(1075, 575), (1190, 575), (1305, 575), (1075, 650), (1190, 650), (1305, 650)]
-    font = pygame.font.SysFont('Calibri', 16, True, False)
-    buttonType = pygame.transform.scale(button_image, size) #transform size
-
-    weaponButtons = []
-    for i in range(0,len(weapons)):
-        print("SIZES")
-        print(positions[i][0])
-        print(names[i])
-        weaponButton = Button(buttonType, (positions[i]), weapons[i], font, (0,255,255), (0,50,50))
-        weaponButtons.append(weaponButton)
-        weaponButton.update(screen)
-    pygame.display.update()
-    return weaponButtons
-
-def printSuggestionHelpButtons(playerNumber, suggestionMatches):
-    print("INSIDE PRINT SUGGESTION HELP BUTTONS")
-    info_font = pygame.font.SysFont('Calibri', 14, False, False)
-    info_font_bold = pygame.font.SysFont('Calibri', 14, True, True)
-    helpMessage = "What card would you like to show to player" + str(playerNumber) + "?"
-    help = Text((1025, 525), helpMessage, info_font, info_font_bold, (0,0,0), info_greyed_color)
-    help.update(screen)
-
-    size = (100, 50)
-    positions = [(1100, 575), (1250, 575), (1175, 650)]
-    font = pygame.font.SysFont('Calibri', 16, True, False)
-    buttonType = pygame.transform.scale(button_image, size) #transform size
-
-    helpButtons = []
-    for i in range(0,len(suggestionMatches)):
-        helpButton = Button(buttonType, (positions[i]), suggestionMatches[i], font, (0,255,255), (0,50,50))
-        helpButtons.append(helpButton)
-        helpButton.update(screen)
-    pygame.display.update()
-    return helpButtons
-    
-
-def handleSuggestion(suggestPerson, suggestRoom, suggestWeapon):
-# def handleSuggestion():
+def handleSuggestion():
     print("Who would you like to suggest?")
-
-    suggestPersonInput = suggestPerson
-    suggestRoomInput = suggestRoom
-    suggestWeaponInput = suggestWeapon
+    suggestPersonInput = input("person ->")
+    suggestRoomInput = p.playerLocation
+    suggestWeaponInput = input("weapon ->")
     all = suggestPersonInput + "," + suggestRoomInput + "," + suggestWeaponInput
     s.send(all.encode())
     print("Move " + suggestPersonInput + " to " + suggestRoomInput + ".\n")
-    print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
-    # while empty == True:
-    #     clientsMessage = s.recv(1024).decode().split("///")[0]
-    #     if(clientsMessage != ""):
-    #         empty = False
+    empty = True
+    while empty == True:
+        clientsMessage = s.recv(1024).decode().split("///")[0]
+        if(clientsMessage != ""):
+            empty = False
 
-    # again = True
-    # while (again == True) and (clientsMessage != "No Matches for this client"):
-    #     suggestionHelpMessage = s.recv(1024).decode()
-    #     if((suggestionHelpMessage != "") or (suggestionHelpMessage != None)) and ("is suggesting" not in suggestionHelpMessage) and (("Next" not in suggestionHelpMessage)):
-    #         again = False
-    # if(" ///" in suggestionHelpMessage):
-    #     suggestion = suggestionHelpMessage.split(" ///")[0]
-    #     print("Another player is suggesting that [" + suggestion + "] is not in the solution")
-    # else:
-    #     suggestion = suggestionHelpMessage
-    #     print("No players had cards that matched your suggestion")
-    # msg = "\n SUGGEST " + suggestPersonInput + " in the " + roomsToNames.get(suggestRoomInput) + " with the " + suggestWeaponInput + "\n"
-    # s.send(msg.encode(form))
-    # p.hasSuggested = True
-    # p.hasMoved = True
-    # p.canEndTurn = True
+    again = True
+    while (again == True) and (clientsMessage != "No Matches for this client"):
+        suggestionHelpMessage = s.recv(1024).decode()
+        if((suggestionHelpMessage != "") or (suggestionHelpMessage != None)) and ("is suggesting" not in suggestionHelpMessage) and (("Next" not in suggestionHelpMessage)):
+            again = False
+    if(" ///" in suggestionHelpMessage):
+        suggestion = suggestionHelpMessage.split(" ///")[0]
+        print("Another player is suggesting that [" + suggestion + "] is not in the solution")
+    else:
+        suggestion = suggestionHelpMessage
+        print("No players had cards that matched your suggestion")
+    msg = "\n SUGGEST " + suggestPersonInput + " in the " + roomsToNames.get(suggestRoomInput) + " with the " + suggestWeaponInput + "\n"
+    s.send(msg.encode(form))
+    p.hasSuggested = True
+    p.hasMoved = True
+    p.canEndTurn = True
 
 def makeAccusation():
     print("Who would you like to accuse?")
@@ -609,6 +541,7 @@ info_height = 32
 info_width = 151
 button_size_3 = (info_width, info_height)
 button_type_3 = pygame.transform.scale(background_image, button_size_3) #transform size
+
 
 button_y_shift = (52) #y-shift (spacing) of buttons PLAY WITH THIS
 button_x_shift = (150) #y-shift (spacing) of buttons PLAY WITH THIS
@@ -894,13 +827,6 @@ currentButtons = []
 buttonsClicked = False
 clickedButton = ""
 myNumber = 0
-suggesting = False
-personSuggested = ""
-weaponSuggested = ""
-roomSuggested = ""
-collectSuggestionHelp = False
-waitingForSuggestion = False
-suggestionHelpPlayer = 0
 
 canClickButtons = False
 done = False
@@ -922,8 +848,6 @@ while not done:
             readmsg = event.message
             print("PRINTING READ MSG HERE")
             print(readmsg)
-            print("==============================")
-            print("==============================")
             
             if("CLOSE ALL CONNECTION" in readmsg):
                 readmsg = readmsg.split(",")
@@ -951,7 +875,7 @@ while not done:
                 else:
                     message = "Colonel Mustard"
                 playerLocation = Game.playerStartLocations.get(message)
-                p = Player(myNumber, message, playerLocation, None, False, False, False, False, False)
+                p = Player(myNumber, message, playerLocation, None, False, False, False, False)
                 sendMessage = p.playerName + "," + playerLocation
                 s.send(sendMessage.encode())
                 #playerMessage = s.recv(1024).decode() # NEED TO GET RID OF THIS
@@ -1049,9 +973,7 @@ while not done:
                     clickedButton = ""
                     buttonsClicked = False
                     currentButtons = []
-                    suggesting = False
-                    personCollected = False
-
+            
             if "move" in readmsg and canClickButtons:
                 choiceInput = readmsg.split("//")
                 print(choiceInput)
@@ -1064,45 +986,12 @@ while not done:
                 print(choiceInput)
                 if moveChoiceMade:
                     print("MOVE CHOICE WAS MADE")
-                    print(p.hasMoved)
-                    if(len(choiceInput) > 1):
-                        moveOptions = movePlayer(p, choiceInput[1], screen)
-                    else:
-                        moveOptions = movePlayer(p, choiceInput[0], screen)
+                    moveOptions = movePlayer(p, choiceInput[1], screen)
                     if moveOptions != "You can only move once per turn.":
                         buttonList = moveOptionButtons(moveOptions)
                         print("&&&&&&&&&&")
                         print(buttonList)
                         currentButtons = buttonList
-                    elif moveOptions == "You can only move once per turn.":
-                        msg = moveInput
-                        print(msg)
-                        s.send(msg.encode(form))
-                        playerMoveActive = False
-
-
-                # blockedOptions = (moveInput == "Your move options are all blocked. You can either make an accusation or end your turn.")
-                #     if(moveInput != "You can only move once per turn.") and ("room" not in moveInput) and (blockedOptions == False):
-                #         p.playerLocation = moveInput
-                #         msg = "\nMove " + p.playerName + " to " + p.playerLocation + "."
-                #         print(msg)
-                #     elif("room" in moveInput):
-                #         p.playerLocation = moveInput
-                #         print("\nMove " + p.playerName + " to " + p.playerLocation + ".")
-                #         msg = "Player must now suggest"
-                #         p.canEndTurn = False
-                #         p.hasSuggested = False
-                #         p.canSuggest = True
-                #         print(msg)
-                #     elif(moveInput != "You can only move once per turn.") and (blockedOptions == False):
-                #         msg = "Player cannot move again."
-                #     elif(blockedOptions):
-                #         msg = moveInput
-                #         print(msg)
-                #     s.send(msg.encode(form))
-                #     playerMoveActive = False
-                
-                
             
             if "end" in readmsg and canClickButtons and ("rend" not in readmsg):
                 print("PRINTING END HERE!!!!")
@@ -1138,152 +1027,6 @@ while not done:
                 if(message == "True"):
                     print("Player " + player + " chose to end their turn.")
                 playerMoveActive = False
-            
-            if "suggest" in readmsg and canClickButtons and p.hasSuggested == False:
-                print("||||||||||||")
-            
-                print(p.hasSuggested)
-                # choiceInput = s.recv(1024).decode().split("//")
-                print("***********")
-                # print(choiceInput)
-                # choice = choiceInput[0]
-                # player_choice = choice[1:]
-                # if("," in player_choice):
-                #     player_choice = player_choice.split(",")[0]
-                suggestionValidation = validateSuggestion(p)
-                if(suggestionValidation == True):
-                    suggesting = True
-                    playerButtons = printPlayerButtons()
-                    currentButtons = playerButtons
-                    print("HERE")
-                    # handleSuggestion()
-                    # playerMoveActive = False
-                # else:
-                #     print("You are are not able to make a suggestion \n")
-                #     suggestionError = "Player cannot make a suggestion!!!! \n"
-                #     s.send(suggestionError.encode())
-                #     playerMoveActive = False
-            
-            if "is suggesting" in readmsg:
-                print(readmsg.split("///"))
-                clientsMessage = readmsg.split("///")[0]
-                again = True
-                while (again == True) and (clientsMessage != "No Matches for this client"):
-                    collectSuggestionHelp = True
-                    again = False
-
-            if (collectSuggestionHelp == True) and ("///" in readmsg) and (p.hasSuggested == False):
-                print("COLLECTSUGGESTIONHELP IS TRUE")
-                print(readmsg)
-                print(readmsg.split("///")[1])
-                if p.playerNumber in readmsg.split("///")[1]:
-                    print("AT THE END PART OF SUGGESTION NOW")
-                    suggestions = readmsg.split("///")[1].split(",")
-                    print(suggestions)
-                    nextPlayer = int(suggestions[3])
-                    keys = [k for k, v in roomsToNames.items() if v == suggestions[1]]
-                    p.playerLocation = keys[0]
-                    p.canSuggest = True
-                    count = 0
-                    if(int(p.playerNumber) == nextPlayer):
-                        matches = []
-                        playerCards = getattr(p, 'cards')
-                        if((suggestions[0] in p.cards) or (suggestions[1] in p.cards) or (suggestions[2] in p.cards)):
-                            count += 1
-                            for i in suggestions:
-                                if i in p.cards:
-                                    matches.append(i)
-                            # print("You have a card to disprove an item in player " + str(playerNum[0]) + "'s suggestion. ")
-                            # print("Your options to show player " +str(playerNum[0]) + " are " + str(matches))
-                            # print("Which would you like to show?")
-                            print("You have a card to disprove an item in player " + str(9999) + "'s suggestion. ")
-                            print("Your options to show player " +str(9999) + " are " + str(matches))
-                            print("Which would you like to show?")
-                            suggestionHelpPlayer = nextPlayer
-                            # canClickButtons = True
-                            p.helpingSuggestion = True
-                            helpButtons = printSuggestionHelpButtons(9999, matches)
-                            currentButtons = helpButtons
-                            print("HERE IN SUGGESTION HELP LOGIC")
-                            # message = input(" -> ")
-                            print(message)
-                            # s.send(message.encode())
-                        else:
-                            count += 1
-                            message = "No matches please move to next player"
-                            s.send(message.encode())
-                    # nextMessage = "Move " + suggestions[0] + " to " + suggestions[1] + ".\n"
-                    # print(nextMessage)
-                    # playerMoveActive = False
-
-                    # suggestionHelpMessage = s.recv(1024).decode()
-                    # if((suggestionHelpMessage != "") or (suggestionHelpMessage != None)) and ("is suggesting" not in suggestionHelpMessage) and (("Next" not in suggestionHelpMessage)):
-                    #     again = False
-                elif p.playerNumber in readmsg.split("///")[0] and ("suggestionHelpMade" not in readmsg.split("///")[1]):
-                    waitingForSuggestion = True
-
-                elif "suggestionHelpMade" in readmsg.split("///")[1] and canClickButtons:
-                    suggestion = readmsg.split(" ///")[0]
-                    print("Another player is suggesting that [" + suggestion + "] is not in the solution")
-                    msg = "\n SUGGEST " + personSuggested + " in the " + roomsToNames.get(roomSuggested) + " with the " + weaponSuggested + "\n"
-                    s.send(msg.encode(form))
-                    p.hasSuggested = True
-                    p.hasMoved = True
-                    p.canEndTurn = True
-                    collectSuggestionHelp = False
-                    waitingForSuggestion = False
-                    suggestionHelpPlayer = 0
-                    currentButtons = []
-                    playerMoveActive = False
-                    choiceInput = ""
-                    clickedButton = ""
-                    buttonsClicked = False
-                    suggesting = False
-
-            if collectSuggestionHelp == True and "///" not in readmsg and canClickButtons:
-                print(readmsg)
-                choiceInput = s.recv(1024).decode().split("//")
-                suggestion = readmsg
-                print("No players had cards that matched your suggestion")
-                # print(roomSuggested)
-                # msg = "\n SUGGEST " + personSuggested + " in the " + roomsToNames.get(roomSuggested) + " with the " + weaponSuggested + "\n"
-                # msg = "No players had cards that matched your suggestion"
-                # print(msg)
-                # s.send(msg.encode(form))
-                p.hasSuggested = True
-                p.hasMoved = True
-                p.canEndTurn = True
-                collectSuggestionHelp = False
-                waitingForSuggestion = False
-                suggestionHelpPlayer = 0
-                currentButtons = []
-                playerMoveActive = False
-                choiceInput = ""
-                clickedButton = ""
-                buttonsClicked = False
-                suggesting = False
-                    
-
-                    # if(" ///" in suggestionHelpMessage):
-                    #     suggestion = suggestionHelpMessage.split(" ///")[0]
-                    #     print("Another player is suggesting that [" + suggestion + "] is not in the solution")
-                    # else:
-                    #     suggestion = suggestionHelpMessage
-                    #     print("No players had cards that matched your suggestion")
-                    # msg = "\n SUGGEST " + suggestPersonInput + " in the " + roomsToNames.get(suggestRoomInput) + " with the " + suggestWeaponInput + "\n"
-                    # s.send(msg.encode(form))
-                    # p.hasSuggested = True
-                    # p.hasMoved = True
-                    # p.canEndTurn = True
-                
-
-                ### WHEN SUGGESTION HELP IS FINISHED set suggestionHelpPlayer back to 0 and reset current Buttons, set can click buttons back to false
-            
-            if waitingForSuggestion == True:
-                print("WAITING")
-
-
-
 
 
         
@@ -1347,143 +1090,143 @@ while not done:
                     t_green.update(screen) 
 
             # updating player card: weapons
-            if t_candle.isOver(pos, info_width, info_height):
-                if t_candle.bolded==False:
-                    t_candle = Button(t_candle.image, (t_candle.x_pos, t_candle.y_pos), t_candle.text_input, info_font_bold, t_candle.base_color, t_candle.hovering_color)
-                    t_candle.bolded = True
-                    t_candle.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_candle = Button(t_candle.image, (t_candle.x_pos, t_candle.y_pos), t_candle.text_input, info_font, t_candle.base_color, t_candle.hovering_color)
-                    t_candle.bolded = False
-                    t_candle.update(screen)
-            if t_dagger.isOver(pos, info_width, info_height):
-                if t_dagger.bolded==False:
-                    t_dagger = Button(t_dagger.image, (t_dagger.x_pos, t_dagger.y_pos), t_dagger.text_input, info_font_bold, t_dagger.base_color, t_dagger.hovering_color)
-                    t_dagger.bolded = True
-                    t_dagger.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_dagger = Button(t_dagger.image, (t_dagger.x_pos, t_dagger.y_pos), t_dagger.text_input, info_font, t_dagger.base_color, t_dagger.hovering_color)
-                    t_dagger.bolded = False
-                    t_dagger.update(screen)
-            if t_pipe.isOver(pos, info_width, info_height):
-                if t_pipe.bolded==False:
-                    t_pipe = Button(t_pipe.image, (t_pipe.x_pos, t_pipe.y_pos), t_pipe.text_input, info_font_bold, t_pipe.base_color, t_pipe.hovering_color)
-                    t_pipe.bolded = True
-                    t_pipe.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_pipe = Button(t_pipe.image, (t_pipe.x_pos, t_pipe.y_pos), t_pipe.text_input, info_font, t_pipe.base_color, t_pipe.hovering_color)
-                    t_pipe.bolded = False
-                    t_pipe.update(screen)
-            if t_rope.isOver(pos, info_width, info_height):
-                if t_rope.bolded==False:
-                    t_rope = Button(t_rope.image, (t_rope.x_pos, t_rope.y_pos), t_rope.text_input, info_font_bold, t_rope.base_color, t_rope.hovering_color)
-                    t_rope.bolded = True
-                    t_rope.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_rope = Button(t_rope.image, (t_rope.x_pos, t_rope.y_pos), t_rope.text_input, info_font, t_rope.base_color, t_rope.hovering_color)
-                    t_rope.bolded = False
-                    t_rope.update(screen)
-            if t_wrench.isOver(pos, info_width, info_height):
-                if t_wrench.bolded==False:
-                    t_wrench = Button(t_wrench.image, (t_wrench.x_pos, t_wrench.y_pos), t_wrench.text_input, info_font_bold, t_wrench.base_color, t_wrench.hovering_color)
-                    t_wrench.bolded = True
-                    t_wrench.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_wrench = Button(t_wrench.image, (t_wrench.x_pos, t_wrench.y_pos), t_wrench.text_input, info_font, t_wrench.base_color, t_wrench.hovering_color)
-                    t_wrench.bolded = False
-                    t_wrench.update(screen)
-            if t_revolver.isOver(pos, info_width, info_height):
-                if t_revolver.bolded==False:
-                    t_revolver = Button(t_revolver.image, (t_revolver.x_pos, t_revolver.y_pos), t_revolver.text_input, info_font_bold, t_revolver.base_color, t_revolver.hovering_color)
-                    t_revolver.bolded = True
-                    t_revolver.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_revolver = Button(t_revolver.image, (t_revolver.x_pos, t_revolver.y_pos), t_revolver.text_input, info_font, t_revolver.base_color, t_revolver.hovering_color)
-                    t_revolver.bolded = False
-                    t_revolver.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
 
             # updating player card: roomsToNames
-            if t_study.isOver(pos, info_width, info_height):
-                if t_study.bolded==False:
-                    t_study = Button(t_study.image, (t_study.x_pos, t_study.y_pos), t_study.text_input, info_font_bold, t_study.base_color, t_study.hovering_color)
-                    t_study.bolded = True
-                    t_study.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_study = Button(t_study.image, (t_study.x_pos, t_study.y_pos), t_study.text_input, info_font, t_study.base_color, t_study.hovering_color)
-                    t_study.bolded = False
-                    t_study.update(screen)
-            if t_hall.isOver(pos, info_width, info_height):
-                if t_hall.bolded==False:
-                    t_hall = Button(t_hall.image, (t_hall.x_pos, t_hall.y_pos), t_hall.text_input, info_font_bold, t_hall.base_color, t_hall.hovering_color)
-                    t_hall.bolded = True
-                    t_hall.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_hall = Button(t_hall.image, (t_hall.x_pos, t_hall.y_pos), t_hall.text_input, info_font, t_hall.base_color, t_hall.hovering_color)
-                    t_hall.bolded = False
-                    t_hall.update(screen)
-            if t_lounge.isOver(pos, info_width, info_height):
-                if t_lounge.bolded==False:
-                    t_lounge = Button(t_lounge.image, (t_lounge.x_pos, t_lounge.y_pos), t_lounge.text_input, info_font_bold, t_lounge.base_color, t_lounge.hovering_color)
-                    t_lounge.bolded = True
-                    t_lounge.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_lounge = Button(t_lounge.image, (t_lounge.x_pos, t_lounge.y_pos), t_lounge.text_input, info_font, t_lounge.base_color, t_lounge.hovering_color)
-                    t_lounge.bolded = False
-                    t_lounge.update(screen)
-            if t_library.isOver(pos, info_width, info_height):
-                if t_library.bolded==False:
-                    t_library = Button(t_library.image, (t_library.x_pos, t_library.y_pos), t_library.text_input, info_font_bold, t_library.base_color, t_library.hovering_color)
-                    t_library.bolded = True
-                    t_library.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_library = Button(t_library.image, (t_library.x_pos, t_library.y_pos), t_library.text_input, info_font, t_library.base_color, t_library.hovering_color)
-                    t_library.bolded = False
-                    t_library.update(screen)
-            if t_billiard.isOver(pos, info_width, info_height):
-                if t_billiard.bolded==False:
-                    t_billiard = Button(t_billiard.image, (t_billiard.x_pos, t_billiard.y_pos), t_billiard.text_input, info_font_bold, t_billiard.base_color, t_billiard.hovering_color)
-                    t_billiard.bolded = True
-                    t_billiard.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_billiard = Button(t_billiard.image, (t_billiard.x_pos, t_billiard.y_pos), t_billiard.text_input, info_font, t_billiard.base_color, t_billiard.hovering_color)
-                    t_billiard.bolded = False
-                    t_billiard.update(screen)
-            if t_dining.isOver(pos, info_width, info_height):
-                if t_dining.bolded==False:
-                    t_dining = Button(t_dining.image, (t_dining.x_pos, t_dining.y_pos), t_dining.text_input, info_font_bold, t_dining.base_color, t_dining.hovering_color)
-                    t_dining.bolded = True
-                    t_dining.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_dining = Button(t_dining.image, (t_dining.x_pos, t_dining.y_pos), t_dining.text_input, info_font, t_dining.base_color, t_dining.hovering_color)
-                    t_dining.bolded = False
-                    t_dining.update(screen)
-            if t_conservatory.isOver(pos, info_width, info_height):
-                if t_conservatory.bolded==False:
-                    t_conservatory = Button(t_conservatory.image, (t_conservatory.x_pos, t_conservatory.y_pos), t_conservatory.text_input, info_font_bold, t_conservatory.base_color, t_conservatory.hovering_color)
-                    t_conservatory.bolded = True
-                    t_conservatory.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_conservatory = Button(t_conservatory.image, (t_conservatory.x_pos, t_conservatory.y_pos), t_conservatory.text_input, info_font, t_conservatory.base_color, t_conservatory.hovering_color)
-                    t_conservatory.bolded = False
-                    t_conservatory.update(screen)
-            if t_ballroom.isOver(pos, info_width, info_height):
-                if t_ballroom.bolded==False:
-                    t_ballroom = Button(t_ballroom.image, (t_ballroom.x_pos, t_ballroom.y_pos), t_ballroom.text_input, info_font_bold, t_ballroom.base_color, t_ballroom.hovering_color)
-                    t_ballroom.bolded = True
-                    t_ballroom.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_ballroom = Button(t_ballroom.image, (t_ballroom.x_pos, t_ballroom.y_pos), t_ballroom.text_input, info_font, t_ballroom.base_color, t_ballroom.hovering_color)
-                    t_ballroom.bolded = False
-                    t_ballroom.update(screen)
-            if t_kitchen.isOver(pos, info_width, info_height):
-                if t_kitchen.bolded==False:
-                    t_kitchen = Button(t_kitchen.image, (t_kitchen.x_pos, t_kitchen.y_pos), t_kitchen.text_input, info_font_bold, t_kitchen.base_color, t_kitchen.hovering_color)
-                    t_kitchen.bolded = True
-                    t_kitchen.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_kitchen = Button(t_kitchen.image, (t_kitchen.x_pos, t_kitchen.y_pos), t_kitchen.text_input, info_font, t_kitchen.base_color, t_kitchen.hovering_color)
-                    t_kitchen.bolded = False
-                    t_kitchen.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
                     
             # if ((TURN_MSG or MOVE_MSG) in readmsg) or (SUGGESTION in readmsg):
             #    suggestionValidation = None
@@ -1492,8 +1235,7 @@ while not done:
             #        playerMoveActive = True # CAN I USE THIS TO ALLOW BUTTON CLICKS?
             #    else:
             #        canClickButtons = False
-            if canClickButtons or p.helpingSuggestion:
-                print("INSIDE THIS PART!!!")
+            if canClickButtons:
                 if b_move.isOver(pos, button_width_1, button_height):
                     message = "move" 
                     print('moving')
@@ -1513,38 +1255,13 @@ while not done:
 
                 if currentButtons != []:
                     for button in currentButtons:
-                        theButton = Button(button.image, (button.x_pos, button.y_pos), button.text_input, button.font, button.base_color, button.hovering_color)
-                        if theButton.isOver(pos, theButton.rect.width, theButton.rect.height):
-                            print(theButton.text_input)
-                            clickedButton = theButton
+                        if button.isOver(pos, button.x_pos, button.y_pos):
+                            clickedButton = button
                             buttonsClicked = True
-                            print(buttonsClicked)
-                            if suggesting == True:
-                                print("SUGGESTING IS TRUE")
-                                if clickedButton.text_input in names:
-                                    personSuggested = clickedButton.text_input
-                                    currentButtons = []
-                                    buttonsClicked = False
-                                    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
-                                    pygame.display.update()
-                                    weaponButtons = printWeaponButtons()
-                                    print(weaponButtons)
-                                    currentButtons = weaponButtons
-                                if clickedButton.text_input in weapons:
-                                    weaponSuggested = clickedButton.text_input
-                                    currentButtons = []
-                                    buttonsClicked = False
-                                    print("WEAPON SUGGESTED")
-                                    print(weaponSuggested)
-                                    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
-                                    pygame.display.update()
-                                    roomSuggested = p.playerLocation
-                                    handleSuggestion(personSuggested, roomSuggested, weaponSuggested)
-
 
 
                 if buttonsClicked == True:
-                    if(p.hasMoved == False) and (p.helpingSuggestion == False):
+                    if(p.hasMoved == False):
                         print("INSIDE HERE")
                         ### NEED TO FIGURE OUT HOW TO MAKE MULTIPLE BUTTONS APPEAR ####
                         print("PRINTING BUTTON TEXT INPUT")
@@ -1552,6 +1269,27 @@ while not done:
                         print(choiceInput)
                         moveInput = whereToMove(p, clickedButton.text_input, choiceInput[1])
                         print(moveInput)
+
+                            # inputGiven = False
+                            # # while moveInput == False:
+
+                            # while inputGiven == False:
+                            #     pygame.event.clear()
+                            #     eventlist = pygame.event.get()
+                            #     for event in eventlist:
+                            #         if event.type == pygame.MOUSEBUTTONDOWN:
+                            #             print("INSIDE HERE")
+                            #             print(event)
+                            #             ### NEED TO FIGURE OUT HOW TO MAKE MULTIPLE BUTTONS APPEAR ####
+                            #             if buttonList[0].isOver(pos, buttonList[0].x_pos, buttonList[0].y_pos):
+                            #                 print("PRINTING BUTTON TEXT INPUT")
+                            #                 print(buttonList[0].text_input)
+                            #                 moveInput = whereToMove(p, buttonList[0].text_input, choiceInput[1])
+                            #                 print(moveInput)
+                            #                 inputGiven = True
+                            #             else:
+                            #                 inputGiven = False
+
 
                         # print(moveOptions)
                         print("&&&&&&&")
@@ -1578,21 +1316,11 @@ while not done:
                         playerMoveActive = False
                         print("IS PLAYER MOVE ACTIVE")
                         print(playerMoveActive)
-                        pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                        pygame.draw.rect(screen, WHITE, [913, 516, 350, 201])
                         pygame.display.update()
 
                         # pygame.draw.rect(screen, WHITE, [0, hLeft, vertical, height])
                         # done = True
-                    if p.helpingSuggestion == True and buttonsClicked == True:
-                        print("IN THIS SPOT")
-                        currentButtons = []
-                        buttonsClicked = False
-                        pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
-                        pygame.display.update()
-                        s.send(clickedButton.text_input.encode())
-                        clickedButton = ""
-                        p.hasMoved = False
-
 
 
                 if b_accuse.isOver(pos, button_width_1, button_height):
@@ -1620,6 +1348,24 @@ while not done:
                     # if player_choice == "suggest":
                     message = "suggest"
                     s.send(message.encode())
+                    choiceInput = s.recv(1024).decode().split("//")
+                    print("***********")
+                    print(choiceInput)
+                    choice = choiceInput[0]
+                    player_choice = choice[1:]
+                    if("," in player_choice):
+                        player_choice = player_choice.split(",")[0]
+
+
+                    suggestionValidation = validateSuggestion(p)
+                    if(suggestionValidation == True):
+                        handleSuggestion()
+                        playerMoveActive = False
+                    else:
+                        print("You are are not able to make a suggestion \n")
+                        suggestionError = "Player cannot make a suggestion!!!! \n"
+                        s.send(suggestionError.encode())
+                        playerMoveActive = False
 
                 if b_show.isOver(pos, button_width_1, button_height):
                     message = "show"
