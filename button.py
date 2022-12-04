@@ -33,33 +33,40 @@ class Button():
         else:
             self.text = self.font.render(self.text_input, True, self.base_color)
 
+    def isOver(self, position, button_width, button_height):
+        x_p = self.x_pos - button_width / 2
+        y_p = self.y_pos - button_height / 2
+        if position[0] > x_p and position[0] < x_p + button_width:
+            if position[1] > y_p and position[1] < y_p + button_height:
+                return True
+        return False
 
-# below shows how button can be used
-pygame.init()
-screen = pygame.display.set_mode((800, 800))
-pygame.display.set_caption("Button!")
-main_font = pygame.font.SysFont("cambria", 50)
-
-SCREEN = pygame.display.set_mode((1100, 1100))
-
-button_surface = pygame.image.load("button.png")
-button_surface = pygame.transform.scale(button_surface, (400, 150))
-button = Button(image=button_surface, pos=(650, 700),
-                  text_input="Quit", font=main_font, base_color="#d7fcd4", hovering_color="White")
-
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            button.checkForInput(pygame.mouse.get_pos())
-            pygame.quit()
-            sys.exit()
-
-    screen.fill("white")
-
-    button.update(screen)
-    button.changeColor(pygame.mouse.get_pos())
-
-    pygame.display.update()
+# # below shows how button can be used
+# pygame.init()
+# screen = pygame.display.set_mode((800, 800))
+# pygame.display.set_caption("Button!")
+# main_font = pygame.font.SysFont("cambria", 50)
+#
+# SCREEN = pygame.display.set_mode((1100, 1100))
+#
+# button_surface = pygame.image.load("button.png")
+# button_surface = pygame.transform.scale(button_surface, (400, 150))
+# button = Button(image=button_surface, pos=(650, 700),
+#                   text_input="Quit", font=main_font, base_color="#d7fcd4", hovering_color="White")
+#
+# while True:
+#     for event in pygame.event.get():
+#         if event.type == pygame.QUIT:
+#             pygame.quit()
+#             sys.exit()
+#         if event.type == pygame.MOUSEBUTTONDOWN:
+#             button.checkForInput(pygame.mouse.get_pos())
+#             pygame.quit()
+#             sys.exit()
+#
+#     screen.fill("white")
+#
+#     button.update(screen)
+#     button.changeColor(pygame.mouse.get_pos())
+#
+#     pygame.display.update()
