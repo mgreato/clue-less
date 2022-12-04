@@ -1090,143 +1090,143 @@ while not done:
                     t_green.update(screen) 
 
             # updating player card: weapons
-            if t_candle.isOver(pos, info_width, info_height):
-                if t_candle.bolded==False:
-                    t_candle = Button(t_candle.image, (t_candle.x_pos, t_candle.y_pos), t_candle.text_input, info_font_bold, t_candle.base_color, t_candle.hovering_color)
-                    t_candle.bolded = True
-                    t_candle.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_candle = Button(t_candle.image, (t_candle.x_pos, t_candle.y_pos), t_candle.text_input, info_font, t_candle.base_color, t_candle.hovering_color)
-                    t_candle.bolded = False
-                    t_candle.update(screen)
-            if t_dagger.isOver(pos, info_width, info_height):
-                if t_dagger.bolded==False:
-                    t_dagger = Button(t_dagger.image, (t_dagger.x_pos, t_dagger.y_pos), t_dagger.text_input, info_font_bold, t_dagger.base_color, t_dagger.hovering_color)
-                    t_dagger.bolded = True
-                    t_dagger.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_dagger = Button(t_dagger.image, (t_dagger.x_pos, t_dagger.y_pos), t_dagger.text_input, info_font, t_dagger.base_color, t_dagger.hovering_color)
-                    t_dagger.bolded = False
-                    t_dagger.update(screen)
-            if t_pipe.isOver(pos, info_width, info_height):
-                if t_pipe.bolded==False:
-                    t_pipe = Button(t_pipe.image, (t_pipe.x_pos, t_pipe.y_pos), t_pipe.text_input, info_font_bold, t_pipe.base_color, t_pipe.hovering_color)
-                    t_pipe.bolded = True
-                    t_pipe.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_pipe = Button(t_pipe.image, (t_pipe.x_pos, t_pipe.y_pos), t_pipe.text_input, info_font, t_pipe.base_color, t_pipe.hovering_color)
-                    t_pipe.bolded = False
-                    t_pipe.update(screen)
-            if t_rope.isOver(pos, info_width, info_height):
-                if t_rope.bolded==False:
-                    t_rope = Button(t_rope.image, (t_rope.x_pos, t_rope.y_pos), t_rope.text_input, info_font_bold, t_rope.base_color, t_rope.hovering_color)
-                    t_rope.bolded = True
-                    t_rope.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_rope = Button(t_rope.image, (t_rope.x_pos, t_rope.y_pos), t_rope.text_input, info_font, t_rope.base_color, t_rope.hovering_color)
-                    t_rope.bolded = False
-                    t_rope.update(screen)
-            if t_wrench.isOver(pos, info_width, info_height):
-                if t_wrench.bolded==False:
-                    t_wrench = Button(t_wrench.image, (t_wrench.x_pos, t_wrench.y_pos), t_wrench.text_input, info_font_bold, t_wrench.base_color, t_wrench.hovering_color)
-                    t_wrench.bolded = True
-                    t_wrench.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_wrench = Button(t_wrench.image, (t_wrench.x_pos, t_wrench.y_pos), t_wrench.text_input, info_font, t_wrench.base_color, t_wrench.hovering_color)
-                    t_wrench.bolded = False
-                    t_wrench.update(screen)
-            if t_revolver.isOver(pos, info_width, info_height):
-                if t_revolver.bolded==False:
-                    t_revolver = Button(t_revolver.image, (t_revolver.x_pos, t_revolver.y_pos), t_revolver.text_input, info_font_bold, t_revolver.base_color, t_revolver.hovering_color)
-                    t_revolver.bolded = True
-                    t_revolver.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_revolver = Button(t_revolver.image, (t_revolver.x_pos, t_revolver.y_pos), t_revolver.text_input, info_font, t_revolver.base_color, t_revolver.hovering_color)
-                    t_revolver.bolded = False
-                    t_revolver.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
 
             # updating player card: roomsToNames
-            if t_study.isOver(pos, info_width, info_height):
-                if t_study.bolded==False:
-                    t_study = Button(t_study.image, (t_study.x_pos, t_study.y_pos), t_study.text_input, info_font_bold, t_study.base_color, t_study.hovering_color)
-                    t_study.bolded = True
-                    t_study.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_study = Button(t_study.image, (t_study.x_pos, t_study.y_pos), t_study.text_input, info_font, t_study.base_color, t_study.hovering_color)
-                    t_study.bolded = False
-                    t_study.update(screen)
-            if t_hall.isOver(pos, info_width, info_height):
-                if t_hall.bolded==False:
-                    t_hall = Button(t_hall.image, (t_hall.x_pos, t_hall.y_pos), t_hall.text_input, info_font_bold, t_hall.base_color, t_hall.hovering_color)
-                    t_hall.bolded = True
-                    t_hall.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_hall = Button(t_hall.image, (t_hall.x_pos, t_hall.y_pos), t_hall.text_input, info_font, t_hall.base_color, t_hall.hovering_color)
-                    t_hall.bolded = False
-                    t_hall.update(screen)
-            if t_lounge.isOver(pos, info_width, info_height):
-                if t_lounge.bolded==False:
-                    t_lounge = Button(t_lounge.image, (t_lounge.x_pos, t_lounge.y_pos), t_lounge.text_input, info_font_bold, t_lounge.base_color, t_lounge.hovering_color)
-                    t_lounge.bolded = True
-                    t_lounge.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_lounge = Button(t_lounge.image, (t_lounge.x_pos, t_lounge.y_pos), t_lounge.text_input, info_font, t_lounge.base_color, t_lounge.hovering_color)
-                    t_lounge.bolded = False
-                    t_lounge.update(screen)
-            if t_library.isOver(pos, info_width, info_height):
-                if t_library.bolded==False:
-                    t_library = Button(t_library.image, (t_library.x_pos, t_library.y_pos), t_library.text_input, info_font_bold, t_library.base_color, t_library.hovering_color)
-                    t_library.bolded = True
-                    t_library.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_library = Button(t_library.image, (t_library.x_pos, t_library.y_pos), t_library.text_input, info_font, t_library.base_color, t_library.hovering_color)
-                    t_library.bolded = False
-                    t_library.update(screen)
-            if t_billiard.isOver(pos, info_width, info_height):
-                if t_billiard.bolded==False:
-                    t_billiard = Button(t_billiard.image, (t_billiard.x_pos, t_billiard.y_pos), t_billiard.text_input, info_font_bold, t_billiard.base_color, t_billiard.hovering_color)
-                    t_billiard.bolded = True
-                    t_billiard.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_billiard = Button(t_billiard.image, (t_billiard.x_pos, t_billiard.y_pos), t_billiard.text_input, info_font, t_billiard.base_color, t_billiard.hovering_color)
-                    t_billiard.bolded = False
-                    t_billiard.update(screen)
-            if t_dining.isOver(pos, info_width, info_height):
-                if t_dining.bolded==False:
-                    t_dining = Button(t_dining.image, (t_dining.x_pos, t_dining.y_pos), t_dining.text_input, info_font_bold, t_dining.base_color, t_dining.hovering_color)
-                    t_dining.bolded = True
-                    t_dining.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_dining = Button(t_dining.image, (t_dining.x_pos, t_dining.y_pos), t_dining.text_input, info_font, t_dining.base_color, t_dining.hovering_color)
-                    t_dining.bolded = False
-                    t_dining.update(screen)
-            if t_conservatory.isOver(pos, info_width, info_height):
-                if t_conservatory.bolded==False:
-                    t_conservatory = Button(t_conservatory.image, (t_conservatory.x_pos, t_conservatory.y_pos), t_conservatory.text_input, info_font_bold, t_conservatory.base_color, t_conservatory.hovering_color)
-                    t_conservatory.bolded = True
-                    t_conservatory.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_conservatory = Button(t_conservatory.image, (t_conservatory.x_pos, t_conservatory.y_pos), t_conservatory.text_input, info_font, t_conservatory.base_color, t_conservatory.hovering_color)
-                    t_conservatory.bolded = False
-                    t_conservatory.update(screen)
-            if t_ballroom.isOver(pos, info_width, info_height):
-                if t_ballroom.bolded==False:
-                    t_ballroom = Button(t_ballroom.image, (t_ballroom.x_pos, t_ballroom.y_pos), t_ballroom.text_input, info_font_bold, t_ballroom.base_color, t_ballroom.hovering_color)
-                    t_ballroom.bolded = True
-                    t_ballroom.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_ballroom = Button(t_ballroom.image, (t_ballroom.x_pos, t_ballroom.y_pos), t_ballroom.text_input, info_font, t_ballroom.base_color, t_ballroom.hovering_color)
-                    t_ballroom.bolded = False
-                    t_ballroom.update(screen)
-            if t_kitchen.isOver(pos, info_width, info_height):
-                if t_kitchen.bolded==False:
-                    t_kitchen = Button(t_kitchen.image, (t_kitchen.x_pos, t_kitchen.y_pos), t_kitchen.text_input, info_font_bold, t_kitchen.base_color, t_kitchen.hovering_color)
-                    t_kitchen.bolded = True
-                    t_kitchen.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
+            if t_mustard.isOver(pos, info_width, info_height):
+                if t_mustard.bolded==False:
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = True
+                    t_mustard.update(screen)
                 else:
-                    t_kitchen = Button(t_kitchen.image, (t_kitchen.x_pos, t_kitchen.y_pos), t_kitchen.text_input, info_font, t_kitchen.base_color, t_kitchen.hovering_color)
-                    t_kitchen.bolded = False
-                    t_kitchen.update(screen)
+                    t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
+                    t_mustard.bolded = False
+                    t_mustard.update(screen)
                     
             # if ((TURN_MSG or MOVE_MSG) in readmsg) or (SUGGESTION in readmsg):
             #    suggestionValidation = None
