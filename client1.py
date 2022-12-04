@@ -454,7 +454,6 @@ def validateEndTurn(p):
 # has functions to bold text and "grey out" the color
 # IF WE WANT USERS TO BE ABLE TO TYPE IN TEXTBOXES, we need to get the "CheckForInput" and "upateText" working
 class Text():
-	
     def __init__(self, position, text_input, font_input, bold_input, base_color, greyed_color):
         self.position = position
         self.text_input = text_input
@@ -635,7 +634,7 @@ b_end.update(screen)
 
 
 ################################
-# Make all of the text boxes Here
+# Make all of the text box BUTTONS Here
 ################################
 # Define fonts
 info_font = pygame.font.SysFont('Calibri', 14, False, False)
@@ -673,7 +672,7 @@ t_mustard= Button(button_type_3, (t_x, t_y), "Col. Mustard", info_font, info_col
 t_mustard.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
-#	boldText()
+#   a boldText() function will have to be made in Button
 
 # Peacock
 t_y = t_y + info_y_shift
@@ -681,7 +680,7 @@ t_peacock= Button(button_type_3, (t_x, t_y), "Mrs. Peacock", info_font, info_col
 t_peacock.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
-#	boldText()
+#   boldText()
 
 # Plum
 t_y = t_y + info_y_shift
@@ -689,7 +688,7 @@ t_plum= Button(button_type_3, (t_x, t_y), "Prof. Plum", info_font, info_color, i
 t_plum.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
-#	boldText()
+#   boldText()
 
 # Scarlet
 t_y = t_y + info_y_shift
@@ -697,7 +696,7 @@ t_scarlet= Button(button_type_3, (t_x, t_y), "Ms. Scarlet", info_font, info_colo
 t_scarlet.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
-#	boldText()
+#   boldText()
 
 # White
 t_y = t_y + info_y_shift
@@ -705,7 +704,7 @@ t_white= Button(button_type_3, (t_x, t_y), "Mrs. White", info_font, info_color, 
 t_white.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
-#	boldText()
+#   boldText()
 
 # Weapons
 t_x = t_x + info_width # shift to the right for a new "column"
@@ -719,7 +718,7 @@ t_candle= Button(button_type_3, (t_x, t_y), "Candlestick", info_font, info_color
 t_candle.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
-#	boldText()
+#   boldText()
 
 # Dagger
 t_y = t_y + info_y_shift
@@ -727,7 +726,7 @@ t_dagger= Button(button_type_3, (t_x, t_y), "Dagger", info_font, info_color, inf
 t_dagger.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
-#	boldText()
+#   boldText()
 
 # Lead Pipe
 t_y = t_y + info_y_shift
@@ -735,7 +734,7 @@ t_pipe= Button(button_type_3, (t_x, t_y), "Lead Pipe", info_font, info_color, in
 t_pipe.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
-#	boldText()
+#   boldText()
 
 # Rope
 t_y = t_y + info_y_shift
@@ -743,7 +742,7 @@ t_rope= Button(button_type_3, (t_x, t_y), "Rope", info_font, info_color, info_gr
 t_rope.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
-#	boldText()
+#   boldText()
 
 # Wrench
 t_y = t_y + info_y_shift
@@ -751,7 +750,7 @@ t_wrench= Button(button_type_3, (t_x, t_y), "Wrench", info_font, info_color, inf
 t_wrench.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
-#	boldText()
+#   boldText()
 
 # Rooms
 t_x = t_x + info_width # shift to the right for a new "column"
@@ -765,7 +764,7 @@ t_study= Button(button_type_3, (t_x, t_y), "Study", info_font, info_color, info_
 t_study.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
-#	boldText()
+#   boldText()
 
 # Hall
 t_y = t_y + info_y_shift
@@ -773,7 +772,7 @@ t_hall= Button(button_type_3, (t_x, t_y), "Hall", info_font, info_color, info_gr
 t_hall.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
-#	boldText()
+#   boldText()
 
 # Lounc
 t_y = t_y + info_y_shift
@@ -781,7 +780,7 @@ t_lounge= Button(button_type_3, (t_x, t_y), "Lounge", info_font, info_color, inf
 t_lounge.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
-#	boldText()
+#   boldText()
 
 # Library
 t_y = t_y + info_y_shift
@@ -789,7 +788,7 @@ t_library= Button(button_type_3, (t_x, t_y), "Library", info_font, info_color, i
 t_library.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
-#	boldText()
+#   boldText()
 
 # Billiard Room
 t_y = t_y + info_y_shift
@@ -797,7 +796,7 @@ t_billiard= Button(button_type_3, (t_x, t_y), "Billiard", info_font, info_color,
 t_billiard.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
-#	boldText()
+#   boldText()
 
 # Dining Room
 t_y = t_y + info_y_shift
@@ -805,7 +804,7 @@ t_dining= Button(button_type_3, (t_x, t_y), "Dining", info_font, info_color, inf
 t_dining.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
-#	boldText()
+#   boldText()
 
 # Conservatory
 t_y = t_y + info_y_shift
@@ -818,7 +817,7 @@ t_ballroom= Button(button_type_3, (t_x, t_y), "Ballroom", info_font, info_color,
 t_ballroom.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
-#	boldText()
+#   boldText()
 
 # Kitchen
 t_y = t_y + info_y_shift
@@ -826,7 +825,7 @@ t_kitchen= Button(button_type_3, (t_x, t_y), "Kitchen", info_font, info_color, i
 t_kitchen.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
-#	boldText()
+#   boldText()
 
 ################################
 # Notifications
@@ -890,6 +889,7 @@ while not done:
     pygame.draw.rect(screen, BLACK, [0, 0, vertical, height], 2) #Draw a rectangle around the map
     pygame.draw.rect(screen, RED, [vertical, 0, width, 192], 2) #Notification Palen
     pygame.draw.rect(screen, BLUE, [vertical, hRight, width, height], 2) #Action Panel
+    
     pygame.display.flip()
     clock.tick(60)
 
@@ -1399,4 +1399,4 @@ while not done:
     pygame.event.clear()    
 
 pygame.quit()
-s.close() 
+s.close()
