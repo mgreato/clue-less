@@ -22,8 +22,6 @@ class Text():
         self.base_color = base_color
         self.greyed_color = greyed_color
         self.text = self.font_input.render(self.text_input, True, self.base_color)
-        #self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))  #needed only for checking inputs
-        #self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))  #needed only for checking inputs
 
     def update(self, screen):
         if self.text_input is not None:
@@ -38,16 +36,6 @@ class Text():
 
     def greyText(self):
         self.text = self.font_input.render(self.text_input, True, self.greyed_color)
-
-    #def checkForInput(self, position):
-    #    if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top,
-    #                                                                                      self.rect.bottom):
-    #        return True
-    #    return False
-
-    #def updateText(self, new_text_input)
-    # read new_text_input 
-    # write new_text_input to text_input 
 
 mustardChosen = False
 peacockChosen = False
@@ -164,9 +152,6 @@ playerChosen = False
 
 playerText = ""
 cardText = ""
-
-choiceInput = ""
-moveChoiceMade = False
 currentButtons = []
 buttonsClicked = False
 clickedButton = ""
@@ -176,9 +161,7 @@ accusing = False
 personSuggested = ""
 weaponSuggested = ""
 roomSuggested = ""
-collectSuggestionHelp = False
 waitingForSuggestion = False
-suggestionHelpPlayer = 0
 
 # set up threading for pygame and server events
 SERVER_MESSAGE = pygame.USEREVENT+1
@@ -383,23 +366,6 @@ def printSuggestionHelpButtons(playerNumber, suggestionMatches):
     pygame.display.update()
     # currentButtons = helpButtons
     return helpButtons
-
-def makeAccusation():
-    print("Who would you like to accuse?")
-    accusePersonInput = input("person ->")
-    accuseRoomInput = input("room ->")
-    accuseWeaponInput = input("weapon ->")
-    allAccusations = accusePersonInput + "," + accuseRoomInput + "," + accuseWeaponInput
-    s.send(allAccusations.encode())
-    clientsMessage = s.recv(1024).decode()
-    wonLostMessage = s.recv(1024).decode()
-    if "won" in wonLostMessage:
-        print("You Won!")
-        msg = "endConnection for all"
-    if "lost" in wonLostMessage:
-        print("You lost, you can no longer move or suggest.")
-        msg = "endConnection for player"
-    return msg
 
 def validateSuggestion(p):
     if (roomsToNames.get(p.playerLocation) != None) and (p.hasSuggested == False) and (p.canSuggest == True):
@@ -992,26 +958,9 @@ def addNewNotificationLine(text):
         updateNotifications(not_text1, not_text2, not_text3, not_text4, not_text5, not_text6, not_text7, not_text8, not_text9, not_text10)
 
 currentPlayerLocations = ""
-    
-playerText = ""
-cardText = ""
-
-choiceInput = ""
-moveChoiceMade = False
-currentButtons = []
-buttonsClicked = False
-clickedButton = ""
-myNumber = 0
 
 first_beginning_screen = False
 second_beginning_screen = False
-suggesting = False
-personSuggested = ""
-weaponSuggested = ""
-roomSuggested = ""
-collectSuggestionHelp = False
-waitingForSuggestion = False
-suggestionHelpPlayer = 0
 gameStarted = False
 gDefined = False
 
@@ -1049,8 +998,15 @@ while not done:
                 readmsg = readmsg.split(",")
                 print(readmsg)
                 if(readmsg[1]) and (int(readmsg[1]) == int(p.playerNumber)):
-                    print(readmsg[2])
-                s.close()
+                    defaultWon = readmsg[2]
+                    defaultWonText = Text((1055, 525), defaultWon, action_font, action_font, (0,0,0), notification_color)
+                    defaultWonText.update(screen)
+                    winning = pygame.image.load("winScreen.png").convert() #load image
+                    winning = pygame.transform.scale(winning, boardSize) #transform size
+                    screen.blit(winning, boardLocation) ##populate on screen
+                    print("You Won!")
+                    # msg = "endConnection for all"
+                # s.close()
                 
             if CONNECTED_MSG in readmsg and waitingForSuggestion == False:
                 myNumber = readmsg.split("You are Player ")[1].split(".")[0]
@@ -1079,9 +1035,6 @@ while not done:
 
                     b_start6 = Button(button_type_start, (b_x_start_updated+4*(b_width_start+dist_between_buttons), b_y_start), "6", button_font, button_color, button_greyed_color)
                     b_start6.update(screen)
-                    #numberOfPlayers = input("->")
-                    #numberOfPlayers = "2" #dummy for now
-                    #s.send(numberOfPlayers.encode())
 
                 else:
                     first_beginning_screen = False
@@ -1093,7 +1046,6 @@ while not done:
 
 
             if PLAYER_CHOICE_MESSAGE in readmsg and waitingForSuggestion == False:
-                #readmsg = s.recv(1024).decode() # NEED TO GET RID OF THIS
                 print(readmsg, "\n")
                 if "Mustard" in readmsg:
                     mustardChosen = False
@@ -1142,19 +1094,6 @@ while not done:
                     b_startGreen = Button(button_type_start, (b_x_start+5*(b_width_start+dist_between_buttons), b_y_start), "Reverend Green", button_font, button_color, button_greyed_color)
                     b_startGreen.update(screen)
                     
-                # message = input(" -> ")
-                #if int(myNumber) == 1: # dummy for now
-                #    message = "Mrs. White"
-                #else:
-                #    message = "Colonel Mustard"
-                #playerLocation = Game.playerStartLocations.get(message) #-- > merge conflict
-                #p = Player(myNumber, message, playerLocation, None, False, False, False, False) # --> merge conflict 
-                #sendMessage = p.playerName + "," + playerLocation
-                #s.send(sendMessage.encode())
-
-                #playerMessage = s.recv(1024).decode() # NEED TO GET RID OF THIS
-                #print(playerMessage)
-                #readmsg = playerMessage
             
             if BEGINNING_MSG in readmsg and waitingForSuggestion == False:
                 print(readmsg)
@@ -1225,16 +1164,14 @@ while not done:
                 screen.blit(boardImage, boardLocation) ##populate on screen 
                 
 
-            if WIN_MSG in readmsg:
+            if WIN_MSG in readmsg and canClickButtons:
                 winning = pygame.image.load("winScreen.png").convert() #load image
                 winning = pygame.transform.scale(winning, boardSize) #transform size
                 screen.blit(winning, boardLocation) ##populate on screen
                 print("You Won!")
                 msg = "endConnection for all"
-                if(msg == "endConnection for all"):
-                    s.close()
 
-            if LOSE_MSG in readmsg:
+            if ((LOSE_MSG in readmsg) and canClickButtons) or ((WIN_MSG in readmsg) and (not canClickButtons)):
                 losing = pygame.image.load("loseScreen.png").convert() #load image
                 losing = pygame.transform.scale(losing, boardSize) #transform size
                 screen.blit(losing, boardLocation) ##populate on screen
@@ -1244,8 +1181,8 @@ while not done:
 
                 
             if TURN_MSG in readmsg:
-                print("-------------------")
-                print(readmsg)
+                # print("-------------------")
+                # print(readmsg)
                 currentPlayerLocations = readmsg.split("|||||")[1]
                 if "Player "+str(p.playerNumber) in readmsg:
                     canClickButtons = True
@@ -1257,7 +1194,6 @@ while not done:
                     buttonsClicked = False
                     suggesting = False
                     accusing = False
-            
                     
             if "is moving to" in readmsg:
                 print("MOVE MESSAGE:")
@@ -1359,7 +1295,7 @@ while not done:
                 playerLocDict[player] = location
                 movePlayerImages(playerLocDict)
             
-            if ("is suggesting" in readmsg) and canClickButtons:
+            if ("is suggesting" in readmsg) and canClickButtons and suggesting:
                 waitingForSuggestion = True
                 print("WAITING")
                 print("INSIDE IS SUGGESTING")
@@ -1821,6 +1757,7 @@ while not done:
                                         #movePlayerImages(playerImageDict)
                                         print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
                                 if accusing == True:
+                                    suggesting = False
                                     print("IN CLICKING BUTTONS FOR ACCUSE!")
                                     if clickedButton.text_input in names:
                                         personAccused = clickedButton.text_input
@@ -1845,7 +1782,7 @@ while not done:
                                         pygame.display.update()
                                         allAccusations = "accuse !!!" + personAccused + "," + roomAccused + "," + weaponAccused
                                         s.send(allAccusations.encode())
-                                        clientsMessage = s.recv(1024).decode()
+                                        # clientsMessage = s.recv(1024).decode()
 
                         if buttonsClicked == True:
                             # if(p.hasMoved == False) and (p.helpingSuggestion == False):
@@ -1854,7 +1791,7 @@ while not done:
                                 ### NEED TO FIGURE OUT HOW TO MAKE MULTIPLE BUTTONS APPEAR ####
                                 print("PRINTING BUTTON TEXT INPUT")
                                 print(clickedButton.text_input)
-                                print(choiceInput)
+                                # print(choiceInput)
                                 moveInput = clickedButton.text_input
                                 print("PRINTING MOVE INPUT HERE")
                                 print(moveInput)
@@ -1966,7 +1903,6 @@ while not done:
 
                     if b_accuse.isOver(pos, button_width_1, button_height):
                         print('accusing')
-                        # msg = makeAccusation()
                         accusing = True
                         playerButtons = printPlayerButtons("accuse")
                         currentButtons = playerButtons
