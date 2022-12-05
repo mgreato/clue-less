@@ -135,8 +135,8 @@ TURN_MSG = "Next Turn"
 MOVE_MSG = "another"
 SUGGESTION = "is suggesting "
 CARDS_MSG = "Your cards are"
-WIN_MSG = "You Win"
-LOSE_MSG = "You Lose"
+WIN_MSG = "won!"
+LOSE_MSG = "lost the game"
 PLAYER_CHOICE_MESSAGE = "What player would you like to be?"
 currentPlayer = 0
 
@@ -1078,10 +1078,19 @@ while not done:
                 winning = pygame.image.load("winScreen.png").convert() #load image
                 winning = pygame.transform.scale(winning, boardSize) #transform size
                 screen.blit(winning, boardLocation) ##populate on screen
+                print("You Won!")
+                msg = "endConnection for all"
+                if(msg == "endConnection for all"):
+                    s.close()
+
             if LOSE_MSG in readmsg:
                 losing = pygame.image.load("loseScreen.png").convert() #load image
                 losing = pygame.transform.scale(losing, boardSize) #transform size
                 screen.blit(losing, boardLocation) ##populate on screen
+                print("You lost, you can no longer move or suggest.")
+                msg = "endConnection for player"
+                s.send(msg.encode())
+
                 
             if TURN_MSG in readmsg:
                 print("-------------------")
@@ -1578,6 +1587,8 @@ while not done:
                                     if clickedButton.text_input in rooms:
                                         roomAccused = clickedButton.text_input
                                         print("INSIDE ACCUSED WITH ALL ACCUSED ANSWERS")
+                                        pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                        pygame.display.update()
                                         allAccusations = "accuse !!!" + personAccused + "," + roomAccused + "," + weaponAccused
                                         s.send(allAccusations.encode())
                                         clientsMessage = s.recv(1024).decode()
