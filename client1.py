@@ -1198,7 +1198,17 @@ while not done:
             if "is moving to" in readmsg:
                 print("MOVE MESSAGE:")
                 print(readmsg)
-                addNewNotificationLine(readmsg)
+                tempMsg = readmsg
+                tempMsg = tempMsg.replace("room1", "study")
+                tempMsg = tempMsg.replace("room2", "hall")
+                tempMsg = tempMsg.replace("room3", "lounge")
+                tempMsg = tempMsg.replace("room4", "dining room")
+                tempMsg = tempMsg.replace("room5", "kitchen")
+                tempMsg = tempMsg.replace("room6", "ballroom")
+                tempMsg = tempMsg.replace("room7", "conservatory")
+                tempMsg = tempMsg.replace("room8", "library")
+                tempMsg = tempMsg.replace("room9", "billiard room")
+                addNewNotificationLine(tempMsg)
 
                 if "Mustard" in readmsg:
                     player = "Colonel Mustard"
