@@ -454,7 +454,137 @@ initialBoardImage = pygame.transform.scale(initialBoardImage, boardSize)
 screen.blit(initialBoardImage, boardLocation) ##populate on screen
 #screen.blit(boardImage, boardLocation) ##populate on screen
 
+playerSize = (32,32)
+mustardImage = pygame.image.load("Colonel Mustard.png").convert()
+mustardImage = pygame.transform.scale(mustardImage, playerSize)
+peacockImage = pygame.image.load("Mrs Peacock.png").convert()
+peacockImage = pygame.transform.scale(peacockImage, playerSize)
+plumImage = pygame.image.load("Professor Plum.png").convert()
+plumImage = pygame.transform.scale(plumImage, playerSize)
+scarlettImage = pygame.image.load("Miss Scarlett.png").convert()
+scarlettImage = pygame.transform.scale(scarlettImage, playerSize)
+whiteImage = pygame.image.load("Mrs White.png").convert()
+whiteImage = pygame.transform.scale(whiteImage, playerSize)
+greenImage = pygame.image.load("Reverend Green.png").convert()
+greenImage = pygame.transform.scale(greenImage, playerSize)
 
+testRoom = "billiard room"
+
+testFirstLocations = {"Miss Scarlett": testRoom, "Colonel Mustard": testRoom, "Mrs. White": testRoom, "Reverend Green": testRoom,
+        "Mrs. Peacock": testRoom, "Professor Plum": testRoom}
+
+def movePlayerImages(playerLocations):
+    screen.blit(boardImage, boardLocation)
+    disp = 6
+    px = 32
+    
+    for player in playerLocations:
+        location = playerLocations[player]    
+        if location == "hallway12":
+            roomx = 255
+            roomy = 133
+        elif location == "hallway23":
+            roomx = 515
+            roomy = 133
+        elif location == "hallway45":
+            roomx = 255
+            roomy = 358     
+        elif location == "hallway56":
+            roomx = 575
+            roomy = 358
+        elif location == "hallway78":
+            roomx = 255
+            roomy = 585   
+        elif location == "hallway89":
+            roomx = 575
+            roomy = 585
+        elif location == "hallway14":
+            roomx = 110
+            roomy = 253   
+        elif location == "hallway25":
+            roomx = 425
+            roomy = 253
+        elif location == "hallway36":
+            roomx = 737
+            roomy = 253   
+        elif location == "hallway47":
+            roomx = 110
+            roomy = 475
+        elif location == "hallway58":
+            roomx = 425
+            roomy = 475   
+        elif location == "hallway69":
+            roomx = 737
+            roomy = 475
+        elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "study":
+            roomx = 65
+            roomy = 84
+        elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "study":
+            roomx = 65
+            roomy = 227-px
+        elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "hall":
+            roomx = 380
+            roomy = 84
+        elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "hall":
+            roomx = 380
+            roomy = 227-px      
+        elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "lounge":
+            roomx = 692
+            roomy = 84
+        elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "lounge":
+            roomx = 692
+            roomy = 227-px
+        elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "dining room":
+            roomx = 65
+            roomy = 310
+        elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "dining room":
+            roomx = 65
+            roomy = 453-px   
+        elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "kitchen":
+            roomx = 380
+            roomy = 310
+        elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "kitchen":
+            roomx = 380
+            roomy = 453-px  
+        elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "ballroom":
+            roomx = 692
+            roomy = 310
+        elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "ballroom":
+            roomx = 692
+            roomy = 453-px                   
+        elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "conservatory":
+            roomx = 65
+            roomy = 535
+        elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "conservatory":
+            roomx = 65
+            roomy = 678-px  
+        elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "library":
+            roomx = 380
+            roomy = 535
+        elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "library":
+            roomx = 380
+            roomy = 678-px  
+        elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "billiard room":
+            roomx = 692 
+            roomy = 535
+        elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "billiard room":
+            roomx = 692
+            roomy = 678-px
+
+        if player == "Colonel Mustard":
+            screen.blit(mustardImage, (roomx + disp, roomy))
+        elif player == "Mrs. Peacock":
+            screen.blit(peacockImage, (roomx + 2*disp + px, roomy))
+        elif player == "Professor Plum":
+            screen.blit(plumImage, (roomx+ 3*disp + 2*px, roomy))
+        elif player == "Miss Scarlett":
+            screen.blit(scarlettImage, (roomx + disp, roomy))
+        elif player == "Mrs. White":
+            screen.blit(whiteImage, (roomx + 2*disp + px, roomy))
+        elif player == "Reverend Green":
+            screen.blit(greenImage, (roomx+ 3*disp + 2*px, roomy))
+        
+                
 ## INSERT PLAYER IMAGES IN HERE
 #playerSize = (50, 50) #set size of character images
 # for each of the images .... 
@@ -881,10 +1011,14 @@ while not done:
     
     pygame.display.flip()
     clock.tick(60)
+    
 
     for event in pygame.event.get():  # User did something
         if event.type == pygame.QUIT:  # If user closes window
             done = True  # Flag to exit the loop
+        
+        if gameStarted == True:
+            movePlayerImages(testFirstLocations)
         
         if event.type == SERVER_MESSAGE: # If the server sends a message
             readmsg = event.message

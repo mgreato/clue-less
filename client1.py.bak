@@ -28,11 +28,26 @@ class Text():
     def update(self, screen):
         if self.text_input is not None:
             screen.blit(self.text, self.position) # populate on screen
+
+
     def boldText(self):
         self.text = self.bold_input.render(self.text_input, True, self.base_color)
     
     def baseText(self):
         self.text = self.font_input.render(self.text_input, True, self.base_color)
+
+    def greyText(self):
+        self.text = self.font_input.render(self.text_input, True, self.greyed_color)
+
+    #def checkForInput(self, position):
+    #    if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top,
+    #                                                                                      self.rect.bottom):
+    #        return True
+    #    return False
+
+    #def updateText(self, new_text_input)
+    # read new_text_input 
+    # write new_text_input to text_input 
 
 mustardChosen = False
 peacockChosen = False
@@ -51,18 +66,6 @@ not_text8 = ""
 not_text9 = ""
 not_text10 = ""
 
-    def greyText(self):
-        self.text = self.font_input.render(self.text_input, True, self.greyed_color)
-
-    #def checkForInput(self, position):
-    #    if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top,
-    #                                                                                      self.rect.bottom):
-    #        return True
-    #    return False
-
-    #def updateText(self, new_text_input)
-    # read new_text_input 
-    # write new_text_input to text_input 
 
 # Button class creates buttons
 class Button():
@@ -132,8 +135,8 @@ TURN_MSG = "Next Turn"
 MOVE_MSG = "another"
 SUGGESTION = "is suggesting "
 CARDS_MSG = "Your cards are"
-WIN_MSG = "You Win"
-LOSE_MSG = "You Lose"
+WIN_MSG = "won!"
+LOSE_MSG = "lost the game"
 PLAYER_CHOICE_MESSAGE = "What player would you like to be?"
 currentPlayer = 0
 
@@ -149,6 +152,7 @@ weapons = ["rope", "candlestick", "dagger", "wrench", "lead pipe", "revolver"]
 #             "Mrs. Peacock": "hallway78", "Professor Plum": "hallway81"}
 playerFirstLocations = {"Miss Scarlett": "hallway23", "Colonel Mustard": "hallway34", "Mrs. White": "hallway56", "Reverend Green": "hallway67",
         "Mrs. Peacock": "hallway78", "Professor Plum": "hallway81"}
+rooms = ["study","hall","lounge","dining room", "kitchen", "ballroom", "conservatory", "library", "billiard room"]
 
 # connect to server
 port = 5050
@@ -167,6 +171,7 @@ buttonsClicked = False
 clickedButton = ""
 myNumber = 0
 suggesting = False
+accusing = False
 personSuggested = ""
 weaponSuggested = ""
 roomSuggested = ""
@@ -210,7 +215,7 @@ def can_take_secret_passage(playerRoom):
     return boolean, diagonal_room_name
 
 def moveOptionButtons(moveOptions):
-    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+    pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
     pygame.display.update()
     print("SHOULD DRAW RECTANGLE NOW")
     info_font = pygame.font.SysFont('Calibri', 14, False, False)
@@ -289,12 +294,13 @@ def movePlayer(p, otherPlayerLocations):
             print("Where would you like to move? Your choices are: " + str(possibleRooms))
             return possibleRooms
 
-def printPlayerButtons():
+def printPlayerButtons(action):
     pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
     pygame.display.update()
     info_font = pygame.font.SysFont('Calibri', 14, False, False)
     info_font_bold = pygame.font.SysFont('Calibri', 14, True, True)
-    who = Text((1075, 525), "Who would you like to suggest?", info_font, info_font_bold, (0,0,0), info_greyed_color)
+    messaging = "Who would you like to " + action + "?"
+    who = Text((1075, 525), messaging, info_font, info_font_bold, (0,0,0), info_greyed_color)
     who.update(screen)
     size = (100, 50)
     positions = [(1075, 575), (1190, 575), (1305, 575), (1075, 650), (1190, 650), (1305, 650)]
@@ -311,13 +317,14 @@ def printPlayerButtons():
     pygame.display.update()
     return playerButtons
 
-def printWeaponButtons():
+def printWeaponButtons(action):
     pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
     pygame.display.update()
     info_font = pygame.font.SysFont('Calibri', 14, False, False)
     info_font_bold = pygame.font.SysFont('Calibri', 14, True, True)
-    who = Text((1075, 525), "What weapon would you like to suggest?", info_font, info_font_bold, (0,0,0), info_greyed_color)
-    who.update(screen)
+    messaging = "What weapon would you like to " + action + "?"
+    what = Text((1075, 525), messaging, info_font, info_font_bold, (0,0,0), info_greyed_color)
+    what.update(screen)
     size = (100, 50)
     positions = [(1075, 575), (1190, 575), (1305, 575), (1075, 650), (1190, 650), (1305, 650)]
     font = pygame.font.SysFont('Calibri', 16, True, False)
@@ -332,6 +339,29 @@ def printWeaponButtons():
         weaponButton.update(screen)
     pygame.display.update()
     return weaponButtons
+
+def printRoomButtons(action):
+    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+    pygame.display.update()
+    info_font = pygame.font.SysFont('Calibri', 14, False, False)
+    info_font_bold = pygame.font.SysFont('Calibri', 14, True, True)
+    messaging = "What room do you choose to " + action + "?"
+    where = Text((1075, 525), messaging, info_font, info_font_bold, (0,0,0), info_greyed_color)
+    where.update(screen)
+    size = (85, 40)
+    positions = [(1075, 575), (1190, 575), (1305, 575), (1075, 630), (1190, 630), (1305, 630), (1075, 685), (1190, 685), (1305, 685)]
+    font = pygame.font.SysFont('Calibri', 16, True, False)
+    buttonType = pygame.transform.scale(button_image, size) #transform size
+    roomButtons = []
+    for i in range(0,len(rooms)):
+        print("SIZES")
+        print(positions[i][0])
+        print(rooms[i])
+        roomButton = Button(buttonType, (positions[i]), rooms[i], font, (0,255,255), (0,50,50))
+        roomButtons.append(roomButton)
+        roomButton.update(screen)
+    pygame.display.update()
+    return roomButtons
 
 def printSuggestionHelpButtons(playerNumber, suggestionMatches):
     print("INSIDE PRINT SUGGESTION HELP BUTTONS")
@@ -424,7 +454,137 @@ initialBoardImage = pygame.transform.scale(initialBoardImage, boardSize)
 screen.blit(initialBoardImage, boardLocation) ##populate on screen
 #screen.blit(boardImage, boardLocation) ##populate on screen
 
+playerSize = (32,32)
+mustardImage = pygame.image.load("Colonel Mustard.png").convert()
+mustardImage = pygame.transform.scale(mustardImage, playerSize)
+peacockImage = pygame.image.load("Mrs Peacock.png").convert()
+peacockImage = pygame.transform.scale(peacockImage, playerSize)
+plumImage = pygame.image.load("Professor Plum.png").convert()
+plumImage = pygame.transform.scale(plumImage, playerSize)
+scarlettImage = pygame.image.load("Miss Scarlett.png").convert()
+scarlettImage = pygame.transform.scale(scarlettImage, playerSize)
+whiteImage = pygame.image.load("Mrs White.png").convert()
+whiteImage = pygame.transform.scale(whiteImage, playerSize)
+greenImage = pygame.image.load("Reverend Green.png").convert()
+greenImage = pygame.transform.scale(greenImage, playerSize)
 
+testRoom = "library"
+
+testFirstLocations = {"Miss Scarlett": testRoom, "Colonel Mustard": testRoom, "Mrs. White": testRoom, "Reverend Green": testRoom,
+        "Mrs. Peacock": testRoom, "Professor Plum": testRoom}
+
+def movePlayerImages(playerLocations):
+    screen.blit(boardImage, boardLocation)
+    disp = 6
+    px = 32
+    
+    for player in playerLocations:
+        location = playerLocations[player]    
+        if location == "hallway12":
+            roomx = 255
+            roomy = 133
+        elif location == "hallway23":
+            roomx = 515
+            roomy = 133
+        elif location == "hallway45":
+            roomx = 255
+            roomy = 358     
+        elif location == "hallway56":
+            roomx = 575
+            roomy = 358
+        elif location == "hallway78":
+            roomx = 255
+            roomy = 585   
+        elif location == "hallway89":
+            roomx = 575
+            roomy = 585
+        elif location == "hallway14":
+            roomx = 110
+            roomy = 253   
+        elif location == "hallway25":
+            roomx = 425
+            roomy = 253
+        elif location == "hallway36":
+            roomx = 737
+            roomy = 253   
+        elif location == "hallway47":
+            roomx = 110
+            roomy = 475
+        elif location == "hallway58":
+            roomx = 425
+            roomy = 475   
+        elif location == "hallway69":
+            roomx = 737
+            roomy = 475
+        elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "study":
+            roomx = 65
+            roomy = 84
+        elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "study":
+            roomx = 65
+            roomy = 227-px
+        elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "hall":
+            roomx = 380
+            roomy = 84
+        elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "hall":
+            roomx = 380
+            roomy = 227-px      
+        elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "lounge":
+            roomx = 692
+            roomy = 84
+        elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "lounge":
+            roomx = 692
+            roomy = 227-px
+        elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "dining room":
+            roomx = 65
+            roomy = 310
+        elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "dining room":
+            roomx = 65
+            roomy = 453-px   
+        elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "kitchen":
+            roomx = 380
+            roomy = 310
+        elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "kitchen":
+            roomx = 380
+            roomy = 453-px  
+        elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "ballroom":
+            roomx = 692
+            roomy = 310
+        elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "ballroom":
+            roomx = 692
+            roomy = 453-px                   
+        elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "conservatory":
+            roomx = 65
+            roomy = 535
+        elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "conservatory":
+            roomx = 65
+            roomy = 678-px  
+        elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "library":
+            roomx = 380
+            roomy = 535
+        elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "library":
+            roomx = 380
+            roomy = 678-px  
+        elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "billiard room":
+            roomx = 692 
+            roomy = 535
+        elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "billiard room":
+            roomx = 692
+            roomy = 678-px
+
+        if player == "Colonel Mustard":
+            screen.blit(mustardImage, (roomx + disp, roomy))
+        elif player == "Mrs. Peacock":
+            screen.blit(peacockImage, (roomx + 2*disp + px, roomy))
+        elif player == "Professor Plum":
+            screen.blit(plumImage, (roomx+ 3*disp + 2*px, roomy))
+        elif player == "Miss Scarlett":
+            screen.blit(scarlettImage, (roomx + disp, roomy))
+        elif player == "Mrs. White":
+            screen.blit(whiteImage, (roomx + 2*disp + px, roomy))
+        elif player == "Reverend Green":
+            screen.blit(greenImage, (roomx+ 3*disp + 2*px, roomy))
+        
+                
 ## INSERT PLAYER IMAGES IN HERE
 #playerSize = (50, 50) #set size of character images
 # for each of the images .... 
@@ -789,7 +949,7 @@ def addNewNotificationLine(text):
     global not_text9
     global not_text10
     global numLinesFilled
-
+    
     numLinesFilled = numLinesFilled+1
     if numLinesFilled ==4 :
         updateNotifications(not_text1, not_text2, not_text3, text, "", "", "", "", "", "")
@@ -815,8 +975,6 @@ def addNewNotificationLine(text):
         not_text9 = not_text10    
         not_text10 = (text)
         updateNotifications(not_text1, not_text2, not_text3, not_text4, not_text5, not_text6, not_text7, not_text8, not_text9, not_text10)
-
-
 
 currentPlayerLocations = ""
     
@@ -853,10 +1011,14 @@ while not done:
     
     pygame.display.flip()
     clock.tick(60)
+    
 
     for event in pygame.event.get():  # User did something
         if event.type == pygame.QUIT:  # If user closes window
             done = True  # Flag to exit the loop
+        
+        if gameStarted == True:
+            movePlayerImages(testFirstLocations)
         
         if event.type == SERVER_MESSAGE: # If the server sends a message
             readmsg = event.message
@@ -1050,12 +1212,21 @@ while not done:
                 winning = pygame.image.load("winScreen.png").convert() #load image
                 winning = pygame.transform.scale(winning, boardSize) #transform size
                 screen.blit(winning, boardLocation) ##populate on screen
+                print("You Won!")
+                msg = "endConnection for all"
+                if(msg == "endConnection for all"):
+                    s.close()
+
             if LOSE_MSG in readmsg:
                 losing = pygame.image.load("loseScreen.png").convert() #load image
                 losing = pygame.transform.scale(losing, boardSize) #transform size
                 screen.blit(losing, boardLocation) ##populate on screen
+                print("You lost, you can no longer move or suggest.")
+                msg = "endConnection for player"
+                s.send(msg.encode())
+
                 
-            if ((TURN_MSG or MOVE_MSG) in readmsg) or (SUGGESTION in readmsg) and waitingForSuggestion == False:
+            if TURN_MSG in readmsg:
                 print("-------------------")
                 print(readmsg)
                 currentPlayerLocations = readmsg.split("|||||")[1]
@@ -1067,6 +1238,8 @@ while not done:
                     p.canEndTurn = False
                     currentButtons = []
                     buttonsClicked = False
+                    suggesting = False
+                    accusing = False
             
             if ("is suggesting" in readmsg) and canClickButtons:
                 waitingForSuggestion = True
@@ -1258,7 +1431,6 @@ while not done:
                     t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
                     t_mustard.bolded = True
                     t_mustard.update(screen)
-                    addNewNotificationLine("updated Mustard text")
                 else:
                     t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
                     t_mustard.bolded = False
@@ -1268,7 +1440,6 @@ while not done:
                     t_peacock = Button(t_peacock.image, (t_peacock.x_pos, t_peacock.y_pos), t_peacock.text_input, info_font_bold, t_peacock.base_color, t_peacock.hovering_color)
                     t_peacock.bolded = True
                     t_peacock.update(screen)
-                    addNewNotificationLine("updated peacock text")
                 else:
                     t_peacock = Button(t_peacock.image, (t_peacock.x_pos, t_peacock.y_pos), t_peacock.text_input, info_font, t_peacock.base_color, t_peacock.hovering_color)
                     t_peacock.bolded = False
@@ -1278,7 +1449,6 @@ while not done:
                     t_plum = Button(t_plum.image, (t_plum.x_pos, t_plum.y_pos), t_plum.text_input, info_font_bold, t_plum.base_color, t_plum.hovering_color)
                     t_plum.bolded = True
                     t_plum.update(screen)
-                    addNewNotificationLine("updated plum text")
                 else:
                     t_plum = Button(t_plum.image, (t_plum.x_pos, t_plum.y_pos), t_plum.text_input, info_font, t_plum.base_color, t_plum.hovering_color)
                     t_plum.bolded = False
@@ -1288,7 +1458,6 @@ while not done:
                     t_scarlet = Button(t_scarlet.image, (t_scarlet.x_pos, t_scarlet.y_pos), t_scarlet.text_input, info_font_bold, t_scarlet.base_color, t_scarlet.hovering_color)
                     t_scarlet.bolded = True
                     t_scarlet.update(screen)
-                    addNewNotificationLine("updated scarlett text")
                 else:
                     t_scarlet = Button(t_scarlet.image, (t_scarlet.x_pos, t_scarlet.y_pos), t_scarlet.text_input, info_font, t_scarlet.base_color, t_scarlet.hovering_color)
                     t_scarlet.bolded = False
@@ -1298,7 +1467,6 @@ while not done:
                     t_white = Button(t_white.image, (t_white.x_pos, t_white.y_pos), t_white.text_input, info_font_bold, t_white.base_color, t_white.hovering_color)
                     t_white.bolded = True
                     t_white.update(screen)
-                    addNewNotificationLine("updated white text")
                 else:
                     t_white = Button(t_white.image, (t_white.x_pos, t_white.y_pos), t_white.text_input, info_font, t_white.base_color, t_white.hovering_color)
                     t_white.bolded = False
@@ -1308,7 +1476,6 @@ while not done:
                     t_green = Button(t_green.image, (t_green.x_pos, t_green.y_pos), t_green.text_input, info_font_bold, t_green.base_color, t_green.hovering_color)
                     t_green.bolded = True
                     t_green.update(screen)
-                    addNewNotificationLine("updated green text")
                 else:
                     t_green = Button(t_green.image, (t_green.x_pos, t_green.y_pos), t_green.text_input, info_font, t_green.base_color, t_green.hovering_color)
                     t_green.bolded = False
@@ -1474,7 +1641,7 @@ while not done:
                                 msg = "KEEP SAME PLAYER TURN"
                                 print(msg)
                                 s.send(msg.encode(form))
-                                # pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                # pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                 # pygame.display.update()
                                 currentButtons = []
                                 # print(moveInput)
@@ -1486,13 +1653,13 @@ while not done:
                                 currentButtons = buttonList
                         else: 
                             updateNotifications("", "You can only move once per turn.", "", "", "", "")
-                            pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                            pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                             pygame.display.update()
                             noDoubleMove = "You can only move once per turn."
                             noDoubleMoveText = Text((1070, 525), noDoubleMove, action_font, action_font, (0,0,0), notification_color)
                             noDoubleMoveText.update(screen)
                             currentButtons = []
-                            # pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                            # pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                             # pygame.display.update()
                             msg = "KEEP SAME PLAYER TURN"
                             print(msg)
@@ -1516,7 +1683,7 @@ while not done:
                                         buttonsClicked = False
                                         pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
                                         pygame.display.update()
-                                        weaponButtons = printWeaponButtons()
+                                        weaponButtons = printWeaponButtons("suggest")
                                         currentButtons = weaponButtons
                                     if clickedButton.text_input in weapons:
                                         weaponSuggested = clickedButton.text_input
@@ -1533,8 +1700,32 @@ while not done:
                                         s.send(all.encode())
                                         print("Move " + personSuggested + " to " + roomSuggested + ".\n")
                                         print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
-
-
+                                if accusing == True:
+                                    print("IN CLICKING BUTTONS FOR ACCUSE!")
+                                    if clickedButton.text_input in names:
+                                        personAccused = clickedButton.text_input
+                                        currentButtons = []
+                                        buttonsClicked = False
+                                        pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                        pygame.display.update()
+                                        weaponButtons = printWeaponButtons("accuse")
+                                        currentButtons = weaponButtons
+                                    if clickedButton.text_input in weapons:
+                                        weaponAccused = clickedButton.text_input
+                                        currentButtons = []
+                                        buttonsClicked = False
+                                        pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                        pygame.display.update()
+                                        roomButtons = printRoomButtons("accuse")
+                                        currentButtons = roomButtons
+                                    if clickedButton.text_input in rooms:
+                                        roomAccused = clickedButton.text_input
+                                        print("INSIDE ACCUSED WITH ALL ACCUSED ANSWERS")
+                                        pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                        pygame.display.update()
+                                        allAccusations = "accuse !!!" + personAccused + "," + roomAccused + "," + weaponAccused
+                                        s.send(allAccusations.encode())
+                                        clientsMessage = s.recv(1024).decode()
 
                         if buttonsClicked == True:
                             # if(p.hasMoved == False) and (p.helpingSuggestion == False):
@@ -1571,7 +1762,7 @@ while not done:
                                 s.send(msg.encode(form))
                                 print(p.hasMoved)
                                 currentButtons = []
-                                pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                 pygame.display.update()
 
                     if b_suggest.isOver(pos, button_width_1, button_height):
@@ -1579,12 +1770,12 @@ while not done:
                         suggestionValidation = validateSuggestion(p)
                         if(suggestionValidation == True):
                             suggesting = True
-                            playerButtons = printPlayerButtons()
+                            playerButtons = printPlayerButtons("suggest")
                             currentButtons = playerButtons
                             print("HERE")
                         else:
                             print("IN CLIENT AND PLAYER CANNOT SUGGEST NOW")
-                            pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                            pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                             pygame.display.update()
                             if p.hasSuggested:
                                 noSuggesting = "You cannot make another suggestion."
@@ -1614,34 +1805,34 @@ while not done:
                             print(msg)
                             s.send(msg.encode(form))
                             print("<<<<<<<<<<<<<<<<<")
-                            pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                            pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                             pygame.display.update()
                                 
                         else:
                             if(p.canSuggest and not p.hasMoved):
                                 # msg = "\nYou must either move or make a suggestion. && " + str(p.canEndTurn)
-                                pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                 pygame.display.update()
                                 endMsg1 = "You must either move or make a suggestion."
                                 noEnd1 = Text((1070, 525), endMsg1, action_font, action_font, (0,0,0), notification_color)
                                 noEnd1.update(screen)
                             if(p.canSuggest and p.hasMoved):
                                 # msg = "\nYou must make a suggestion. && " + str(p.canEndTurn)
-                                pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                 pygame.display.update()
                                 endMsg2 = "You must make a suggestion."
                                 noEnd2 = Text((1070, 525), endMsg2, action_font, action_font, (0,0,0), notification_color)
                                 noEnd2.update(screen)
                             if(not p.canSuggest and p.hasMoved):
                                 # msg = "\nYou must move to a new location. && " + str(p.canEndTurn)
-                                pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                 pygame.display.update()
                                 endMsg3 = "You are not in a location to suggest."
                                 noEnd3 = Text((1070, 525), endMsg3, action_font, action_font, (0,0,0), notification_color)
                                 noEnd3.update(screen)
                             if(not p.canSuggest and not p.hasMoved):
                                 # msg = "\nYou must move to a new location. && " + str(p.canEndTurn)
-                                pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                 pygame.display.update()
                                 endMsg4 = "You must make a move to a new location."
                                 noEnd4 = Text((1055, 525), endMsg4, action_font, action_font, (0,0,0), notification_color)
@@ -1652,24 +1843,12 @@ while not done:
                             print("//////////")
 
                     if b_accuse.isOver(pos, button_width_1, button_height):
-                            print('accusing')
-                            # message = "accuse"
-                            # s.send(message.encode())
-                            # choiceInput = s.recv(1024).decode().split("//")
-                            # print("***********")
-                            # print(choiceInput)
-                            # choice = choiceInput[0]
-                            # player_choice = choice[1:]
-                            # if("," in player_choice):
-                            #     player_choice = player_choice.split(",")[0]
-
-
-                            # # if player_choice == "accuse":
-                            # msg = makeAccusation()
-                            # s.send(msg.encode())
-                            # if(msg == "endConnection for all"):
-                            #     s.close()
-                            # playerMoveActive = False
+                        print('accusing')
+                        # msg = makeAccusation()
+                        accusing = True
+                        playerButtons = printPlayerButtons("accuse")
+                        currentButtons = playerButtons
+                        print("HERE IN ACCUSE")
 
                 elif p.helpingSuggestion == True and gameStarted:
                     print(currentButtons)
@@ -1679,7 +1858,7 @@ while not done:
                         if button.isOver(pos, button.rect.width, button.rect.height):
                             print(button)
                             suggestionHelp = button.text_input
-                    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                    pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                     pygame.display.update()
                     print("SUGGESTION HELP HERE")
                     print(suggestionHelp)
