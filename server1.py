@@ -129,12 +129,15 @@ while gameOn:
         currentPlayer = who_plays_next(currentPlayer, False)
         while winner==0:
             print("Current player: ", currentPlayer)
+            print("UP HERE")
             msg = "\nNext Turn: Player "+str(currentPlayer)+"."
             send_message(msg, clients)
 
             playerTurn = True
             while playerTurn:
                 moveMsg = clients[currentPlayer-1].recv(1024)
+                print("skjakdjeiodowedjiojewodewjdoijweoidjwd")
+                print(moveMsg)
                 playerMoveMsg = str(currentPlayer) + moveMsg.decode(form) + "//" + str(list(g.playerLocations.values()))
 
                 if (MOVE_MSG in playerMoveMsg) or ("moving" in playerMoveMsg):
@@ -178,6 +181,7 @@ while gameOn:
                         clientsToValidate.pop(currentPlayer-1)
                         send_message(goodSuggestion, clientsToValidate)
                         suggestion = suggestionMessage.split(",")
+                        print("HERE!!!!!!!s")
                         person = suggestion[0]
                         room = roomsToNames.get(suggestion[1])
                         weapon = suggestion[2]
@@ -216,12 +220,14 @@ while gameOn:
                             else:
                                 clientToSend = []
                                 clientToSend.append(clients[currentPlayer-1])
-                                send_message(suggestionHelp + " ///\n", clientToSend)
+                                send_message(suggestionHelp + " ///suggestionHelpMade\n", clientToSend)
                                 if(playerSuggest == numPlayers):
                                     print("Player 1 is showing [" + suggestionHelp + "] to disprove the suggestion.")
                                 else:
                                     print("Player " + str(playerSuggest+1) + " is showing [" + suggestionHelp + "] to disprove the suggestion.")
                                 msg = clients[currentPlayer-1].recv(1024).decode()
+                                print("RIGHT HERE IN SERVER CODE")
+                                print(msg)
                                 suggestionHelpMade = True
                         nextMessage = "Move " + person + " to " + room + ".\n"
                         print(nextMessage)
