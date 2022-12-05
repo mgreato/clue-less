@@ -268,12 +268,12 @@ while gameOn:
                             closeConnectionMessage = "CLOSE ALL CONNECTION," + str(currentPlayer) + ",You are the only player left so you win!"
                             send_message(closeConnectionMessage, clients)
                             s.close()
-                    if "all" in msg:
-                        print("Connection should be ended for all.")
-                        activePlayerNumbers.clear()
-                        currentPlayer = who_plays_next(currentPlayer, False)
-                        send_message("CLOSE ALL CONNECTION", clients)
-                        s.close()
+                    # if "all" in msg:
+                    #     print("Connection should be ended for all.")
+                    #     activePlayerNumbers.clear()
+                    #     currentPlayer = who_plays_next(currentPlayer, False)
+                    #     send_message("CLOSE ALL CONNECTION", clients)
+                    #     s.close()
                     playerTurn = False
                     
                 if (END_MSG in playerMoveMsg) and ("end connection" not in playerMoveMsg) and ("rend") not in playerMoveMsg:

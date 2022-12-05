@@ -248,14 +248,12 @@ while gameOn:
                     weaponAccuse = accuse[2]
                     accusation = personAccuse + " in the " + roomAccuse + " with the " + weaponAccuse
                     accusationMessage = "Player " + str(currentPlayer) + " is accusing " + accusation + " \n"
-                    send_message(accusationMessage, clients)
-                    time.sleep(1)
                     if((personAccuse == solutionName) and (roomAccuse == solutionLocation) and (weaponAccuse == solutionWeapon)):
-                        wonMessage = "Player " + str(currentPlayer) + " won! \n"
+                        wonMessage = "Player " + str(currentPlayer) + " won! \n *****" + accusationMessage
                         print(wonMessage)
                         send_message(wonMessage, clients)
                     else:
-                        lostMessage = "Player " + str(currentPlayer) + " lost the game. \n"
+                        lostMessage = "Player " + str(currentPlayer) + " lost the game. \n *****" + accusationMessage
                         print(lostMessage)
                         send_message(lostMessage, clients)
                     msg = clients[currentPlayer-1].recv(1024).decode()
