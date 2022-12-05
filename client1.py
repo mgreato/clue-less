@@ -19,6 +19,16 @@ plumChosen = False
 scarletChosen = False
 whiteChosen = False
 greenChosen = False
+not_text1 = ""
+not_text2 = ""
+not_text3 = ""
+not_text4 = ""
+not_text5 = ""
+not_text6 = ""
+not_text7 = ""
+not_text8 = ""
+not_text9 = ""
+not_text10 = ""
 
 class DropDown():
     def __init__(self, x, y, w, h, color, highlight_color, font, option_list, selected = 0):
@@ -885,10 +895,18 @@ t_line5 = Text((vertical+5, 5+4*fontHeight), "", notification_font, info_font_bo
 t_line5.update(screen)
 t_line6 = Text((vertical+5, 5+5*fontHeight), "", notification_font, info_font_bold, notification_color, notification_color)
 t_line6.update(screen)
+t_line7 = Text((vertical+5, 5+6*fontHeight), "", notification_font, info_font_bold, notification_color, notification_color)
+t_line7.update(screen)
+t_line8 = Text((vertical+5, 5+7*fontHeight), "", notification_font, info_font_bold, notification_color, notification_color)
+t_line8.update(screen)
+t_line9 = Text((vertical+5, 5+8*fontHeight), "", notification_font, info_font_bold, notification_color, notification_color)
+t_line9.update(screen)
+t_line10 = Text((vertical+5, 5+9*fontHeight), "", notification_font, info_font_bold, notification_color, notification_color)
+t_line10.update(screen)
 
+numLinesFilled = 3
 
-
-def updateNotifications(text1, text2, text3, text4, text5, text6):
+def updateNotifications(text1, text2, text3, text4, text5, text6, text7, text8, text9, text10):
     pygame.draw.rect(screen, WHITE, [vertical, 0, vertical, 192])
     pygame.draw.rect(screen, RED, [vertical, 0, vertical, 192], 2)
     t_line1 = Text((vertical+5, 5), text1, notification_font, info_font_bold, notification_color, notification_color)
@@ -903,6 +921,74 @@ def updateNotifications(text1, text2, text3, text4, text5, text6):
     t_line5.update(screen)
     t_line6 = Text((vertical+5, 5+5*fontHeight), text6, notification_font, info_font_bold, notification_color, notification_color)
     t_line6.update(screen)
+    t_line7 = Text((vertical+5, 5+6*fontHeight), text7, notification_font, info_font_bold, notification_color, notification_color)
+    t_line7.update(screen)
+    t_line8 = Text((vertical+5, 5+7*fontHeight), text8, notification_font, info_font_bold, notification_color, notification_color)
+    t_line8.update(screen)
+    t_line9 = Text((vertical+5, 5+8*fontHeight), text9, notification_font, info_font_bold, notification_color, notification_color)
+    t_line9.update(screen)
+    t_line10 = Text((vertical+5, 5+9*fontHeight), text10, notification_font, info_font_bold, notification_color, notification_color)
+    t_line10.update(screen)
+    global not_text1
+    global not_text2
+    global not_text3
+    global not_text4
+    global not_text5
+    global not_text6
+    global not_text7
+    global not_text8
+    global not_text9
+    global not_text10
+    not_text1 = text1
+    not_text2 = text2
+    not_text3 = text3
+    not_text4 = text4
+    not_text5 = text5
+    not_text6 = text6
+    not_text7 = text7
+    not_text8 = text8
+    not_text9 = text9  
+    not_text10 = text10
+    
+def addNewNotificationLine(text):
+    global not_text1
+    global not_text2
+    global not_text3
+    global not_text4
+    global not_text5
+    global not_text6
+    global not_text7
+    global not_text8
+    global not_text9
+    global not_text10
+    global numLinesFilled
+    
+    numLinesFilled = numLinesFilled+1
+    if numLinesFilled ==4 :
+        updateNotifications(not_text1, not_text2, not_text3, text, "", "", "", "", "", "")
+    elif numLinesFilled ==5 :
+        updateNotifications(not_text1, not_text2, not_text3, not_text4, text, "", "", "", "", "")
+    elif numLinesFilled ==6 :
+        updateNotifications(not_text1, not_text2, not_text3, not_text4, not_text5, text, "", "", "", "")
+    elif numLinesFilled ==7 :
+        updateNotifications(not_text1, not_text2, not_text3, not_text4, not_text5, not_text6, text, "", "", "")
+    elif numLinesFilled ==8 :
+        updateNotifications(not_text1, not_text2, not_text3, not_text4, not_text5, not_text6, not_text7, text, "", "")
+    elif numLinesFilled ==9 :
+        updateNotifications(not_text1, not_text2, not_text3, not_text4, not_text5, not_text6, not_text7, not_text8, text, "")
+    elif numLinesFilled ==10 :
+        updateNotifications(not_text1, not_text2, not_text3, not_text4, not_text5, not_text6, not_text7, not_text8, not_text9, text)
+    else:
+        not_text3 = not_text4
+        not_text4 = not_text5
+        not_text5 = not_text6
+        not_text6 = not_text7
+        not_text7 = not_text8
+        not_text8 = not_text9
+        not_text9 = not_text10    
+        not_text10 = (text)
+        updateNotifications(not_text1, not_text2, not_text3, not_text4, not_text5, not_text6, not_text7, not_text8, not_text9, not_text10)
+
     
 playerText = ""
 cardText = ""
@@ -959,7 +1045,7 @@ while not done:
                 myNumber = readmsg.split("You are Player ")[1].split(".")[0]
                 if(int(myNumber) == 1):
                     print(readmsg)
-                    updateNotifications(readmsg[1:]+".", "", "", "", "", "")
+                    updateNotifications(readmsg[1:]+".", "", "", "", "", "", "", "", "", "")
                     print("How many players are going to be playing in the game?")
                     first_beginning_screen = True
                     second_beginning_screen = False
@@ -992,7 +1078,7 @@ while not done:
                     secondBoardImage = pygame.image.load("secondStartScreen.png").convert()
                     secondBoardImage = pygame.transform.scale(secondBoardImage, boardSize)
                     screen.blit(secondBoardImage, boardLocation)
-                    print("mustardChosen: ", mustardChosen)
+                    updateNotifications(readmsg[1:41]+".", "", "", "", "", "", "", "", "", "")
 
 
             if PLAYER_CHOICE_MESSAGE in readmsg:
@@ -1077,7 +1163,7 @@ while not done:
                 cardTextForCount = cardText.split(", ")
                 print("CARD TEXT FOR COUNT:")
                 print(cardTextForCount)
-                updateNotifications(playerText, "", readmsg[1:34], "", "", "")
+                updateNotifications(playerText, "", readmsg[1:34], "", "", "", "", "", "", "")
 
                 t_card1 = Text((911+5, 33+387), "Click on cards to track what you know.", action_font, action_font, notification_color, notification_color)
                 t_card1.update(screen)
@@ -1440,7 +1526,6 @@ while not done:
                     screen.blit(boardImage, boardLocation)
                     gameStarted = True
                  
-            
             if first_beginning_screen == True:
                 updateFirstBeginningScreen = False
  
