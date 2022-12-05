@@ -1208,7 +1208,7 @@ while not done:
                 tempMsg = tempMsg.replace("room7", "conservatory")
                 tempMsg = tempMsg.replace("room8", "library")
                 tempMsg = tempMsg.replace("room9", "billiard room")
-                addNewNotificationLine(readmsg)
+                addNewNotificationLine(tempMsg)
 
                 if "Mustard" in readmsg:
                     player = "Colonel Mustard"

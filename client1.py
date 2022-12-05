@@ -1500,7 +1500,6 @@ while not done:
                     t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
                     t_mustard.bolded = True
                     t_mustard.update(screen)
-                    addNewNotificationLine("Mustard clicked")
                 else:
                     t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
                     t_mustard.bolded = False
@@ -1510,7 +1509,6 @@ while not done:
                     t_peacock = Button(t_peacock.image, (t_peacock.x_pos, t_peacock.y_pos), t_peacock.text_input, info_font_bold, t_peacock.base_color, t_peacock.hovering_color)
                     t_peacock.bolded = True
                     t_peacock.update(screen)
-                    addNewNotificationLine("Peacock clicked")
                 else:
                     t_peacock = Button(t_peacock.image, (t_peacock.x_pos, t_peacock.y_pos), t_peacock.text_input, info_font, t_peacock.base_color, t_peacock.hovering_color)
                     t_peacock.bolded = False
