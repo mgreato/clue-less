@@ -194,7 +194,7 @@ def can_take_secret_passage(playerRoom):
     return boolean, diagonal_room_name
 
 def moveOptionButtons(moveOptions):
-    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+    pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
     pygame.display.update()
     print("SHOULD DRAW RECTANGLE NOW")
     info_font = pygame.font.SysFont('Calibri', 14, False, False)
@@ -274,7 +274,7 @@ def movePlayer(p, otherPlayerLocations):
             return possibleRooms
 
 def printPlayerButtons():
-    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+    pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
     pygame.display.update()
     info_font = pygame.font.SysFont('Calibri', 14, False, False)
     info_font_bold = pygame.font.SysFont('Calibri', 14, True, True)
@@ -296,7 +296,7 @@ def printPlayerButtons():
     return playerButtons
 
 def printWeaponButtons():
-    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+    pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
     pygame.display.update()
     info_font = pygame.font.SysFont('Calibri', 14, False, False)
     info_font_bold = pygame.font.SysFont('Calibri', 14, True, True)
@@ -805,6 +805,7 @@ currentPlayerLocations = ""
 canClickButtons = False
 done = False
 clock = pygame.time.Clock()
+gameStarted = False
 while not done:
     pygame.draw.rect(screen, BLACK, [0, 0, vertical, height], 2) #Draw a rectangle around the map
     pygame.draw.rect(screen, RED, [vertical, 0, width-vertical, 192], 2) #Notification Panel
@@ -1428,7 +1429,7 @@ while not done:
                                 msg = "KEEP SAME PLAYER TURN"
                                 print(msg)
                                 s.send(msg.encode(form))
-                                # pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                # pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                 # pygame.display.update()
                                 currentButtons = []
                                 # print(moveInput)
@@ -1440,13 +1441,13 @@ while not done:
                                 currentButtons = buttonList
                         else: 
                             updateNotifications("", "You can only move once per turn.", "", "", "", "")
-                            pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                            pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                             pygame.display.update()
                             noDoubleMove = "You can only move once per turn."
                             noDoubleMoveText = Text((1070, 525), noDoubleMove, action_font, action_font, (0,0,0), notification_color)
                             noDoubleMoveText.update(screen)
                             currentButtons = []
-                            # pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                            # pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                             # pygame.display.update()
                             msg = "KEEP SAME PLAYER TURN"
                             print(msg)
@@ -1468,7 +1469,7 @@ while not done:
                                         personSuggested = clickedButton.text_input
                                         currentButtons = []
                                         buttonsClicked = False
-                                        pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                        pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                         pygame.display.update()
                                         weaponButtons = printWeaponButtons()
                                         currentButtons = weaponButtons
@@ -1478,7 +1479,7 @@ while not done:
                                         buttonsClicked = False
                                         print("WEAPON SUGGESTED")
                                         print(weaponSuggested)
-                                        pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                        pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                         pygame.display.update()
                                         roomSuggested = p.playerLocation
                                         all = "suggest !!!" + personSuggested + "," + roomSuggested + "," + weaponSuggested
@@ -1525,7 +1526,7 @@ while not done:
                                 s.send(msg.encode(form))
                                 print(p.hasMoved)
                                 currentButtons = []
-                                pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                 pygame.display.update()
 
                     if b_suggest.isOver(pos, button_width_1, button_height):
@@ -1538,7 +1539,7 @@ while not done:
                             print("HERE")
                         else:
                             print("IN CLIENT AND PLAYER CANNOT SUGGEST NOW")
-                            pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                            pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                             pygame.display.update()
                             if p.hasSuggested:
                                 noSuggesting = "You cannot make another suggestion."
@@ -1568,34 +1569,34 @@ while not done:
                             print(msg)
                             s.send(msg.encode(form))
                             print("<<<<<<<<<<<<<<<<<")
-                            pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                            pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                             pygame.display.update()
                                 
                         else:
                             if(p.canSuggest and not p.hasMoved):
                                 # msg = "\nYou must either move or make a suggestion. && " + str(p.canEndTurn)
-                                pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                 pygame.display.update()
                                 endMsg1 = "You must either move or make a suggestion."
                                 noEnd1 = Text((1070, 525), endMsg1, action_font, action_font, (0,0,0), notification_color)
                                 noEnd1.update(screen)
                             if(p.canSuggest and p.hasMoved):
                                 # msg = "\nYou must make a suggestion. && " + str(p.canEndTurn)
-                                pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                 pygame.display.update()
                                 endMsg2 = "You must make a suggestion."
                                 noEnd2 = Text((1070, 525), endMsg2, action_font, action_font, (0,0,0), notification_color)
                                 noEnd2.update(screen)
                             if(not p.canSuggest and p.hasMoved):
                                 # msg = "\nYou must move to a new location. && " + str(p.canEndTurn)
-                                pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                 pygame.display.update()
                                 endMsg3 = "You are not in a location to suggest."
                                 noEnd3 = Text((1070, 525), endMsg3, action_font, action_font, (0,0,0), notification_color)
                                 noEnd3.update(screen)
                             if(not p.canSuggest and not p.hasMoved):
                                 # msg = "\nYou must move to a new location. && " + str(p.canEndTurn)
-                                pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                 pygame.display.update()
                                 endMsg4 = "You must make a move to a new location."
                                 noEnd4 = Text((1055, 525), endMsg4, action_font, action_font, (0,0,0), notification_color)
@@ -1633,7 +1634,7 @@ while not done:
                         if button.isOver(pos, button.rect.width, button.rect.height):
                             print(button)
                             suggestionHelp = button.text_input
-                    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                    pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                     pygame.display.update()
                     print("SUGGESTION HELP HERE")
                     print(suggestionHelp)
