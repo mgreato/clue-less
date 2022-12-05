@@ -115,6 +115,7 @@ weapons = ["rope", "candlestick", "dagger", "wrench", "lead pipe", "revolver"]
 #             "Mrs. Peacock": "hallway78", "Professor Plum": "hallway81"}
 playerFirstLocations = {"Miss Scarlett": "hallway23", "Colonel Mustard": "hallway34", "Mrs. White": "hallway56", "Reverend Green": "hallway67",
         "Mrs. Peacock": "hallway78", "Professor Plum": "hallway81"}
+rooms = ["study","hall","lounge","dining room", "kitchen", "ballroom", "conservatory", "library", "billiard room"]
 
 # connect to server
 port = 5050
@@ -133,9 +134,13 @@ buttonsClicked = False
 clickedButton = ""
 myNumber = 0
 suggesting = False
+accusing = False
 personSuggested = ""
 weaponSuggested = ""
 roomSuggested = ""
+personAccused = ""
+weaponAccused = ""
+roomAccused = ""
 collectSuggestionHelp = False
 waitingForSuggestion = False
 suggestionHelpPlayer = 0
@@ -283,12 +288,13 @@ def movePlayer(p, otherPlayerLocations):
         # p.hasMoved = True
     # return moveInput
 
-def printPlayerButtons():
+def printPlayerButtons(action):
     pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
     pygame.display.update()
     info_font = pygame.font.SysFont('Calibri', 14, False, False)
     info_font_bold = pygame.font.SysFont('Calibri', 14, True, True)
-    who = Text((1075, 525), "Who would you like to suggest?", info_font, info_font_bold, (0,0,0), info_greyed_color)
+    messaging = "Who would you like to " + action + "?"
+    who = Text((1075, 525), messaging, info_font, info_font_bold, (0,0,0), info_greyed_color)
     who.update(screen)
     size = (100, 50)
     positions = [(1075, 575), (1190, 575), (1305, 575), (1075, 650), (1190, 650), (1305, 650)]
@@ -305,13 +311,14 @@ def printPlayerButtons():
     pygame.display.update()
     return playerButtons
 
-def printWeaponButtons():
+def printWeaponButtons(action):
     pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
     pygame.display.update()
     info_font = pygame.font.SysFont('Calibri', 14, False, False)
     info_font_bold = pygame.font.SysFont('Calibri', 14, True, True)
-    who = Text((1075, 525), "What weapon would you like to suggest?", info_font, info_font_bold, (0,0,0), info_greyed_color)
-    who.update(screen)
+    messaging = "What weapon would you like to " + action + "?"
+    what = Text((1075, 525), messaging, info_font, info_font_bold, (0,0,0), info_greyed_color)
+    what.update(screen)
     size = (100, 50)
     positions = [(1075, 575), (1190, 575), (1305, 575), (1075, 650), (1190, 650), (1305, 650)]
     font = pygame.font.SysFont('Calibri', 16, True, False)
@@ -326,6 +333,29 @@ def printWeaponButtons():
         weaponButton.update(screen)
     pygame.display.update()
     return weaponButtons
+
+def printRoomButtons(action):
+    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+    pygame.display.update()
+    info_font = pygame.font.SysFont('Calibri', 14, False, False)
+    info_font_bold = pygame.font.SysFont('Calibri', 14, True, True)
+    messaging = "What room do you choose to " + action + "?"
+    where = Text((1075, 525), messaging, info_font, info_font_bold, (0,0,0), info_greyed_color)
+    where.update(screen)
+    size = (85, 40)
+    positions = [(1075, 575), (1190, 575), (1305, 575), (1075, 630), (1190, 630), (1305, 630), (1075, 685), (1190, 685), (1305, 685)]
+    font = pygame.font.SysFont('Calibri', 16, True, False)
+    buttonType = pygame.transform.scale(button_image, size) #transform size
+    roomButtons = []
+    for i in range(0,len(rooms)):
+        print("SIZES")
+        print(positions[i][0])
+        print(rooms[i])
+        roomButton = Button(buttonType, (positions[i]), rooms[i], font, (0,255,255), (0,50,50))
+        roomButtons.append(roomButton)
+        roomButton.update(screen)
+    pygame.display.update()
+    return roomButtons
 
 def printSuggestionHelpButtons(playerNumber, suggestionMatches):
     print("INSIDE PRINT SUGGESTION HELP BUTTONS")
@@ -702,7 +732,7 @@ while not done:
                     updateNotifications(readmsg[1:]+".", "", "", "", "", "")
                     print("How many players are going to be playing in the game?")
                     #numberOfPlayers = input("->")
-                    numberOfPlayers = "3" #dummy for now
+                    numberOfPlayers = "2" #dummy for now
                     s.send(numberOfPlayers.encode())
 
             if PLAYER_CHOICE_MESSAGE in readmsg and waitingForSuggestion == False:
@@ -802,6 +832,7 @@ while not done:
                     p.canEndTurn = False
                     currentButtons = []
                     buttonsClicked = False
+                    suggesting = False
             
             if ("is suggesting" in readmsg) and canClickButtons:
                 waitingForSuggestion = True
@@ -958,7 +989,7 @@ while not done:
                                     buttonsClicked = False
                                     pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
                                     pygame.display.update()
-                                    weaponButtons = printWeaponButtons()
+                                    weaponButtons = printWeaponButtons("suggest")
                                     currentButtons = weaponButtons
                                 if clickedButton.text_input in weapons:
                                     weaponSuggested = clickedButton.text_input
@@ -975,6 +1006,47 @@ while not done:
                                     s.send(all.encode())
                                     print("Move " + personSuggested + " to " + roomSuggested + ".\n")
                                     print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
+                            if accusing == True:
+                                print("IN CLICKING BUTTONS FOR ACCUSE!")
+                                if clickedButton.text_input in names:
+                                    personAccused = clickedButton.text_input
+                                    currentButtons = []
+                                    buttonsClicked = False
+                                    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                    pygame.display.update()
+                                    weaponButtons = printWeaponButtons("accuse")
+                                    currentButtons = weaponButtons
+                                if clickedButton.text_input in weapons:
+                                    weaponAccused = clickedButton.text_input
+                                    currentButtons = []
+                                    buttonsClicked = False
+                                    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                    pygame.display.update()
+                                    roomButtons = printRoomButtons("accuse")
+                                    currentButtons = roomButtons
+                                if clickedButton.text_input in rooms:
+                                    roomAccused = clickedButton.text_input
+                                    print("INSIDE ACCUSED WITH ALL ACCUSED ANSWERS")
+                                    # print("Who would you like to accuse?")
+                                    # accusePersonInput = input("person ->")
+                                    # accuseRoomInput = input("room ->")
+                                    # accuseWeaponInput = input("weapon ->")
+                                    allAccusations = "accuse !!!" + personAccused + "," + roomAccused + "," + weaponAccused
+                                    s.send(allAccusations.encode())
+                                    clientsMessage = s.recv(1024).decode()
+                                    # wonLostMessage = s.recv(1024).decode()
+                                    # if "won" in wonLostMessage:
+                                    #     print("You Won!")
+                                    #     msg = "endConnection for all"
+                                    # if "lost" in wonLostMessage:
+                                    #     print("You lost, you can no longer move or suggest.")
+                                    #     msg = "endConnection for player"
+                                    # return msg
+
+                                    # print(all)
+                                    # s.send(all.encode())
+                                    # print("Move " + personSuggested + " to " + roomSuggested + ".\n")
+                                    # print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
 
                     if buttonsClicked == True:
                         # if(p.hasMoved == False) and (p.helpingSuggestion == False):
@@ -1020,7 +1092,7 @@ while not done:
                     suggestionValidation = validateSuggestion(p)
                     if(suggestionValidation == True):
                         suggesting = True
-                        playerButtons = printPlayerButtons()
+                        playerButtons = printPlayerButtons("suggest")
                         currentButtons = playerButtons
                         print("HERE")
                     else:
@@ -1042,6 +1114,22 @@ while not done:
                         msg = "KEEP SAME PLAYER TURN"
                         print(msg)
                         s.send(msg.encode(form))
+
+                if b_accuse.isOver(pos, button_width_1, button_height):
+                    print('accusing')
+                    # msg = makeAccusation()
+                    accusing = True
+                    playerButtons = printPlayerButtons("accuse")
+                    currentButtons = playerButtons
+                    print("HERE IN ACCUSE")
+
+                        
+
+                    # s.send(msg.encode())
+                    # if(msg == "endConnection for all"):
+                    #     s.close()
+                    # playerMoveActive = False
+
 
                 if b_end.isOver(pos, button_width_2, button_height):
                     print('ending')

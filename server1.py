@@ -242,8 +242,7 @@ while gameOn:
 
                 if ACCUSATION_MSG in playerMoveMsg:
                     send_message(playerMoveMsg,clients)
-                    accusationClientMesssage = clients[currentPlayer-1].recv(1024).decode()
-                    accuse = accusationClientMesssage.split(",")
+                    accuse = playerMoveMsg.split(" !!!")[1].split("//")[0].split(",")
                     personAccuse = accuse[0]
                     roomAccuse = accuse[1]
                     weaponAccuse = accuse[2]
