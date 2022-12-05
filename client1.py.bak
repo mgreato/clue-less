@@ -28,12 +28,28 @@ class Text():
     def update(self, screen):
         if self.text_input is not None:
             screen.blit(self.text, self.position) # populate on screen
-
     def boldText(self):
         self.text = self.bold_input.render(self.text_input, True, self.base_color)
     
     def baseText(self):
         self.text = self.font_input.render(self.text_input, True, self.base_color)
+
+mustardChosen = False
+peacockChosen = False
+plumChosen = False
+scarletChosen = False
+whiteChosen = False
+greenChosen = False
+not_text1 = ""
+not_text2 = ""
+not_text3 = ""
+not_text4 = ""
+not_text5 = ""
+not_text6 = ""
+not_text7 = ""
+not_text8 = ""
+not_text9 = ""
+not_text10 = ""
 
     def greyText(self):
         self.text = self.font_input.render(self.text_input, True, self.greyed_color)
@@ -801,7 +817,30 @@ def addNewNotificationLine(text):
         updateNotifications(not_text1, not_text2, not_text3, not_text4, not_text5, not_text6, not_text7, not_text8, not_text9, not_text10)
 
 
+
 currentPlayerLocations = ""
+    
+playerText = ""
+cardText = ""
+
+choiceInput = ""
+moveChoiceMade = False
+currentButtons = []
+buttonsClicked = False
+clickedButton = ""
+myNumber = 0
+
+first_beginning_screen = False
+second_beginning_screen = False
+suggesting = False
+personSuggested = ""
+weaponSuggested = ""
+roomSuggested = ""
+collectSuggestionHelp = False
+waitingForSuggestion = False
+suggestionHelpPlayer = 0
+gameStarted = False
+
 canClickButtons = False
 done = False
 clock = pygame.time.Clock()
@@ -1163,7 +1202,7 @@ while not done:
                     s.send(sendMessage.encode())
                     screen.blit(boardImage, boardLocation)
                     gameStarted = True
-            
+
             if first_beginning_screen == True:
                 updateFirstBeginningScreen = False
 
@@ -1219,6 +1258,7 @@ while not done:
                     t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font_bold, t_mustard.base_color, t_mustard.hovering_color)
                     t_mustard.bolded = True
                     t_mustard.update(screen)
+                    addNewNotificationLine("updated Mustard text")
                 else:
                     t_mustard = Button(t_mustard.image, (t_mustard.x_pos, t_mustard.y_pos), t_mustard.text_input, info_font, t_mustard.base_color, t_mustard.hovering_color)
                     t_mustard.bolded = False
@@ -1228,6 +1268,7 @@ while not done:
                     t_peacock = Button(t_peacock.image, (t_peacock.x_pos, t_peacock.y_pos), t_peacock.text_input, info_font_bold, t_peacock.base_color, t_peacock.hovering_color)
                     t_peacock.bolded = True
                     t_peacock.update(screen)
+                    addNewNotificationLine("updated peacock text")
                 else:
                     t_peacock = Button(t_peacock.image, (t_peacock.x_pos, t_peacock.y_pos), t_peacock.text_input, info_font, t_peacock.base_color, t_peacock.hovering_color)
                     t_peacock.bolded = False
@@ -1237,6 +1278,7 @@ while not done:
                     t_plum = Button(t_plum.image, (t_plum.x_pos, t_plum.y_pos), t_plum.text_input, info_font_bold, t_plum.base_color, t_plum.hovering_color)
                     t_plum.bolded = True
                     t_plum.update(screen)
+                    addNewNotificationLine("updated plum text")
                 else:
                     t_plum = Button(t_plum.image, (t_plum.x_pos, t_plum.y_pos), t_plum.text_input, info_font, t_plum.base_color, t_plum.hovering_color)
                     t_plum.bolded = False
@@ -1246,6 +1288,7 @@ while not done:
                     t_scarlet = Button(t_scarlet.image, (t_scarlet.x_pos, t_scarlet.y_pos), t_scarlet.text_input, info_font_bold, t_scarlet.base_color, t_scarlet.hovering_color)
                     t_scarlet.bolded = True
                     t_scarlet.update(screen)
+                    addNewNotificationLine("updated scarlett text")
                 else:
                     t_scarlet = Button(t_scarlet.image, (t_scarlet.x_pos, t_scarlet.y_pos), t_scarlet.text_input, info_font, t_scarlet.base_color, t_scarlet.hovering_color)
                     t_scarlet.bolded = False
@@ -1255,6 +1298,7 @@ while not done:
                     t_white = Button(t_white.image, (t_white.x_pos, t_white.y_pos), t_white.text_input, info_font_bold, t_white.base_color, t_white.hovering_color)
                     t_white.bolded = True
                     t_white.update(screen)
+                    addNewNotificationLine("updated white text")
                 else:
                     t_white = Button(t_white.image, (t_white.x_pos, t_white.y_pos), t_white.text_input, info_font, t_white.base_color, t_white.hovering_color)
                     t_white.bolded = False
@@ -1264,6 +1308,7 @@ while not done:
                     t_green = Button(t_green.image, (t_green.x_pos, t_green.y_pos), t_green.text_input, info_font_bold, t_green.base_color, t_green.hovering_color)
                     t_green.bolded = True
                     t_green.update(screen)
+                    addNewNotificationLine("updated green text")
                 else:
                     t_green = Button(t_green.image, (t_green.x_pos, t_green.y_pos), t_green.text_input, info_font, t_green.base_color, t_green.hovering_color)
                     t_green.bolded = False

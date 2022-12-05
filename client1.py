@@ -29,6 +29,7 @@ class Text():
         if self.text_input is not None:
             screen.blit(self.text, self.position) # populate on screen
 
+
     def boldText(self):
         self.text = self.bold_input.render(self.text_input, True, self.base_color)
     
@@ -47,6 +48,24 @@ class Text():
     #def updateText(self, new_text_input)
     # read new_text_input 
     # write new_text_input to text_input 
+
+mustardChosen = False
+peacockChosen = False
+plumChosen = False
+scarletChosen = False
+whiteChosen = False
+greenChosen = False
+not_text1 = ""
+not_text2 = ""
+not_text3 = ""
+not_text4 = ""
+not_text5 = ""
+not_text6 = ""
+not_text7 = ""
+not_text8 = ""
+not_text9 = ""
+not_text10 = ""
+
 
 # Button class creates buttons
 class Button():
@@ -773,7 +792,7 @@ def addNewNotificationLine(text):
     global not_text9
     global not_text10
     global numLinesFilled
-
+    
     numLinesFilled = numLinesFilled+1
     if numLinesFilled ==4 :
         updateNotifications(not_text1, not_text2, not_text3, text, "", "", "", "", "", "")
@@ -800,8 +819,29 @@ def addNewNotificationLine(text):
         not_text10 = (text)
         updateNotifications(not_text1, not_text2, not_text3, not_text4, not_text5, not_text6, not_text7, not_text8, not_text9, not_text10)
 
-
 currentPlayerLocations = ""
+    
+playerText = ""
+cardText = ""
+
+choiceInput = ""
+moveChoiceMade = False
+currentButtons = []
+buttonsClicked = False
+clickedButton = ""
+myNumber = 0
+
+first_beginning_screen = False
+second_beginning_screen = False
+suggesting = False
+personSuggested = ""
+weaponSuggested = ""
+roomSuggested = ""
+collectSuggestionHelp = False
+waitingForSuggestion = False
+suggestionHelpPlayer = 0
+gameStarted = False
+
 canClickButtons = False
 done = False
 clock = pygame.time.Clock()
@@ -1163,7 +1203,7 @@ while not done:
                     s.send(sendMessage.encode())
                     screen.blit(boardImage, boardLocation)
                     gameStarted = True
-            
+
             if first_beginning_screen == True:
                 updateFirstBeginningScreen = False
 
