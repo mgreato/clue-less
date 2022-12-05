@@ -265,6 +265,13 @@ def movePlayer(p, otherPlayerLocations, screen):
         clientsMessage = s.recv(1024).decode()
         p.hasMoved = True
     return moveInput
+    
+mustardChosen = False
+peacockChosen = False
+plumChosen = False
+scarletChosen = False
+whiteChosen = False
+greenChosen = False
 
 # def movePlayer(p, otherPlayerLocations): # break into 2 functions - first populates drop down correctly, second actually does action
     # otherPlayerLocationsList = [h for h in ast.literal_eval(otherPlayerLocations) if ("room" not in h)]
@@ -511,6 +518,7 @@ initialBoardImage = pygame.transform.scale(initialBoardImage, boardSize)
 screen.blit(initialBoardImage, boardLocation) ##populate on screen
 #screen.blit(boardImage, boardLocation) ##populate on screen
 
+
 ## INSERT PLAYER IMAGES IN HERE
 #playerSize = (50, 50) #set size of character images
 # for each of the images .... 
@@ -528,7 +536,7 @@ button_color = (255, 249, 242)
 button_greyed_color = (133, 105, 73)
 button_image = pygame.image.load("button_background.png").convert() #image to be used as button background PLAY WITH THIS
 button_width_1 = 100 #width of buttons PLAY WITH THIS
-button_height = 50
+button_height = 64
 button_size_1 = (button_width_1, button_height)
 button_type_1 = pygame.transform.scale(button_image, button_size_1) #transform size
 
@@ -543,13 +551,13 @@ button_size_3 = (info_width, info_height)
 button_type_3 = pygame.transform.scale(background_image, button_size_3) #transform size
 
 
-button_y_shift = (52) #y-shift (spacing) of buttons PLAY WITH THIS
+button_y_shift = (button_height) #y-shift (spacing) of buttons PLAY WITH THIS
 button_x_shift = (150) #y-shift (spacing) of buttons PLAY WITH THIS
 
 # Initialize and update individual BUTTONs: image, pos, text_input, font, base_color, hovering_color)
 # Move Button
 b_x = width - 455 + (button_width_1/2)
-b_y = height - 256 + (50/2)
+b_y = 512 + button_height/2
 b_move = Button(button_type_1, (b_x, b_y), "Move", button_font, button_color, button_greyed_color)
 b_move.update(screen)
 # Suggest Button
@@ -562,14 +570,23 @@ b_y = b_y + button_y_shift
 b_accuse = Button(button_type_1, (b_x, b_y), "Accuse", button_font, button_color, button_greyed_color)
 b_accuse.update(screen)
 # Show Button
-b_y = b_y + button_y_shift
-b_show = Button(button_type_1, (b_x, b_y), "Show", button_font, button_color, button_greyed_color)
-b_show.update(screen)
+#b_y = b_y + button_y_shift
+#b_show = Button(button_type_1, (b_x, b_y), "Show", button_font, button_color, button_greyed_color)
+#b_show.update(screen)
 # End Button
 b_x = width - (button_width_2/2)
 b_y = b_y + button_y_shift
 b_end = Button(button_type_2, (b_x, b_y), "End Turn", button_font, button_color, button_greyed_color)
 b_end.update(screen)
+
+# Initialize Start Buttons
+b_width_start = 140
+b_height_start = 64
+dist_between_buttons = 10
+b_x_start = 10+b_width_start/2
+b_y_start = 384+b_height_start/2
+button_size_start = (b_width_start, b_height_start)
+button_type_start = pygame.transform.scale(button_image, button_size_start) #transform size
 
 
 ################################
@@ -630,7 +647,7 @@ t_plum.update(screen)
 
 # Scarlet
 t_y = t_y + info_y_shift
-t_scarlet= Button(button_type_3, (t_x, t_y), "Ms. Scarlet", info_font, info_color, info_greyed_color)
+t_scarlet= Button(button_type_3, (t_x, t_y), "Miss Scarlett", info_font, info_color, info_greyed_color)
 t_scarlet.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
 #if "user has this card in their deck":
@@ -827,6 +844,8 @@ currentButtons = []
 buttonsClicked = False
 clickedButton = ""
 myNumber = 0
+first_beginning_screen = False
+second_beginning_screen = False
 
 canClickButtons = False
 done = False
@@ -862,22 +881,69 @@ while not done:
                     print(readmsg)
                     updateNotifications(readmsg[1:]+".", "", "", "", "", "")
                     print("How many players are going to be playing in the game?")
+                    first_beginning_screen = True
+                    second_beginning_screen = False
+                    firstBoardImage = pygame.image.load("firstStartScreen.png").convert()
+                    firstBoardImage = pygame.transform.scale(firstBoardImage, boardSize)
+                    screen.blit(firstBoardImage, boardLocation)
+                    
+                    b_x_start_updated = b_x_start+75
+                    b_start2 = Button(button_type_start, (b_x_start_updated+0*(b_width_start+dist_between_buttons), b_y_start), "2", button_font, button_color, button_greyed_color)
+                    b_start2.update(screen)
+
+                    b_start3 = Button(button_type_start, (b_x_start_updated+1*(b_width_start+dist_between_buttons), b_y_start), "3", button_font, button_color, button_greyed_color)
+                    b_start3.update(screen)
+
+                    b_start4 = Button(button_type_start, (b_x_start_updated+2*(b_width_start+dist_between_buttons), b_y_start), "4", button_font, button_color, button_greyed_color)
+                    b_start4.update(screen)
+
+                    b_start5 = Button(button_type_start, (b_x_start_updated+3*(b_width_start+dist_between_buttons), b_y_start), "5", button_font, button_color, button_greyed_color)
+                    b_start5.update(screen)
+
+                    b_start6 = Button(button_type_start, (b_x_start_updated+4*(b_width_start+dist_between_buttons), b_y_start), "6", button_font, button_color, button_greyed_color)
+                    b_start6.update(screen)
                     #numberOfPlayers = input("->")
-                    numberOfPlayers = "2" #dummy for now
-                    s.send(numberOfPlayers.encode())
+                    #numberOfPlayers = "2" #dummy for now
+                    #s.send(numberOfPlayers.encode())
+
+                else:
+                    first_beginning_screen = False
+                    second_beginning_screen = True
+                    secondBoardImage = pygame.image.load("secondStartScreen.png").convert()
+                    secondBoardImage = pygame.transform.scale(secondBoardImage, boardSize)
+                    screen.blit(secondBoardImage, boardLocation)
+                    if mustardChosen == False:
+                        b_startMustard = Button(button_type_start, (b_x_start, b_y_start), "Colonel Mustard", button_font, button_color, button_greyed_color)
+                        b_startMustard.update(screen)
+                    if peacockChosen == False:
+                        b_startPeacock = Button(button_type_start, (b_x_start+1*(b_width_start+dist_between_buttons), b_y_start), "Mrs. Peacock", button_font, button_color, button_greyed_color)
+                        b_startPeacock.update(screen)
+                    if plumChosen == False:  
+                        b_startPlum = Button(button_type_start, (b_x_start+2*(b_width_start+dist_between_buttons), b_y_start), "Professor Plum", button_font, button_color, button_greyed_color)
+                        b_startPlum.update(screen)
+                    if scarletChosen == False:
+                        b_startScarlet = Button(button_type_start, (b_x_start+3*(b_width_start+dist_between_buttons), b_y_start), "Miss Scarlett", button_font, button_color, button_greyed_color)
+                        b_startScarlet.update(screen)
+                    if whiteChosen == False:
+                        b_startWhite = Button(button_type_start, (b_x_start+4*(b_width_start+dist_between_buttons), b_y_start), "Mrs. White", button_font, button_color, button_greyed_color)
+                        b_startWhite.update(screen)
+                    if greenChosen == False:
+                        b_startGreen = Button(button_type_start, (b_x_start+5*(b_width_start+dist_between_buttons), b_y_start), "Reverend Green", button_font, button_color, button_greyed_color)
+                        b_startGreen.update(screen)
+
 
             if PLAYER_CHOICE_MESSAGE in readmsg:
                 #readmsg = s.recv(1024).decode() # NEED TO GET RID OF THIS
                 print(readmsg, "\n")
                 # message = input(" -> ")
-                if int(myNumber) == 1: # dummy for now
-                    message = "Mrs. White"
-                else:
-                    message = "Colonel Mustard"
-                playerLocation = Game.playerStartLocations.get(message)
-                p = Player(myNumber, message, playerLocation, None, False, False, False, False)
-                sendMessage = p.playerName + "," + playerLocation
-                s.send(sendMessage.encode())
+                #if int(myNumber) == 1: # dummy for now
+                #    message = "Mrs. White"
+                #else:
+                #    message = "Colonel Mustard"
+                #playerLocation = Game.playerStartLocations.get(message)
+                #p = Player(myNumber, message, playerLocation, None, False, False, False, False)
+                #sendMessage = p.playerName + "," + playerLocation
+                #s.send(sendMessage.encode())
                 #playerMessage = s.recv(1024).decode() # NEED TO GET RID OF THIS
                 #print(playerMessage)
                 #readmsg = playerMessage
@@ -1032,6 +1098,103 @@ while not done:
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = pygame.mouse.get_pos()
+                                
+            if second_beginning_screen == True:
+                updateSecondBeginningScreen = False
+                if b_startMustard.isOver(pos, b_width_start, b_height_start):
+                    print("Mustard")
+                    updateSecondBeginningScreen = True
+                    message = ("Colonel Mustard")
+                    mustardChosen = True
+                    
+                if b_startPeacock.isOver(pos, b_width_start, b_height_start):
+                    print("Peacock")
+                    updateSecondBeginningScreen = True
+                    message = "Mrs. Peacock"
+                    peacockChosen = True
+                    
+                if b_startPlum.isOver(pos, b_width_start, b_height_start):
+                    print("Plum")
+                    updateSecondBeginningScreen = True
+                    message = "Professor Plum"
+                    plumChosen = True
+
+                if b_startScarlet.isOver(pos, b_width_start, b_height_start):
+                    print("Scarlet")
+                    updateSecondBeginningScreen = True
+                    message = "Miss Scarlett"
+                    scarletChosen = True
+
+                if b_startWhite.isOver(pos, b_width_start, b_height_start):
+                    print("white")
+                    updateSecondBeginningScreen = True
+                    message = "Mrs. White"
+                    whiteChosen = True
+                    
+                if b_startGreen.isOver(pos, b_width_start, b_height_start):
+                    print("green")  
+                    updateSecondBeginningScreen = True
+                    message = "Reverend Green"
+                    greenChosen = True
+                    
+                if updateSecondBeginningScreen == True:
+                    first_beginning_screen = False
+                    second_beginning_screen = False
+                    playerLocation = Game.playerStartLocations.get(message)
+                    p = Player(myNumber, message, playerLocation, None, False, False, False, False)
+                    sendMessage = p.playerName + "," + playerLocation
+                    s.send(sendMessage.encode())
+                    screen.blit(boardImage, boardLocation)
+                 
+            
+            if first_beginning_screen == True:
+                updateFirstBeginningScreen = False
+ 
+                if b_start2.isOver(pos, b_width_start, b_height_start):
+                    print("2")
+                    updateFirstBeginningScreen = True
+                    inputNumPlayers = "2"
+                    
+                if b_start3.isOver(pos, b_width_start, b_height_start):
+                    print("3")
+                    updateFirstBeginningScreen = True
+                    inputNumPlayers = "3"
+
+                if b_start4.isOver(pos, b_width_start, b_height_start):
+                    print("4")
+                    updateFirstBeginningScreen = True
+                    inputNumPlayers = "4"
+
+                if b_start5.isOver(pos, b_width_start, b_height_start):
+                    print("5")
+                    updateFirstBeginningScreen = True
+                    inputNumPlayers = "5"                    
+                    
+                if b_start6.isOver(pos, b_width_start, b_height_start):
+                    print("6") 
+                    updateFirstBeginningScreen = True
+                    inputNumPlayers = "6"                    
+
+                if updateFirstBeginningScreen == True:
+                    first_beginning_screen = False
+                    second_beginning_screen = True
+                    secondBoardImage = pygame.image.load("secondStartScreen.png").convert()
+                    secondBoardImage = pygame.transform.scale(secondBoardImage, boardSize)
+                    screen.blit(secondBoardImage, boardLocation)
+                    b_startMustard = Button(button_type_start, (b_x_start, b_y_start), "Colonel Mustard", button_font, button_color, button_greyed_color)
+                    b_startMustard.update(screen)
+                    b_startPeacock = Button(button_type_start, (b_x_start+1*(b_width_start+dist_between_buttons), b_y_start), "Mrs. Peacock", button_font, button_color, button_greyed_color)
+                    b_startPeacock.update(screen)
+                    b_startPlum = Button(button_type_start, (b_x_start+2*(b_width_start+dist_between_buttons), b_y_start), "Professor Plum", button_font, button_color, button_greyed_color)
+                    b_startPlum.update(screen)
+                    b_startScarlet = Button(button_type_start, (b_x_start+3*(b_width_start+dist_between_buttons), b_y_start), "Miss Scarlett", button_font, button_color, button_greyed_color)
+                    b_startScarlet.update(screen)
+                    b_startWhite = Button(button_type_start, (b_x_start+4*(b_width_start+dist_between_buttons), b_y_start), "Mrs. White", button_font, button_color, button_greyed_color)
+                    b_startWhite.update(screen)
+                    b_startGreen = Button(button_type_start, (b_x_start+5*(b_width_start+dist_between_buttons), b_y_start), "Reverend Green", button_font, button_color, button_greyed_color)
+                    b_startGreen.update(screen)
+                    s.send(inputNumPlayers.encode())
+            
             
             # updating player card: people
             if t_mustard.isOver(pos, info_width, info_height):
@@ -1366,9 +1529,6 @@ while not done:
                         suggestionError = "Player cannot make a suggestion!!!! \n"
                         s.send(suggestionError.encode())
                         playerMoveActive = False
-
-                if b_show.isOver(pos, button_width_1, button_height):
-                    message = "show"
 
                 if b_end.isOver(pos, button_width_2, button_height):
                     print('ending')
