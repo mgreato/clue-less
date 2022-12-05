@@ -136,7 +136,6 @@ while gameOn:
             playerTurn = True
             while playerTurn:
                 moveMsg = clients[currentPlayer-1].recv(1024)
-                # print(moveMsg)
                 playerMoveMsg = str(currentPlayer) + "..." +  moveMsg.decode(form) + "//" + str(list(g.playerLocations.values()))
                 print("PLAYER TURN MOVE MESSAGE HERE IN SERVER")
                 print(playerMoveMsg)
@@ -148,7 +147,6 @@ while gameOn:
                 if (MOVE_MSG in playerMoveMsg) or ("moving" in playerMoveMsg):
                     print("IN MOVING THIS IS THE PLAYER MOVE MSG")
                     print(playerMoveMsg)
-                    # send_message(playerMoveMsg,clients)
                     movePlayer = playerMoveMsg.split("...")[1].split("---")[1]
                     print("MOVE PLAYER")
                     print(movePlayer)
@@ -161,56 +159,13 @@ while gameOn:
                     send_message(moveMessage, clients)
                     currentPlayer = currentPlayer
                     playerTurn = False
-
-
-
-                    # moveMessage = clients[currentPlayer-1].recv(1024).decode()
-
-                    # if("," in moveMessage):
-                    #     moveOptions = moveMessage.split(",")
-                    #     moveChoice = moveOptions[0]
-                    #     movePlayer = moveOptions[1]
-                    # else:
-                    #     moveOptions = moveMessage
-
-                    # if(moveOptions == "You can only move once per turn."):
-                    #     moveMessage = "Player cannot move again."
-                    #     print(moveMessage)
-                    # else:
-                    #     moveMessage = str(movePlayer) + " is moving to " + str(moveChoice) + "."
-                    #     print(moveMessage)
-                    
-                    # send_message(moveMessage, clients)
-                    # msg = clients[currentPlayer-1].recv(1024).decode()
-                    # if("Move" in msg):
-                    #     print(msg)
-                    # g.playerLocations[movePlayer] = moveChoice
-                    # currentPlayer = currentPlayer
-                    # playerTurn = False
                     
                 if SUGGESTION_MSG in playerMoveMsg:
-                # if playerMoveMsg == SUGGESTION_MSG:
                     print("INSIDE SUGGESTION")
                     print(playerMoveMsg)
-                    # send_message(playerMoveMsg,clients)
-                    # suggestionMessage = clients[currentPlayer-1].recv(1024).decode()
                     print("PRINTING SUGGESTION MESSAGE HERE")
-                    suggestionMessage = playerMoveMsg.split("//")[0].split("suggest ")[1]
+                    suggestionMessage = playerMoveMsg.split("//")[0].split("!!!")[1]
                     print(suggestionMessage)
-                    # if "cannot" in suggestionMessage:
-                    #     falseSuggestion = "You are not in a room so you cannot make a suggestion \n"
-                    #     send_message(falseSuggestion, clients)
-                    #     currentPlayer = currentPlayer
-                    #     playerTurn = False
-                    # if "&&" in suggestionMessage:
-                    #     valid = suggestionMessage.split("&&")[1]
-                    #     if "False" in valid:
-                    #         falseSuggestion = "You must make a suggestion \n"
-                    #         send_message(falseSuggestion, clients)
-                    #         currentPlayer = currentPlayer
-                    #         playerTurn = False
-                    # else:
-                        # goodSuggestion = "Player is able to make a suggestion \n"
                     clientsToValidate = []
                     clientsToValidate.extend(clients)
                     clientsToValidate.pop(currentPlayer-1)
@@ -233,16 +188,21 @@ while gameOn:
                             fullSuggestion = person + "," + room + "," + weapon + "," + str(1)
                         else:
                             fullSuggestion = person + "," + room + "," + weapon + "," + str(playerSuggest+1)
+                        print("SUGGESTION MESSAGE PLUS FULL SUGGESTION BELOW")
                         print(suggestionMessage + fullSuggestion)
                         send_message(suggestionMessage + fullSuggestion, clients)
 
                         g.playerLocations[person] = suggestion[1]
+                        print("HERE")
+                        print(playerSuggest)
+                        print(numPlayers)
+                        print(suggestCheckCount)
                         if(playerSuggest == numPlayers) and (suggestCheckCount != numPlayers-1): 
                             print("THIS IS THE PART FOR A PLAYER TO SUGGEST")
                             suggestionHelp = clients[0].recv(1024).decode()
                         else:
                             if(suggestCheckCount == numPlayers-1):
-                                noSuggestionsMessage = "No player has cards that match your suggestion"
+                                noSuggestionsMessage = "No player has cards that match your suggestion ///suggestionHelpMade\n"
                                 print("No player had cards that matched the suggestion.")
                                 clientToSend = []
                                 clientToSend.append(clients[currentPlayer-1])
@@ -250,10 +210,14 @@ while gameOn:
                                 suggestionHelpMade = True
                             else:
                                 waitForHelp = True
+                                print("THIS IS WHERE THE HOLD UP IS")
+                                print(playerSuggest)
                                 suggestionHelp = clients[playerSuggest].recv(1024).decode()
+                                print(suggestionHelp)
                                 while waitForHelp:
-                                    if suggestionHelp != "":
+                                    if suggestionHelp == "":
                                         suggestionHelp = clients[playerSuggest].recv(1024).decode()
+                                    else:
                                         waitForHelp = False
                                 print("GETTING THIS SUGGESTION HELP")
                                 print(suggestionHelp)
@@ -270,9 +234,6 @@ while gameOn:
                                 print("Player 1 is showing [" + suggestionHelp + "] to disprove the suggestion.")
                             else:
                                 print("Player " + str(playerSuggest+1) + " is showing [" + suggestionHelp + "] to disprove the suggestion.")
-                            msg = clients[currentPlayer-1].recv(1024).decode()
-                            print("RIGHT HERE IN SERVER CODE")
-                            print(msg)
                             suggestionHelpMade = True
                     nextMessage = "Move " + person + " to " + room + ".\n"
                     print(nextMessage)
@@ -316,59 +277,11 @@ while gameOn:
                         s.close()
                     playerTurn = False
                     
-                if (END_MSG in playerMoveMsg) and ("end connection" not in playerMoveMsg):
+                if (END_MSG in playerMoveMsg) and ("end connection" not in playerMoveMsg) and ("rend") not in playerMoveMsg:
                     print("IN END AND HERE IS THE MOVE MESSSAGE")
                     print(moveMsg.decode(form))
-                    # playerMoveMsg = str(currentPlayer) + moveMsg.decode(form) + ","+ str(currentPlayer)+ "//" + str(list(g.playerLocations.values()))
-                    # send_message(playerMoveMsg,clients)
-                    # print("PRINTING THIS NOW22222222")
-                    # print(playerMoveMsg)
-                    # msg = clients[currentPlayer-1].recv(1024).decode()
-                    # print("PRINTING VALIDATION HERE")
-                    # print(moveMsg)
-                    # print(moveMsg.decode().split("&& ")[1])
-                    # validation = bool(moveMsg.decode().split("&& ")[1])
-                    # print(validation)
-                    # print(validation == True)
-                    # print(validation == False)
-                    # if(validation == True):
                     print("Player " + str(currentPlayer) + " chose to end their turn.")
-                        # send_message(validation[1], clients)
-                        # print("&&&&&&&&&&&&&&&&")
-                        # msg = clients[currentPlayer-1].recv(1024).decode()
-                        # print("WAITING OR NOT")
                     currentPlayer = who_plays_next(currentPlayer, False)
                     playerTurn = False
-                    # elif(validation == False):
-                    #     currentPlayer = currentPlayer
-                    #     # send_message(validation[1], clients)
-                    #     # msg = clients[currentPlayer-1].recv(1024).decode()
-                    #     playerTurn = False 
 
-
-                    # playerMoveMsg = str(currentPlayer) + moveMsg.decode(form) + ","+ str(currentPlayer)+ "//" + str(list(g.playerLocations.values()))
-                    # send_message(playerMoveMsg,clients)
-                    # print("PRINTING THIS NOW22222222")
-                    # print(playerMoveMsg)
-                    # # msg = clients[currentPlayer-1].recv(1024).decode()
-                    # print("PRINTING VALIDATION HERE")
-                    # print(moveMsg)
-                    # print(moveMsg.decode().split("&& ")[1])
-                    # validation = bool(moveMsg.decode().split("&& ")[1])
-                    # print(validation)
-                    # print(validation == True)
-                    # print(validation == False)
-                    # if(validation == True):
-                    #     print("Player " + str(currentPlayer) + " chose to end their turn.")
-                    #     # send_message(validation[1], clients)
-                    #     print("&&&&&&&&&&&&&&&&")
-                    #     # msg = clients[currentPlayer-1].recv(1024).decode()
-                    #     print("WAITING OR NOT")
-                    #     currentPlayer = who_plays_next(currentPlayer, False)
-                    #     playerTurn = False
-                    # elif(validation == False):
-                    #     currentPlayer = currentPlayer
-                    #     # send_message(validation[1], clients)
-                    #     # msg = clients[currentPlayer-1].recv(1024).decode()
-                    #     playerTurn = False 
 s.close()

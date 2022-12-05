@@ -106,6 +106,23 @@ s.connect((socket.gethostname(), port))
 form = 'utf-8'
 playerChosen = False
 
+playerText = ""
+cardText = ""
+
+choiceInput = ""
+moveChoiceMade = False
+currentButtons = []
+buttonsClicked = False
+clickedButton = ""
+myNumber = 0
+suggesting = False
+personSuggested = ""
+weaponSuggested = ""
+roomSuggested = ""
+collectSuggestionHelp = False
+waitingForSuggestion = False
+suggestionHelpPlayer = 0
+
 # set up threading for pygame and server events
 SERVER_MESSAGE = pygame.USEREVENT+1
 class SocketListener(threading.Thread):
@@ -384,6 +401,7 @@ def printSuggestionHelpButtons(playerNumber, suggestionMatches):
         helpButtons.append(helpButton)
         helpButton.update(screen)
     pygame.display.update()
+    currentButtons = helpButtons
     return helpButtons
     
 
@@ -394,7 +412,9 @@ def handleSuggestion(suggestPerson, suggestRoom, suggestWeapon):
     suggestPersonInput = suggestPerson
     suggestRoomInput = suggestRoom
     suggestWeaponInput = suggestWeapon
-    all = suggestPersonInput + "," + suggestRoomInput + "," + suggestWeaponInput
+    all = "suggest " + suggestPersonInput + "," + suggestRoomInput + "," + suggestWeaponInput
+    print("INSIDE HANDLING SUGGESTION IN CLIENT")
+    print(all)
     s.send(all.encode())
     print("Move " + suggestPersonInput + " to " + suggestRoomInput + ".\n")
     print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
@@ -884,23 +904,7 @@ def updateNotifications(text1, text2, text3, text4, text5, text6):
     t_line5.update(screen)
     t_line6 = Text((vertical+5, 5+5*fontHeight), text6, notification_font, info_font_bold, notification_color, notification_color)
     t_line6.update(screen)
-    
-playerText = ""
-cardText = ""
 
-choiceInput = ""
-moveChoiceMade = False
-currentButtons = []
-buttonsClicked = False
-clickedButton = ""
-myNumber = 0
-suggesting = False
-personSuggested = ""
-weaponSuggested = ""
-roomSuggested = ""
-collectSuggestionHelp = False
-waitingForSuggestion = False
-suggestionHelpPlayer = 0
 
 canClickButtons = False
 done = False
@@ -922,6 +926,7 @@ while not done:
             readmsg = event.message
             print("PRINTING READ MSG HERE")
             print(readmsg)
+            print(canClickButtons)
             print("==============================")
             print("==============================")
             
@@ -932,7 +937,7 @@ while not done:
                     print(readmsg[2])
                 s.close()
                 
-            if CONNECTED_MSG in readmsg:
+            if CONNECTED_MSG in readmsg and waitingForSuggestion == False:
                 myNumber = readmsg.split("You are Player ")[1].split(".")[0]
                 if(int(myNumber) == 1):
                     print(readmsg)
@@ -942,7 +947,7 @@ while not done:
                     numberOfPlayers = "2" #dummy for now
                     s.send(numberOfPlayers.encode())
 
-            if PLAYER_CHOICE_MESSAGE in readmsg:
+            if PLAYER_CHOICE_MESSAGE in readmsg and waitingForSuggestion == False:
                 #readmsg = s.recv(1024).decode() # NEED TO GET RID OF THIS
                 print(readmsg, "\n")
                 # message = input(" -> ")
@@ -958,7 +963,7 @@ while not done:
                 #print(playerMessage)
                 #readmsg = playerMessage
             
-            if BEGINNING_MSG in readmsg:
+            if BEGINNING_MSG in readmsg and waitingForSuggestion == False:
                 print(readmsg)
                 cards = readmsg.split("Your cards are: ")[1]
                 if("Next Turn" in cards):
@@ -1027,12 +1032,12 @@ while not done:
                 screen.blit(boardImage, boardLocation) ##populate on screen
                 
 
-            if WIN_MSG in readmsg:
+            if WIN_MSG in readmsg and waitingForSuggestion == False:
                 pass # dummy right now
-            if LOSE_MSG in readmsg:
+            if LOSE_MSG in readmsg and waitingForSuggestion == Falsed:
                 pass # dummy right now
                 
-            if ((TURN_MSG or MOVE_MSG) in readmsg) or (SUGGESTION in readmsg):
+            if ((TURN_MSG or MOVE_MSG) in readmsg) or (SUGGESTION in readmsg) and waitingForSuggestion == False:
                 suggestionValidation = None
                 print("-------------------")
                 print(readmsg)
@@ -1052,7 +1057,7 @@ while not done:
                     suggesting = False
                     personCollected = False
 
-            if "move" in readmsg and canClickButtons:
+            if "move" in readmsg and canClickButtons and waitingForSuggestion == False:
                 choiceInput = readmsg.split("//")
                 print(choiceInput)
                 choice = choiceInput[0]
@@ -1104,7 +1109,7 @@ while not done:
                 
                 
             
-            if "end" in readmsg and canClickButtons and ("rend" not in readmsg):
+            if "end" in readmsg and canClickButtons and ("rend" not in readmsg) and waitingForSuggestion == False:
                 print("PRINTING END HERE!!!!")
                 # end = s.recv(1024).decode()
                 print("PRINTING END HERE!!!!")
@@ -1130,18 +1135,24 @@ while not done:
                 # s.send("END".encode(form))
                 # end = s.recv(1024).decode()
             
-            if "end" in readmsg and (not canClickButtons) and ("rend" not in readmsg):
-                player = readmsg.split("//")[0].split(",")[1]
-                print("($#*@!(*(*!$(*$(!$)!@*($!@$#@")
-                print(player)
-                # message = s.recv(1024).decode()
-                if(message == "True"):
-                    print("Player " + player + " chose to end their turn.")
-                playerMoveActive = False
+            if "end" in readmsg and (not canClickButtons) and ("rend" not in readmsg) and waitingForSuggestion == False:
+                if "suggestion" in readmsg:
+                    player = readmsg.split("//")[0].split("&&")[1]
+                    if player == False:
+                        print("You cannot end your turn. You must make a suggestion first.")
+                else:
+                    print("END PART")
+                    print(readmsg)
+                    player = readmsg.split("//")[0].split(",")[1]
+                    print("($#*@!(*(*!$(*$(!$)!@*($!@$#@")
+                    print(player)
+                    # message = s.recv(1024).decode()
+                    if(message == "True"):
+                        print("Player " + player + " chose to end their turn.")
+                    playerMoveActive = False
             
-            if "suggest" in readmsg and canClickButtons and p.hasSuggested == False:
+            if "suggest" in readmsg and ("is suggesting" not in readmsg) and canClickButtons and p.hasSuggested == False:
                 print("||||||||||||")
-            
                 print(p.hasSuggested)
                 # choiceInput = s.recv(1024).decode().split("//")
                 print("***********")
@@ -1150,12 +1161,12 @@ while not done:
                 # player_choice = choice[1:]
                 # if("," in player_choice):
                 #     player_choice = player_choice.split(",")[0]
-                suggestionValidation = validateSuggestion(p)
-                if(suggestionValidation == True):
-                    suggesting = True
-                    playerButtons = printPlayerButtons()
-                    currentButtons = playerButtons
-                    print("HERE")
+                # suggestionValidation = validateSuggestion(p)
+                # if(suggestionValidation == True):
+                #     suggesting = True
+                #     playerButtons = printPlayerButtons()
+                #     currentButtons = playerButtons
+                #     print("HERE")
                     # handleSuggestion()
                     # playerMoveActive = False
                 # else:
@@ -1164,7 +1175,7 @@ while not done:
                 #     s.send(suggestionError.encode())
                 #     playerMoveActive = False
             
-            if "is suggesting" in readmsg:
+            if "is suggesting" in readmsg and waitingForSuggestion == False:
                 print(readmsg.split("///"))
                 clientsMessage = readmsg.split("///")[0]
                 again = True
@@ -1172,10 +1183,16 @@ while not done:
                     collectSuggestionHelp = True
                     again = False
 
-            if (collectSuggestionHelp == True) and ("///" in readmsg) and (p.hasSuggested == False):
+            if (collectSuggestionHelp == True) and ("///" in readmsg) and (p.hasSuggested == False) and waitingForSuggestion == False:
                 print("COLLECTSUGGESTIONHELP IS TRUE")
                 print(readmsg)
                 print(readmsg.split("///")[1])
+                print("WAITING FOR SUGGESTION HELP CHECKS")
+                print(canClickButtons)
+                print(waitingForSuggestion)
+                print(p.playerNumber in readmsg.split("///")[0])
+                print("suggestionHelpMade" not in readmsg.split("///")[1])
+
                 if p.playerNumber in readmsg.split("///")[1]:
                     print("AT THE END PART OF SUGGESTION NOW")
                     suggestions = readmsg.split("///")[1].split(",")
@@ -1219,10 +1236,10 @@ while not done:
                     # suggestionHelpMessage = s.recv(1024).decode()
                     # if((suggestionHelpMessage != "") or (suggestionHelpMessage != None)) and ("is suggesting" not in suggestionHelpMessage) and (("Next" not in suggestionHelpMessage)):
                     #     again = False
-                elif p.playerNumber in readmsg.split("///")[0] and ("suggestionHelpMade" not in readmsg.split("///")[1]):
+                elif p.playerNumber in readmsg.split("///")[0] and ("suggestionHelpMade" not in readmsg.split("///")[1]) and waitingForSuggestion == False:
                     waitingForSuggestion = True
 
-                elif "suggestionHelpMade" in readmsg.split("///")[1] and canClickButtons:
+                elif "suggestionHelpMade" in readmsg.split("///")[1] and canClickButtons and waitingForSuggestion == True:
                     suggestion = readmsg.split(" ///")[0]
                     print("Another player is suggesting that [" + suggestion + "] is not in the solution")
                     msg = "\n SUGGEST " + personSuggested + " in the " + roomsToNames.get(roomSuggested) + " with the " + weaponSuggested + "\n"
@@ -1240,7 +1257,7 @@ while not done:
                     buttonsClicked = False
                     suggesting = False
 
-            if collectSuggestionHelp == True and "///" not in readmsg and canClickButtons:
+            if collectSuggestionHelp == True and "///" not in readmsg and canClickButtons and waitingForSuggestion == True:
                 print(readmsg)
                 choiceInput = s.recv(1024).decode().split("//")
                 suggestion = readmsg
@@ -1494,6 +1511,7 @@ while not done:
             #        canClickButtons = False
             if canClickButtons or p.helpingSuggestion:
                 print("INSIDE THIS PART!!!")
+                print(currentButtons)
                 if b_move.isOver(pos, button_width_1, button_height):
                     message = "move" 
                     print('moving')
@@ -1512,6 +1530,7 @@ while not done:
                     
 
                 if currentButtons != []:
+                    print("CURRENT BUTTONS ISNT AN EMPTY LIST")
                     for button in currentButtons:
                         theButton = Button(button.image, (button.x_pos, button.y_pos), button.text_input, button.font, button.base_color, button.hovering_color)
                         if theButton.isOver(pos, theButton.rect.width, theButton.rect.height):
@@ -1589,9 +1608,12 @@ while not done:
                         buttonsClicked = False
                         pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
                         pygame.display.update()
+                        print(clickedButton.text_input)
+                        print("SENDING CLICKED BUTTON INPUT")
                         s.send(clickedButton.text_input.encode())
                         clickedButton = ""
                         p.hasMoved = False
+                        playerMoveActive = False
 
 
 
@@ -1617,24 +1639,29 @@ while not done:
 
                 if b_suggest.isOver(pos, button_width_1, button_height):
                     print('suggesting')
-                    # if player_choice == "suggest":
-                    message = "suggest"
-                    s.send(message.encode())
+                    suggestionValidation = validateSuggestion(p)
+                    if(suggestionValidation == True):
+                        suggesting = True
+                        playerButtons = printPlayerButtons()
+                        currentButtons = playerButtons
+                        print("HERE")
+                    # message = "suggest"
+                    # s.send(message.encode())
 
                 if b_show.isOver(pos, button_width_1, button_height):
                     message = "show"
 
                 if b_end.isOver(pos, button_width_2, button_height):
                     print('ending')
-                    message = "end"
-                    s.send(message.encode())
+                    # message = "end"
+                    # s.send(message.encode())
                     
                     # if player_choice == "end":
                     canTurnEnd = validateEndTurn(p)
                     print("CAN PLAYER END TURN?")
                     print(canTurnEnd)
                     if(canTurnEnd == True):
-                        msg = "\nTurn Over. && " + str(p.canEndTurn)
+                        msg = "end \nTurn Over. && " + str(p.canEndTurn)
                         print("<<<<!!!!!!!!!!!!<<<<<<<<<<<<<")
                         print(msg)
                         s.send(msg.encode(form))
@@ -1642,7 +1669,7 @@ while not done:
                         # end = s.recv(1024).decode()
                         # print(end)
                         # s.send("END".encode(form))
-                        # playerMoveActive = False
+                        playerMoveActive = False
                         # done = True
                     else:
                         if(p.canSuggest and not p.hasMoved):
