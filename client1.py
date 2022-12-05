@@ -9,9 +9,87 @@ import threading
 import select
 import queue
 
+# Class definitions 
+# Text class creates text boxes in (position) with (fontInput) of (base_color)
+# has functions to bold text and "grey out" the color
+# IF WE WANT USERS TO BE ABLE TO TYPE IN TEXTBOXES, we need to get the "CheckForInput" and "upateText" working
+class Text():
+    def __init__(self, position, text_input, font_input, bold_input, base_color, greyed_color):
+        self.position = position
+        self.text_input = text_input
+        self.font_input = font_input
+        self.bold_input = bold_input
+        self.base_color = base_color
+        self.greyed_color = greyed_color
+        self.text = self.font_input.render(self.text_input, True, self.base_color)
+        #self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))  #needed only for checking inputs
+        #self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))  #needed only for checking inputs
+
+    def update(self, screen):
+        if self.text_input is not None:
+            screen.blit(self.text, self.position) # populate on screen
+
+    def boldText(self):
+        self.text = self.bold_input.render(self.text_input, True, self.base_color)
+    
+    def baseText(self):
+        self.text = self.font_input.render(self.text_input, True, self.base_color)
+
+    def greyText(self):
+        self.text = self.font_input.render(self.text_input, True, self.greyed_color)
+
+    #def checkForInput(self, position):
+    #    if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top,
+    #                                                                                      self.rect.bottom):
+    #        return True
+    #    return False
+
+    #def updateText(self, new_text_input)
+    # read new_text_input 
+    # write new_text_input to text_input 
+
+# Button class creates buttons
+class Button():
+    def __init__(self, image, pos, text_input, font, base_color, hovering_color):
+        self.image = image
+        self.x_pos = pos[0]
+        self.y_pos = pos[1]     
+        self.font = font
+        self.base_color, self.hovering_color = base_color, hovering_color
+        self.text_input = text_input
+        self.text = self.font.render(self.text_input, True, self.base_color)
+        if self.image is None:
+            self.image = self.text
+        self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
+        self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
+        self.bolded = False
+
+    def update(self, screen):
+        if self.image is not None:
+            screen.blit(self.image, self.rect)
+        screen.blit(self.text, self.text_rect)
+
+    def checkForInput(self, position):
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top,self.rect.bottom):
+            return True
+        return False
+
+    def changeColor(self, position):
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top,self.rect.bottom):
+            self.text = self.font.render(self.text_input, True, self.hovering_color)
+        else:
+            self.text = self.font.render(self.text_input, True, self.base_color)
+            
+    def isOver(self, position, button_width, button_height):
+        x_p = self.x_pos-button_width/2
+        y_p = self.y_pos-button_height/2
+        if position[0] > x_p and position[0] < x_p + button_width:
+            if position[1] > y_p and position[1] < y_p + button_height:
+                return True
+        return False
+
 pygame.init()
 pygame.event.clear()
-
 
 mustardChosen = False
 peacockChosen = False
@@ -20,67 +98,16 @@ scarletChosen = False
 whiteChosen = False
 greenChosen = False
 
-class DropDown():
-    def __init__(self, x, y, w, h, color, highlight_color, font, option_list, selected = 0):
-        self.color = color
-        self.highlight_color = highlight_color
-        self.rect = pygame.Rect(x, y, w, h)
-        self.font = font
-        self.option_list = option_list
-        self.selected = selected
-        self.draw_menu = False
-        self.menu_active = False
-        self.active_option = -1
-
-    def draw(self, surf):
-        pygame.draw.rect(surf, self.highlight_color if self.menu_active else self.color, self.rect)
-        pygame.draw.rect(surf, (0, 0, 0), self.rect, 2)
-        msg = self.font.render(self.option_list[self.selected], 1, (0, 0, 0))
-        surf.blit(msg, msg.get_rect(center = self.rect.center))
-
-        if self.draw_menu:
-            for i, text in enumerate(self.option_list):
-                rect = self.rect.copy()
-                rect.y += (i+1) * self.rect.height
-                pygame.draw.rect(surf, self.highlight_color if i == self.active_option else self.color, rect)
-                msg = self.font.render(text, 1, (0, 0, 0))
-                surf.blit(msg, msg.get_rect(center = rect.center))
-            outer_rect = (self.rect.x, self.rect.y + self.rect.height, self.rect.width, self.rect.height * len(self.option_list))
-            pygame.draw.rect(surf, (0, 0, 0), outer_rect, 2)
-
-    def update(self, event_list):
-        mpos = pygame.mouse.get_pos()
-        self.menu_active = self.rect.collidepoint(mpos)
-
-        self.active_option = -1
-        for i in range(len(self.option_list)):
-            rect = self.rect.copy()
-            rect.y += (i+1) * self.rect.height
-            if rect.collidepoint(mpos):
-                self.active_option = i
-                break
-
-        if not self.menu_active and self.active_option == -1:
-            self.draw_menu = False
-
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            if self.menu_active:
-                self.draw_menu = not self.draw_menu
-            elif self.draw_menu and self.active_option >= 0:
-                self.selected = self.active_option
-                self.draw_menu = False
-                return self.active_option
-        return -1
-
-    def isOver(self, position, button_width, button_height):
-        x_p = self.rect.topleft[0]-button_width/2
-        y_p = self.rect.topleft[1]-button_height/2
-        if position[0] > x_p and position[0] < x_p + button_width:
-            if position[1] > y_p and position[1] < y_p + button_height:
-                return True
-        return False
-        
-     
+not_text1 = ""
+not_text2 = ""
+not_text3 = ""
+not_text4 = ""
+not_text5 = ""
+not_text6 = ""
+not_text7 = ""
+not_text8 = ""
+not_text9 = ""
+not_text10 = ""
 
 # possible messages from server
 CONNECTED_MSG = "Connection established"
@@ -167,10 +194,14 @@ def can_take_secret_passage(playerRoom):
     return boolean, diagonal_room_name
 
 def moveOptionButtons(moveOptions):
+    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+    pygame.display.update()
     print("SHOULD DRAW RECTANGLE NOW")
-    # Drawing Rectangle
-    # textBox = pygame.draw.rect(screen, BLUE, [925, 525, 160, 40], 2)
-    size = (150, 75)
+    info_font = pygame.font.SysFont('Calibri', 14, False, False)
+    info_font_bold = pygame.font.SysFont('Calibri', 14, True, True)
+    where = Text((1075, 525), "Where would you like to move?", info_font, info_font_bold, (0,0,0), info_greyed_color)
+    where.update(screen)
+    size = (145, 65)
     font = pygame.font.SysFont('Calibri', 16, True, False)
     buttonType = pygame.transform.scale(button_image, size) #transform size
     buttonList = []
@@ -184,7 +215,7 @@ def moveOptionButtons(moveOptions):
             print("ODD")
             print(x)
             print(y)
-            option = Button(buttonType, (850+x, 315+y), option, font, (0,255,255), (0,50,50))
+            option = Button(buttonType, (850+x, 325+y), option, font, (0,255,255), (0,50,50))
             buttonList.append(option)
             option.update(screen)
             x += 170
@@ -193,76 +224,31 @@ def moveOptionButtons(moveOptions):
             print("EVEN")
             print(x)
             print(y)
-            option = Button(buttonType, (850+x, 315+y), option, font, (0,255,255), (0,50,50))
+            option = Button(buttonType, (850+x, 325+y), option, font, (0,255,255), (0,50,50))
             buttonList.append(option)
             option.update(screen)
             y += 250
             buttonCount += 1
         pygame.display.update()
     return buttonList
-    # if dropDown.isOver(mpos, dropDown.rect.topleft[0], dropDown.rect.topleft[1]):
-    #     selected_option = dropDown.update(event_list)
-    #     if selected_option >= 0:
-    #         print(selected_option)
-    
-    # dropDown.draw(screen)
 
-def whereToMove(p, moveTo, otherPlayerLocations):
-    otherPlayerLocationsList = [h for h in ast.literal_eval(otherPlayerLocations) if ("room" not in h)]
-    validMove = False
-    while validMove == False:
-        moveInput = moveTo
-        if(moveInput not in otherPlayerLocationsList):
-            validMove = True
-        else:
-            print("That room is already occupied, please enter another choice.")
-    if("room" not in moveInput):
-        p.hasSuggested = True   
-        p.canEndTurn = True 
-    moveMessage = moveInput + "," + p.playerName
-    s.send(moveMessage.encode())
-    clientsMessage = s.recv(1024).decode()
-    p.hasMoved = True
-    return moveInput
-
-
-def movePlayer(p, otherPlayerLocations, screen):
+def movePlayer(p, otherPlayerLocations):
     otherPlayerLocationsList = [h for h in ast.literal_eval(otherPlayerLocations) if ("room" not in h)]
     playerInRoom = p.playerLocation.__contains__("room")
+    if(p.playerLocation == "None"):
+        possibleHallways = playerFirstLocations.get(p.playerName)
+        return [possibleHallways]
     if(playerInRoom):
         roomNumber = p.playerLocation.split("room")[1]
         possibleHallways = [h for h in locations if (("hallway" and roomNumber in h) and ("room" not in h) and (h not in otherPlayerLocationsList))]
+        print("IN THE PLAYER IS IN A ROOM PART")
+        print(otherPlayerLocationsList)
+        print(possibleHallways)
         check_diagonal_result = can_take_secret_passage(p.playerLocation)
-    if(p.playerLocation == "None"):
-        possibleHallways = playerFirstLocations.get(p.playerName)
-        print(str(possibleHallways))
-        print([possibleHallways])
-        print(type(possibleHallways))
-        print("Where would you like to move? Your first move must be to: " + str(possibleHallways))
-        return [possibleHallways]
-    if(p.hasMoved == True):
-        moveInput = "You can only move once per turn."
-        print(moveInput)
-        s.send(moveInput.encode())
-        # clientsMessage = s.recv(1024).decode()
-    elif(playerInRoom) and (len(possibleHallways) == 0) and (check_diagonal_result[0] == False):
-        moveInput = "Your move options are all blocked. You can either make an accusation or end your turn."
-        print(moveInput)
-        s.send(moveInput.encode())
-        clientsMessage = s.recv(1024).decode()
-        print(clientsMessage)
-    else:
-        if(p.playerLocation.__contains__("hallway")):
-            hallwayRooms = p.playerLocation.split("hallway")[1]
-            roomChoices = list(hallwayRooms)
-            roomChoice1 = "room" + roomChoices[0]
-            roomChoice2 = "room" + roomChoices[1]
-            possibleRooms = []
-            possibleRooms.append(roomChoice1)
-            possibleRooms.append(roomChoice2)
-            print("Where would you like to move? Your choices are: " + str(possibleRooms))
-            return possibleRooms
-        if(playerInRoom):
+        if (len(possibleHallways) == 0) and (check_diagonal_result[0] == False):
+            moveInput = "NO POSSIBLE OPTIONS"
+            return moveInput
+        else:
             if check_diagonal_result[0] == True:
                 if(len(possibleHallways) == 0):
                     print("Where would you like to move? Your only option is:  " + check_diagonal_result[1])
@@ -275,88 +261,29 @@ def movePlayer(p, otherPlayerLocations, screen):
             else:
                 print("Where would you like to move? Your choices are: " + str(possibleHallways))
                 return possibleHallways
-        validMove = False
-        while validMove == False:
-            moveInput = input("->")
-            if(moveInput not in otherPlayerLocationsList):
-                validMove = True
-            else:
-                print("That room is already occupied, please enter another choice.")
-        if("room" not in moveInput):
-            p.hasSuggested = True   
-            p.canEndTurn = True 
-        moveMessage = moveInput + "," + p.playerName
-        s.send(moveMessage.encode())
-        clientsMessage = s.recv(1024).decode()
-        p.hasMoved = True
-    return moveInput
-    
-# def movePlayer(p, otherPlayerLocations): # break into 2 functions - first populates drop down correctly, second actually does action
-    # otherPlayerLocationsList = [h for h in ast.literal_eval(otherPlayerLocations) if ("room" not in h)]
-    # playerInRoom = p.playerLocation.__contains__("room")
-    # if(playerInRoom):
-    #     roomNumber = p.playerLocation.split("room")[1]
-    #     possibleHallways = [h for h in locations if (("hallway" and roomNumber in h) and ("room" not in h) and (h not in otherPlayerLocationsList))]
-    #     check_diagonal_result = can_take_secret_passage(p.playerLocation)
-    # if(p.playerLocation == "None"):
-    #     possibleHallways = playerFirstLocations.get(p.playerName)
-    #     print("Where would you like to move? Your first move must be to: " + str(possibleHallways))
-    # if(p.hasMoved == True):
-    #     moveInput = "You can only move once per turn."
-    #     print(moveInput)
-    #     s.send(moveInput.encode())
-    #     clientsMessage = s.recv(1024).decode()
-    # elif(playerInRoom) and (len(possibleHallways) == 0) and (check_diagonal_result[0] == False):
-    #     moveInput = "Your move options are all blocked. You can either make an accusation or end your turn."
-    #     print(moveInput)
-    #     s.send(moveInput.encode())
-    #     clientsMessage = s.recv(1024).decode()
-    #     print(clientsMessage)
-    # else:
-    #     if(p.playerLocation.__contains__("hallway")):
-    #         hallwayRooms = p.playerLocation.split("hallway")[1]
-    #         roomChoices = list(hallwayRooms)
-    #         roomChoice1 = "room" + roomChoices[0]
-    #         roomChoice2 = "room" + roomChoices[1]
-    #         possibleRooms = []
-    #         possibleRooms.append(roomChoice1)
-    #         possibleRooms.append(roomChoice2)
-    #         print("Where would you like to move? Your choices are: " + str(possibleRooms))
-    #     if(playerInRoom):
-    #         if check_diagonal_result[0] == True:
-    #             if(len(possibleHallways) == 0):
-    #                 print("Where would you like to move? Your only option is:  " + check_diagonal_result[1])
-    #             else:
-    #                 print("Where would you like to move? Your hallway choices are: " + str(possibleHallways) + ". Your diagonal room choice is: " + check_diagonal_result[1])
-    #         else:
-    #             print("Where would you like to move? Your choices are: " + str(possibleHallways))
-    #     validMove = False
-    #     while validMove == False:
-    #         moveInput = input("->")
-    #         if(moveInput not in otherPlayerLocationsList):
-    #             validMove = True
-    #         else:
-    #             print("That room is already occupied, please enter another choice.")
-    #     if("room" not in moveInput):
-    #         p.hasSuggested = True   
-    #         p.canEndTurn = True 
-    #     moveMessage = moveInput + "," + p.playerName
-    #     s.send(moveMessage.encode())
-    #     clientsMessage = s.recv(1024).decode()
-    #     p.hasMoved = True
-    # return moveInput #actual moving of player happens later - this just gets a VALID move from player, which it returns
+    else:
+        if(p.playerLocation.__contains__("hallway")):
+            hallwayRooms = p.playerLocation.split("hallway")[1]
+            roomChoices = list(hallwayRooms)
+            roomChoice1 = "room" + roomChoices[0]
+            roomChoice2 = "room" + roomChoices[1]
+            possibleRooms = []
+            possibleRooms.append(roomChoice1)
+            possibleRooms.append(roomChoice2)
+            print("Where would you like to move? Your choices are: " + str(possibleRooms))
+            return possibleRooms
 
 def printPlayerButtons():
+    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+    pygame.display.update()
     info_font = pygame.font.SysFont('Calibri', 14, False, False)
     info_font_bold = pygame.font.SysFont('Calibri', 14, True, True)
     who = Text((1075, 525), "Who would you like to suggest?", info_font, info_font_bold, (0,0,0), info_greyed_color)
     who.update(screen)
-
     size = (100, 50)
     positions = [(1075, 575), (1190, 575), (1305, 575), (1075, 650), (1190, 650), (1305, 650)]
     font = pygame.font.SysFont('Calibri', 16, True, False)
     buttonType = pygame.transform.scale(button_image, size) #transform size
-
     playerButtons = []
     for i in range(0,len(names)):
         print("SIZES")
@@ -369,16 +296,16 @@ def printPlayerButtons():
     return playerButtons
 
 def printWeaponButtons():
+    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+    pygame.display.update()
     info_font = pygame.font.SysFont('Calibri', 14, False, False)
     info_font_bold = pygame.font.SysFont('Calibri', 14, True, True)
     who = Text((1075, 525), "What weapon would you like to suggest?", info_font, info_font_bold, (0,0,0), info_greyed_color)
     who.update(screen)
-
     size = (100, 50)
     positions = [(1075, 575), (1190, 575), (1305, 575), (1075, 650), (1190, 650), (1305, 650)]
     font = pygame.font.SysFont('Calibri', 16, True, False)
     buttonType = pygame.transform.scale(button_image, size) #transform size
-
     weaponButtons = []
     for i in range(0,len(weapons)):
         print("SIZES")
@@ -397,56 +324,18 @@ def printSuggestionHelpButtons(playerNumber, suggestionMatches):
     helpMessage = "What card would you like to show to player" + str(playerNumber) + "?"
     help = Text((1025, 525), helpMessage, info_font, info_font_bold, (0,0,0), info_greyed_color)
     help.update(screen)
-
     size = (100, 50)
     positions = [(1100, 575), (1250, 575), (1175, 650)]
     font = pygame.font.SysFont('Calibri', 16, True, False)
     buttonType = pygame.transform.scale(button_image, size) #transform size
-
     helpButtons = []
     for i in range(0,len(suggestionMatches)):
         helpButton = Button(buttonType, (positions[i]), suggestionMatches[i], font, (0,255,255), (0,50,50))
         helpButtons.append(helpButton)
         helpButton.update(screen)
     pygame.display.update()
-    currentButtons = helpButtons
+    # currentButtons = helpButtons
     return helpButtons
-    
-
-def handleSuggestion(suggestPerson, suggestRoom, suggestWeapon):
-# def handleSuggestion():
-    print("Who would you like to suggest?")
-
-    suggestPersonInput = suggestPerson
-    suggestRoomInput = suggestRoom
-    suggestWeaponInput = suggestWeapon
-    all = "suggest " + suggestPersonInput + "," + suggestRoomInput + "," + suggestWeaponInput
-    print("INSIDE HANDLING SUGGESTION IN CLIENT")
-    print(all)
-    s.send(all.encode())
-    print("Move " + suggestPersonInput + " to " + suggestRoomInput + ".\n")
-    print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
-    # while empty == True:
-    #     clientsMessage = s.recv(1024).decode().split("///")[0]
-    #     if(clientsMessage != ""):
-    #         empty = False
-
-    # again = True
-    # while (again == True) and (clientsMessage != "No Matches for this client"):
-    #     suggestionHelpMessage = s.recv(1024).decode()
-    #     if((suggestionHelpMessage != "") or (suggestionHelpMessage != None)) and ("is suggesting" not in suggestionHelpMessage) and (("Next" not in suggestionHelpMessage)):
-    #         again = False
-    # if(" ///" in suggestionHelpMessage):
-    #     suggestion = suggestionHelpMessage.split(" ///")[0]
-    #     print("Another player is suggesting that [" + suggestion + "] is not in the solution")
-    # else:
-    #     suggestion = suggestionHelpMessage
-    #     print("No players had cards that matched your suggestion")
-    # msg = "\n SUGGEST " + suggestPersonInput + " in the " + roomsToNames.get(suggestRoomInput) + " with the " + suggestWeaponInput + "\n"
-    # s.send(msg.encode(form))
-    # p.hasSuggested = True
-    # p.hasMoved = True
-    # p.canEndTurn = True
 
 def makeAccusation():
     print("Who would you like to accuse?")
@@ -471,94 +360,6 @@ def validateSuggestion(p):
         return True
     else:
         return False
-
-def validateEndTurn(p):
-    if(p.canEndTurn == True):
-        p.canSuggest = False
-        return True
-    else:
-        return False
-        
-# Class definitions 
-# Text class creates text boxes in (position) with (fontInput) of (base_color)
-# has functions to bold text and "grey out" the color
-# IF WE WANT USERS TO BE ABLE TO TYPE IN TEXTBOXES, we need to get the "CheckForInput" and "upateText" working
-class Text():
-    def __init__(self, position, text_input, font_input, bold_input, base_color, greyed_color):
-        self.position = position
-        self.text_input = text_input
-        self.font_input = font_input
-        self.bold_input = bold_input
-        self.base_color = base_color
-        self.greyed_color = greyed_color
-        self.text = self.font_input.render(self.text_input, True, self.base_color)
-        #self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))  #needed only for checking inputs
-        #self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))  #needed only for checking inputs
-
-    def update(self, screen):
-        if self.text_input is not None:
-            screen.blit(self.text, self.position) # populate on screen
-
-    def boldText(self):
-        self.text = self.bold_input.render(self.text_input, True, self.base_color)
-    
-    def baseText(self):
-        self.text = self.font_input.render(self.text_input, True, self.base_color)
-
-    def greyText(self):
-        self.text = self.font_input.render(self.text_input, True, self.greyed_color)
-
-    #def checkForInput(self, position):
-    #    if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top,
-    #                                                                                      self.rect.bottom):
-    #        return True
-    #    return False
-
-    #def updateText(self, new_text_input)
-    # read new_text_input 
-    # write new_text_input to text_input 
-
-# Button class creates buttons
-class Button():
-    def __init__(self, image, pos, text_input, font, base_color, hovering_color):
-        self.image = image
-        self.x_pos = pos[0]
-        self.y_pos = pos[1]     
-        self.font = font
-        self.base_color, self.hovering_color = base_color, hovering_color
-        self.text_input = text_input
-        self.text = self.font.render(self.text_input, True, self.base_color)
-        if self.image is None:
-            self.image = self.text
-        self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
-        self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
-        self.bolded = False
-
-    def update(self, screen):
-        if self.image is not None:
-            screen.blit(self.image, self.rect)
-        screen.blit(self.text, self.text_rect)
-
-    def checkForInput(self, position):
-        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top,self.rect.bottom):
-            return True
-        return False
-
-    def changeColor(self, position):
-        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top,self.rect.bottom):
-            self.text = self.font.render(self.text_input, True, self.hovering_color)
-        else:
-            self.text = self.font.render(self.text_input, True, self.base_color)
-            
-    def isOver(self, position, button_width, button_height):
-        x_p = self.x_pos-button_width/2
-        y_p = self.y_pos-button_height/2
-        if position[0] > x_p and position[0] < x_p + button_width:
-            if position[1] > y_p and position[1] < y_p + button_height:
-                return True
-        return False
-    
-
 
 
 ################################
@@ -590,7 +391,7 @@ hRight= 2*height/3 # = 512
 # Basic Sreen setup
 pygame.display.set_caption("Ctrl-Alt-Elites Clueless") # name of the tab
 screen.fill(WHITE) # background color
- 
+
 ################################
 # Import Images Here
 ################################# Boardgame Image
@@ -905,10 +706,18 @@ t_line5 = Text((vertical+5, 5+4*fontHeight), "", notification_font, info_font_bo
 t_line5.update(screen)
 t_line6 = Text((vertical+5, 5+5*fontHeight), "", notification_font, info_font_bold, notification_color, notification_color)
 t_line6.update(screen)
+t_line7 = Text((vertical+5, 5+6*fontHeight), "", notification_font, info_font_bold, notification_color, notification_color)
+t_line7.update(screen)
+t_line8 = Text((vertical+5, 5+7*fontHeight), "", notification_font, info_font_bold, notification_color, notification_color)
+t_line8.update(screen)
+t_line9 = Text((vertical+5, 5+8*fontHeight), "", notification_font, info_font_bold, notification_color, notification_color)
+t_line9.update(screen)
+t_line10 = Text((vertical+5, 5+9*fontHeight), "", notification_font, info_font_bold, notification_color, notification_color)
+t_line10.update(screen)
 
+numLinesFilled = 3
 
-
-def updateNotifications(text1, text2, text3, text4, text5, text6):
+def updateNotifications(text1, text2, text3, text4, text5, text6, text7, text8, text9, text10):
     pygame.draw.rect(screen, WHITE, [vertical, 0, vertical, 192])
     pygame.draw.rect(screen, RED, [vertical, 0, vertical, 192], 2)
     t_line1 = Text((vertical+5, 5), text1, notification_font, info_font_bold, notification_color, notification_color)
@@ -923,25 +732,76 @@ def updateNotifications(text1, text2, text3, text4, text5, text6):
     t_line5.update(screen)
     t_line6 = Text((vertical+5, 5+5*fontHeight), text6, notification_font, info_font_bold, notification_color, notification_color)
     t_line6.update(screen)
+    t_line7 = Text((vertical+5, 5+6*fontHeight), text7, notification_font, info_font_bold, notification_color, notification_color)
+    t_line7.update(screen)
+    t_line8 = Text((vertical+5, 5+7*fontHeight), text8, notification_font, info_font_bold, notification_color, notification_color)
+    t_line8.update(screen)
+    t_line9 = Text((vertical+5, 5+8*fontHeight), text9, notification_font, info_font_bold, notification_color, notification_color)
+    t_line9.update(screen)
+    t_line10 = Text((vertical+5, 5+9*fontHeight), text10, notification_font, info_font_bold, notification_color, notification_color)
+    t_line10.update(screen)
+    global not_text1
+    global not_text2
+    global not_text3
+    global not_text4
+    global not_text5
+    global not_text6
+    global not_text7
+    global not_text8
+    global not_text9
+    global not_text10
+    not_text1 = text1
+    not_text2 = text2
+    not_text3 = text3
+    not_text4 = text4
+    not_text5 = text5
+    not_text6 = text6
+    not_text7 = text7
+    not_text8 = text8
+    not_text9 = text9  
+    not_text10 = text10
 
-choiceInput = ""
-moveChoiceMade = False
-currentButtons = []
-buttonsClicked = False
-clickedButton = ""
-myNumber = 0
+def addNewNotificationLine(text):
+    global not_text1
+    global not_text2
+    global not_text3
+    global not_text4
+    global not_text5
+    global not_text6
+    global not_text7
+    global not_text8
+    global not_text9
+    global not_text10
+    global numLinesFilled
 
-first_beginning_screen = False
-second_beginning_screen = False
-suggesting = False
-personSuggested = ""
-weaponSuggested = ""
-roomSuggested = ""
-collectSuggestionHelp = False
-waitingForSuggestion = False
-suggestionHelpPlayer = 0
-gameStarted = False
+    numLinesFilled = numLinesFilled+1
+    if numLinesFilled ==4 :
+        updateNotifications(not_text1, not_text2, not_text3, text, "", "", "", "", "", "")
+    elif numLinesFilled ==5 :
+        updateNotifications(not_text1, not_text2, not_text3, not_text4, text, "", "", "", "", "")
+    elif numLinesFilled ==6 :
+        updateNotifications(not_text1, not_text2, not_text3, not_text4, not_text5, text, "", "", "", "")
+    elif numLinesFilled ==7 :
+        updateNotifications(not_text1, not_text2, not_text3, not_text4, not_text5, not_text6, text, "", "", "")
+    elif numLinesFilled ==8 :
+        updateNotifications(not_text1, not_text2, not_text3, not_text4, not_text5, not_text6, not_text7, text, "", "")
+    elif numLinesFilled ==9 :
+        updateNotifications(not_text1, not_text2, not_text3, not_text4, not_text5, not_text6, not_text7, not_text8, text, "")
+    elif numLinesFilled ==10 :
+        updateNotifications(not_text1, not_text2, not_text3, not_text4, not_text5, not_text6, not_text7, not_text8, not_text9, text)
+    else:
+        not_text3 = not_text4
+        not_text4 = not_text5
+        not_text5 = not_text6
+        not_text6 = not_text7
+        not_text7 = not_text8
+        not_text8 = not_text9
+        not_text9 = not_text10    
+        not_text10 = (text)
+        updateNotifications(not_text1, not_text2, not_text3, not_text4, not_text5, not_text6, not_text7, not_text8, not_text9, not_text10)
 
+
+currentPlayerLocations = ""
 canClickButtons = False
 done = False
 clock = pygame.time.Clock()
@@ -977,7 +837,7 @@ while not done:
                 myNumber = readmsg.split("You are Player ")[1].split(".")[0]
                 if(int(myNumber) == 1):
                     print(readmsg)
-                    updateNotifications(readmsg[1:]+".", "", "", "", "", "")
+                    updateNotifications(readmsg[1:]+".", "", "", "", "", "", "", "", "", "")
                     print("How many players are going to be playing in the game?")
                     first_beginning_screen = True
                     second_beginning_screen = False
@@ -1010,7 +870,7 @@ while not done:
                     secondBoardImage = pygame.image.load("secondStartScreen.png").convert()
                     secondBoardImage = pygame.transform.scale(secondBoardImage, boardSize)
                     screen.blit(secondBoardImage, boardLocation)
-                    print("mustardChosen: ", mustardChosen)
+                    updateNotifications(readmsg[1:41]+".", "", "", "", "", "", "", "", "", "")
 
 
             if PLAYER_CHOICE_MESSAGE in readmsg and waitingForSuggestion == False:
@@ -1095,7 +955,7 @@ while not done:
                 cardTextForCount = cardText.split(", ")
                 print("CARD TEXT FOR COUNT:")
                 print(cardTextForCount)
-                updateNotifications(playerText, "", readmsg[1:34], "", "", "")
+                updateNotifications(playerText, "", readmsg[1:34], "", "", "", "", "", "", "")
 
                 t_card1 = Text((911+5, 33+387), "Click on cards to track what you know.", action_font, action_font, notification_color, notification_color)
                 t_card1.update(screen)
@@ -1156,271 +1016,104 @@ while not done:
                 screen.blit(losing, boardLocation) ##populate on screen
                 
             if ((TURN_MSG or MOVE_MSG) in readmsg) or (SUGGESTION in readmsg) and waitingForSuggestion == False:
-                suggestionValidation = None
                 print("-------------------")
                 print(readmsg)
+                currentPlayerLocations = readmsg.split("|||||")[1]
                 if "Player "+str(p.playerNumber) in readmsg:
                     canClickButtons = True
-                    playerMoveActive = True # CAN I USE THIS TO ALLOW BUTTON CLICKS?
                 else:
                     canClickButtons = False
-                    playerMoveActive = False
-                    p.hasSuggested = False
                     p.hasMoved = False
-                    choiceInput = ""
-                    moveChoiceMade = False
-                    clickedButton = ""
-                    buttonsClicked = False
+                    p.canEndTurn = False
                     currentButtons = []
-                    suggesting = False
-                    personCollected = False
-
-            if "move" in readmsg and canClickButtons and waitingForSuggestion == False:
-                choiceInput = readmsg.split("//")
-                print(choiceInput)
-                choice = choiceInput[0]
-                player_choice = choice[1:]
-                if("," in player_choice):
-                    player_choice = player_choice.split(",")[0]
-                moveChoiceMade = True
-                print("PRINTING CHOICE INPUT")
-                print(choiceInput)
-                if moveChoiceMade:
-                    print("MOVE CHOICE WAS MADE")
-                    print(p.hasMoved)
-                    if(len(choiceInput) > 1):
-                        moveOptions = movePlayer(p, choiceInput[1], screen)
-                    else:
-                        moveOptions = movePlayer(p, choiceInput[0], screen)
-                    if moveOptions != "You can only move once per turn.":
-                        buttonList = moveOptionButtons(moveOptions)
-                        print("&&&&&&&&&&")
-                        print(buttonList)
-                        currentButtons = buttonList
-                    elif moveOptions == "You can only move once per turn.":
-                        msg = moveInput
-                        print(msg)
-                        s.send(msg.encode(form))
-                        playerMoveActive = False
-
-
-                # blockedOptions = (moveInput == "Your move options are all blocked. You can either make an accusation or end your turn.")
-                #     if(moveInput != "You can only move once per turn.") and ("room" not in moveInput) and (blockedOptions == False):
-                #         p.playerLocation = moveInput
-                #         msg = "\nMove " + p.playerName + " to " + p.playerLocation + "."
-                #         print(msg)
-                #     elif("room" in moveInput):
-                #         p.playerLocation = moveInput
-                #         print("\nMove " + p.playerName + " to " + p.playerLocation + ".")
-                #         msg = "Player must now suggest"
-                #         p.canEndTurn = False
-                #         p.hasSuggested = False
-                #         p.canSuggest = True
-                #         print(msg)
-                #     elif(moveInput != "You can only move once per turn.") and (blockedOptions == False):
-                #         msg = "Player cannot move again."
-                #     elif(blockedOptions):
-                #         msg = moveInput
-                #         print(msg)
-                #     s.send(msg.encode(form))
-                #     playerMoveActive = False
-                
-                
+                    buttonsClicked = False
             
-            if "end" in readmsg and canClickButtons and ("rend" not in readmsg) and waitingForSuggestion == False:
-                print("PRINTING END HERE!!!!")
-                # end = s.recv(1024).decode()
-                print("PRINTING END HERE!!!!")
-                # print(end)
-                msg = "\nTurn Over. && " + str(p.canEndTurn)
-                print("<<<<!!!!!!!!!!!!<<<<<<<<<<<<<")
-                print(msg)
-                s.send(msg.encode(form))
-                # s.send("END".encode(form))
-                print("^^^^^^^^^^^^^^^^^^^^^^^^")
-                # if "//" in end:
-                #     choiceInput = end
-                # else:
-                # choiceInput = s.recv(1024).decode().split("//")
-                # print("***********")
-                # playerMoveActive = False
-                # print(choiceInput)
-                # choice = choiceInput[0]
-                # player_choice = choice[1:]
-                # if("," in player_choice):
-                #     player_choice = player_choice.split(",")[0]
-                print("HERE AT THE BOTTOM OF END")
-                # s.send("END".encode(form))
-                # end = s.recv(1024).decode()
-            
-            if "end" in readmsg and (not canClickButtons) and ("rend" not in readmsg) and waitingForSuggestion == False:
-                if "suggestion" in readmsg:
-                    player = readmsg.split("//")[0].split("&&")[1]
-                    if player == False:
-                        print("You cannot end your turn. You must make a suggestion first.")
-                else:
-                    print("END PART")
-                    print(readmsg)
-                    player = readmsg.split("//")[0].split(",")[1]
-                    print("($#*@!(*(*!$(*$(!$)!@*($!@$#@")
-                    print(player)
-                    # message = s.recv(1024).decode()
-                    if(message == "True"):
-                        print("Player " + player + " chose to end their turn.")
-                    playerMoveActive = False
-            
-            if gameStarted == True:
-                if "suggest" in readmsg and canClickButtons and p.hasSuggested == False:
-                    print("||||||||||||")
-                
-                    print(p.hasSuggested)
-                    # choiceInput = s.recv(1024).decode().split("//")
-                    print("***********")
-                    # print(choiceInput)
-                    # choice = choiceInput[0]
-                    # player_choice = choice[1:]
-                    # if("," in player_choice):
-                    #     player_choice = player_choice.split(",")[0]
-                    suggestionValidation = validateSuggestion(p)
-                    if(suggestionValidation == True):
-                        suggesting = True
-                        playerButtons = printPlayerButtons()
-                        currentButtons = playerButtons
-                        print("HERE")
-                        # handleSuggestion()
-                        # playerMoveActive = False
-                    # else:
-                    #     print("You are are not able to make a suggestion \n")
-                    #     suggestionError = "Player cannot make a suggestion!!!! \n"
-                    #     s.send(suggestionError.encode())
-                    #     playerMoveActive = False
-            
-            if "is suggesting" in readmsg and waitingForSuggestion == False:
+            if ("is suggesting" in readmsg) and canClickButtons:
+                waitingForSuggestion = True
+                print("WAITING")
+                print("INSIDE IS SUGGESTING")
+                print(readmsg)
                 print(readmsg.split("///"))
                 clientsMessage = readmsg.split("///")[0]
-                again = True
-                while (again == True) and (clientsMessage != "No Matches for this client"):
-                    collectSuggestionHelp = True
-                    again = False
 
-            if (collectSuggestionHelp == True) and ("///" in readmsg) and (p.hasSuggested == False) and waitingForSuggestion == False:
-                print("COLLECTSUGGESTIONHELP IS TRUE")
+            if waitingForSuggestion == True and ("suggestionHelpMade" in readmsg):
+                print("YOU ARE NOW HERE!!!!")
                 print(readmsg)
-                print(readmsg.split("///")[1])
-                print("WAITING FOR SUGGESTION HELP CHECKS")
-                print(canClickButtons)
-                print(waitingForSuggestion)
-                print(p.playerNumber in readmsg.split("///")[0])
-                print("suggestionHelpMade" not in readmsg.split("///")[1])
-
-                if p.playerNumber in readmsg.split("///")[1]:
-                    print("AT THE END PART OF SUGGESTION NOW")
-                    suggestions = readmsg.split("///")[1].split(",")
-                    print(suggestions)
-                    nextPlayer = int(suggestions[3])
-                    keys = [k for k, v in roomsToNames.items() if v == suggestions[1]]
-                    p.playerLocation = keys[0]
-                    p.canSuggest = True
-                    count = 0
-                    if(int(p.playerNumber) == nextPlayer):
-                        matches = []
-                        playerCards = getattr(p, 'cards')
-                        if((suggestions[0] in p.cards) or (suggestions[1] in p.cards) or (suggestions[2] in p.cards)):
-                            count += 1
-                            for i in suggestions:
-                                if i in p.cards:
-                                    matches.append(i)
-                            # print("You have a card to disprove an item in player " + str(playerNum[0]) + "'s suggestion. ")
-                            # print("Your options to show player " +str(playerNum[0]) + " are " + str(matches))
-                            # print("Which would you like to show?")
-                            print("You have a card to disprove an item in player " + str(9999) + "'s suggestion. ")
-                            print("Your options to show player " +str(9999) + " are " + str(matches))
-                            print("Which would you like to show?")
-                            suggestionHelpPlayer = nextPlayer
-                            # canClickButtons = True
-                            p.helpingSuggestion = True
-                            helpButtons = printSuggestionHelpButtons(9999, matches)
-                            currentButtons = helpButtons
-                            print("HERE IN SUGGESTION HELP LOGIC")
-                            # message = input(" -> ")
-                            print(message)
-                            # s.send(message.encode())
-                        else:
-                            count += 1
-                            message = "No matches please move to next player"
-                            s.send(message.encode())
-                    # nextMessage = "Move " + suggestions[0] + " to " + suggestions[1] + ".\n"
-                    # print(nextMessage)
-                    # playerMoveActive = False
-
-                    # suggestionHelpMessage = s.recv(1024).decode()
-                    # if((suggestionHelpMessage != "") or (suggestionHelpMessage != None)) and ("is suggesting" not in suggestionHelpMessage) and (("Next" not in suggestionHelpMessage)):
-                    #     again = False
-                elif p.playerNumber in readmsg.split("///")[0] and ("suggestionHelpMade" not in readmsg.split("///")[1]) and waitingForSuggestion == False:
-                    waitingForSuggestion = True
-
-                elif "suggestionHelpMade" in readmsg.split("///")[1] and canClickButtons and waitingForSuggestion == True:
-                    suggestion = readmsg.split(" ///")[0]
-                    print("Another player is suggesting that [" + suggestion + "] is not in the solution")
-                    msg = "\n SUGGEST " + personSuggested + " in the " + roomsToNames.get(roomSuggested) + " with the " + weaponSuggested + "\n"
-                    s.send(msg.encode(form))
+                suggestionHelpMessage = readmsg.split(" ///")
+                if "No player has cards that match your suggestion" in suggestionHelpMessage:
+                    print("IN THIS PART NOW!!!")
+                    suggestion = suggestionHelpMessage
+                    print("No player has cards that match your suggestion")
+                    noSuggestionFont = pygame.font.SysFont('Calibri', 14, False, False)
+                    noSuggestionHelp = "No player has cards that match your suggestion."
+                    noSuggestionHelpText = Text((1030, 525), noSuggestionHelp, noSuggestionFont, noSuggestionFont, (0,0,0), notification_color)
+                    noSuggestionHelpText.update(screen)
                     p.hasSuggested = True
                     p.hasMoved = True
                     p.canEndTurn = True
-                    collectSuggestionHelp = False
-                    waitingForSuggestion = False
-                    suggestionHelpPlayer = 0
-                    currentButtons = []
-                    playerMoveActive = False
-                    choiceInput = ""
-                    clickedButton = ""
-                    buttonsClicked = False
-                    suggesting = False
-
-            if collectSuggestionHelp == True and "///" not in readmsg and canClickButtons and waitingForSuggestion == True:
-                print(readmsg)
-                choiceInput = s.recv(1024).decode().split("//")
-                suggestion = readmsg
-                print("No players had cards that matched your suggestion")
-                # print(roomSuggested)
-                # msg = "\n SUGGEST " + personSuggested + " in the " + roomsToNames.get(roomSuggested) + " with the " + weaponSuggested + "\n"
-                # msg = "No players had cards that matched your suggestion"
-                # print(msg)
-                # s.send(msg.encode(form))
-                p.hasSuggested = True
-                p.hasMoved = True
-                p.canEndTurn = True
-                collectSuggestionHelp = False
-                waitingForSuggestion = False
-                suggestionHelpPlayer = 0
-                currentButtons = []
-                playerMoveActive = False
-                choiceInput = ""
-                clickedButton = ""
-                buttonsClicked = False
-                suggesting = False
-                    
-
-                    # if(" ///" in suggestionHelpMessage):
-                    #     suggestion = suggestionHelpMessage.split(" ///")[0]
-                    #     print("Another player is suggesting that [" + suggestion + "] is not in the solution")
-                    # else:
-                    #     suggestion = suggestionHelpMessage
-                    #     print("No players had cards that matched your suggestion")
-                    # msg = "\n SUGGEST " + suggestPersonInput + " in the " + roomsToNames.get(suggestRoomInput) + " with the " + suggestWeaponInput + "\n"
-                    # s.send(msg.encode(form))
-                    # p.hasSuggested = True
-                    # p.hasMoved = True
-                    # p.canEndTurn = True
-                
-
-                ### WHEN SUGGESTION HELP IS FINISHED set suggestionHelpPlayer back to 0 and reset current Buttons, set can click buttons back to false
+                    msg = "KEEP SAME PLAYER TURN"
+                    print(msg)
+                    s.send(msg.encode(form))
+                else:
+                    suggestionHelp1 = "Another player is suggesting that"
+                    suggestionHelpText1 = Text((1055, 525), suggestionHelp1, action_font, action_font, (0,0,0), notification_color)
+                    suggestionHelpText1.update(screen)
+                    suggestionHelp2 = "[ " + str(suggestionHelpMessage[0]) + " ]"
+                    suggestionHelpText2 = Text((1105, 545), suggestionHelp2, action_font, action_font, (0,0,0), notification_color)
+                    suggestionHelpText2.update(screen)
+                    suggestionHelp3 = "is not in the solution."
+                    suggestionHelpText3 = Text((1085, 565), suggestionHelp3, action_font, action_font, (0,0,0), notification_color)
+                    suggestionHelpText3.update(screen)
+                    msg = "KEEP SAME PLAYER TURN"
+                    print(msg)
+                    s.send(msg.encode(form))
+                    print("Another player is suggesting that [" + str(suggestionHelpMessage[0]) + "] is not in the solution")
+                    p.hasSuggested = True
+                    p.hasMoved = True
+                    p.canEndTurn = True
             
-            if waitingForSuggestion == True:
-                print("WAITING")
-
-
-
+            if ("is suggesting" in readmsg) and (not canClickButtons):
+                playerSuggesting = readmsg.split("///")[0][7]
+                print("PLAYER SUGGESTING")
+                print(playerSuggesting)
+                cardsToCheck = readmsg.split("///")[1]
+                suggestions = cardsToCheck.split(",")
+                if(p.playerName == suggestions[0]):
+                    keys = [k for k, v in roomsToNames.items() if v == suggestions[1]]
+                    p.playerLocation = keys[0]
+                    p.canSuggest = True
+                if p.playerNumber in cardsToCheck:
+                    print("INSIDE HERE SO ADD CHECK FOR SUGGESTION HELPER")
+                    print(readmsg)
+                    print(readmsg.split("///"))
+                    # nextPlayer = int(suggestions[3])
+                    count = 0
+                    # if(int(p.playerNumber) == nextPlayer):
+                    matches = []
+                    playerCards = getattr(p, 'cards')
+                    if((suggestions[0] in p.cards) or (suggestions[1] in p.cards) or (suggestions[2] in p.cards)):
+                        count += 1
+                        for i in suggestions:
+                            if i in p.cards:
+                                matches.append(i)
+                        print("CHEKING THIS")
+                        print(playerSuggesting)
+                        print("You have a card to disprove an item in player " + str(playerSuggesting) + "'s suggestion. ")
+                        print("Your options to show player " +str(playerSuggesting) + " are " + str(matches))
+                        print("Which would you like to show?")
+                        p.helpingSuggestion = True
+                        helpButtons = printSuggestionHelpButtons(playerSuggesting, matches)
+                        currentButtons = helpButtons
+                        print("HERE IN SUGGESTION HELP LOGIC")
+                        # message = input(" -> ")
+                        # s.send(message.encode())
+                    else:
+                        count += 1
+                        message = "No matches please move to next player"
+                        s.send(message.encode())
+                    nextMessage = "Move " + suggestions[0] + " to " + suggestions[1] + ".\n"
+                    print(nextMessage)
+                    playerMoveActive = False
 
 
         
@@ -1469,11 +1162,10 @@ while not done:
                     s.send(sendMessage.encode())
                     screen.blit(boardImage, boardLocation)
                     gameStarted = True
-                 
             
             if first_beginning_screen == True:
                 updateFirstBeginningScreen = False
- 
+
                 if b_start2.isOver(pos, b_width_start, b_height_start):
                     print("2")
                     updateFirstBeginningScreen = True
@@ -1715,245 +1407,239 @@ while not done:
                     t_kitchen.bolded = False
                     t_kitchen.update(screen)
                     
-            # if ((TURN_MSG or MOVE_MSG) in readmsg) or (SUGGESTION in readmsg):
-            #    suggestionValidation = None
-            #    if "Player "+str(p.playerNumber) in readmsg:
-            #        canClickButtons = True
-            #        playerMoveActive = True # CAN I USE THIS TO ALLOW BUTTON CLICKS?
-            #    else:
-            #        canClickButtons = False
-            if canClickButtons or p.helpingSuggestion:
-                print("INSIDE THIS PART!!!")
-                print(currentButtons)
-                if b_move.isOver(pos, button_width_1, button_height):
-                    message = "move" 
-                    print('moving')
 
-                        s.send(message.encode())
-                        # choiceInput = s.recv(1024).decode().split("//")
-                        print("***********")
-                        # print(choiceInput)
-                        # choice = choiceInput[0]
-                        # player_choice = choice[1:]
-                        # if("," in player_choice):
-                        #     player_choice = player_choice.split(",")[0]
-
-                        # # if player_choice == "move":
-                        # moveInput = movePlayer(p, choiceInput[1], screen)
-                        
-
-                if currentButtons != []:
-                    print("CURRENT BUTTONS ISNT AN EMPTY LIST")
-                    for button in currentButtons:
-                        theButton = Button(button.image, (button.x_pos, button.y_pos), button.text_input, button.font, button.base_color, button.hovering_color)
-                        if theButton.isOver(pos, theButton.rect.width, theButton.rect.height):
-                            print(theButton.text_input)
-                            clickedButton = theButton
-                            buttonsClicked = True
-                            print(buttonsClicked)
-                            if suggesting == True:
-                                print("SUGGESTING IS TRUE")
-                                if clickedButton.text_input in names:
-                                    personSuggested = clickedButton.text_input
-                                    currentButtons = []
-                                    buttonsClicked = False
-                                    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
-                                    pygame.display.update()
-                                    weaponButtons = printWeaponButtons()
-                                    print(weaponButtons)
-                                    currentButtons = weaponButtons
-                                if clickedButton.text_input in weapons:
-                                    weaponSuggested = clickedButton.text_input
-                                    currentButtons = []
-                                    buttonsClicked = False
-                                    print("WEAPON SUGGESTED")
-                                    print(weaponSuggested)
-                                    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
-                                    pygame.display.update()
-                                    roomSuggested = p.playerLocation
-                                    handleSuggestion(personSuggested, roomSuggested, weaponSuggested)
-
-
-
-                    if buttonsClicked == True:
-                        if(p.hasMoved == False) and (p.helpingSuggestion == False):
-                            print("INSIDE HERE")
-                            ### NEED TO FIGURE OUT HOW TO MAKE MULTIPLE BUTTONS APPEAR ####
-                            print("PRINTING BUTTON TEXT INPUT")
-                            print(clickedButton.text_input)
-                            print(choiceInput)
-                            moveInput = whereToMove(p, clickedButton.text_input, choiceInput[1])
-                            print(moveInput)
-
-                            # print(moveOptions)
-                            print("&&&&&&&")
-                            print(moveInput)
-                            blockedOptions = (moveInput == "Your move options are all blocked. You can either make an accusation or end your turn.")
-                            if(moveInput != "You can only move once per turn.") and ("room" not in moveInput) and (blockedOptions == False):
-                                p.playerLocation = moveInput
-                                msg = "\nMove " + p.playerName + " to " + p.playerLocation + "."
+            if gameStarted:
+                if canClickButtons:
+                    print("INSIDE THIS PART!!!")
+                    print(currentButtons)
+                    if b_move.isOver(pos, button_width_1, button_height):
+                        print("NOW WE MADE IT HERE")
+                        print("MOVE CHOICE WAS MADE")
+                        print(p.hasMoved)
+                        if p.hasMoved == False:
+                            moveOptions = movePlayer(p, currentPlayerLocations)
+                            if moveOptions == "NO POSSIBLE OPTIONS":
+                                moveInput1 = "Your move options are all blocked."
+                                moveInput2 = "You can either accuse or end your turn."
+                                blockedText1 = Text((1070, 525), moveInput1, action_font, action_font, (0,0,0), notification_color)
+                                blockedText2 = Text((1050, 540), moveInput2, action_font, action_font, (0,0,0), notification_color)
+                                blockedText1.update(screen)
+                                blockedText2.update(screen)
+                                msg = "KEEP SAME PLAYER TURN"
                                 print(msg)
-                            elif("room" in moveInput):
-                                p.playerLocation = moveInput
-                                print("\nMove " + p.playerName + " to " + p.playerLocation + ".")
-                                msg = "Player must now suggest"
-                                p.canEndTurn = False
-                                p.hasSuggested = False
-                                p.canSuggest = True
-                                print(msg)
-                            elif(moveInput != "You can only move once per turn.") and (blockedOptions == False):
-                                msg = "Player cannot move again."
-                            elif(blockedOptions):
-                                msg = moveInput
-                                print(msg)
-                            s.send(msg.encode(form))
-                            playerMoveActive = False
-                            print("IS PLAYER MOVE ACTIVE")
-                            print(playerMoveActive)
+                                s.send(msg.encode(form))
+                                # pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                # pygame.display.update()
+                                currentButtons = []
+                                # print(moveInput)
+                                ##### UPDATE NOTIFICATION HERE!!!!!!! ####
+                            else:
+                                buttonList = moveOptionButtons(moveOptions)
+                                print("&&&&&&&&&&")
+                                print(buttonList)
+                                currentButtons = buttonList
+                        else: 
+                            updateNotifications("", "You can only move once per turn.", "", "", "", "")
                             pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
                             pygame.display.update()
-
-                            # pygame.draw.rect(screen, WHITE, [0, hLeft, vertical, height])
-                            # done = True
-                        if p.helpingSuggestion == True and buttonsClicked == True:
-                            print("IN THIS SPOT")
+                            noDoubleMove = "You can only move once per turn."
+                            noDoubleMoveText = Text((1070, 525), noDoubleMove, action_font, action_font, (0,0,0), notification_color)
+                            noDoubleMoveText.update(screen)
                             currentButtons = []
-                            buttonsClicked = False
+                            # pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                            # pygame.display.update()
+                            msg = "KEEP SAME PLAYER TURN"
+                            print(msg)
+                            s.send(msg.encode(form))
+
+
+                    if currentButtons != []:
+                        print("CURRENT BUTTONS ISNT AN EMPTY LIST")
+                        for button in currentButtons:
+                            theButton = Button(button.image, (button.x_pos, button.y_pos), button.text_input, button.font, button.base_color, button.hovering_color)
+                            if theButton.isOver(pos, theButton.rect.width, theButton.rect.height):
+                                print(theButton.text_input)
+                                clickedButton = theButton
+                                buttonsClicked = True
+                                print(buttonsClicked)
+                                if suggesting == True:
+                                    print("SUGGESTING IS TRUE")
+                                    if clickedButton.text_input in names:
+                                        personSuggested = clickedButton.text_input
+                                        currentButtons = []
+                                        buttonsClicked = False
+                                        pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                        pygame.display.update()
+                                        weaponButtons = printWeaponButtons()
+                                        currentButtons = weaponButtons
+                                    if clickedButton.text_input in weapons:
+                                        weaponSuggested = clickedButton.text_input
+                                        currentButtons = []
+                                        buttonsClicked = False
+                                        print("WEAPON SUGGESTED")
+                                        print(weaponSuggested)
+                                        pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                        pygame.display.update()
+                                        roomSuggested = p.playerLocation
+                                        all = "suggest !!!" + personSuggested + "," + roomSuggested + "," + weaponSuggested
+                                        print("INSIDE HANDLING SUGGESTION IN CLIENT")
+                                        print(all)
+                                        s.send(all.encode())
+                                        print("Move " + personSuggested + " to " + roomSuggested + ".\n")
+                                        print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
+
+
+
+                        if buttonsClicked == True:
+                            # if(p.hasMoved == False) and (p.helpingSuggestion == False):
+                            if(p.hasMoved == False):
+                                print("INSIDE HERE")
+                                ### NEED TO FIGURE OUT HOW TO MAKE MULTIPLE BUTTONS APPEAR ####
+                                print("PRINTING BUTTON TEXT INPUT")
+                                print(clickedButton.text_input)
+                                print(choiceInput)
+                                moveInput = clickedButton.text_input
+                                print("PRINTING MOVE INPUT HERE")
+                                print(moveInput)
+                                if "room" not in moveInput:
+                                    p.playerLocation = moveInput
+                                    msg = "\nmove---" + p.playerName + "---" + p.playerLocation
+                                    print(msg)
+                                    # p.hasSuggested = True   
+                                    p.canEndTurn = True 
+                                    p.canSuggest = False
+
+                                elif("room" in moveInput):
+                                    p.playerLocation = moveInput
+                                    print("\nmove " + p.playerName + " to " + p.playerLocation + ".")
+                                    msg = "\nmove---" + p.playerName + "---" + p.playerLocation
+                                    # msg = "Player must now suggest"
+                                    p.canEndTurn = False
+                                    p.hasSuggested = False
+                                    p.canSuggest = True
+                                    print(msg)
+
+                                p.hasMoved = True
+                                print("THIS IS THE MESSAGE MOVE WILL SEND")
+                                print(msg)
+                                s.send(msg.encode(form))
+                                print(p.hasMoved)
+                                currentButtons = []
+                                pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                pygame.display.update()
+
+                    if b_suggest.isOver(pos, button_width_1, button_height):
+                        print('suggesting')
+                        suggestionValidation = validateSuggestion(p)
+                        if(suggestionValidation == True):
+                            suggesting = True
+                            playerButtons = printPlayerButtons()
+                            currentButtons = playerButtons
+                            print("HERE")
+                        else:
+                            print("IN CLIENT AND PLAYER CANNOT SUGGEST NOW")
                             pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
                             pygame.display.update()
-                            s.send(clickedButton.text_input.encode())
-                            clickedButton = ""
-                            p.hasMoved = False
-
-
-
-                    if b_accuse.isOver(pos, button_width_1, button_height):
-                        print('accusing')
-                        message = "accuse"
-                        s.send(message.encode())
-                        choiceInput = s.recv(1024).decode().split("//")
-                        print("***********")
-                        print(choiceInput)
-                        choice = choiceInput[0]
-                        player_choice = choice[1:]
-                        if("," in player_choice):
-                            player_choice = player_choice.split(",")[0]
-
-
-                        # if player_choice == "accuse":
-                        msg = makeAccusation()
-                        s.send(msg.encode())
-                        if(msg == "endConnection for all"):
-                            s.close()
-                        playerMoveActive = False
-
-                        # pygame.draw.rect(screen, WHITE, [0, hLeft, vertical, height])
-                        # done = True
-                    if p.helpingSuggestion == True and buttonsClicked == True:
-                        print("IN THIS SPOT")
-                        currentButtons = []
-                        buttonsClicked = False
-                        pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
-                        pygame.display.update()
-                        print(clickedButton.text_input)
-                        print("SENDING CLICKED BUTTON INPUT")
-                        s.send(clickedButton.text_input.encode())
-                        clickedButton = ""
-                        p.hasMoved = False
-                        playerMoveActive = False
+                            if p.hasSuggested:
+                                noSuggesting = "You cannot make another suggestion."
+                                noSuggestingText = Text((1070, 525), noSuggesting, action_font, action_font, (0,0,0), notification_color)
+                                noSuggestingText.update(screen)
+                            elif p.canSuggest == False and p.hasMoved:
+                                noSuggesting = "You are not in a location to suggest."
+                                noSuggestingText = Text((1070, 525), noSuggesting, action_font, action_font, (0,0,0), notification_color)
+                                noSuggestingText.update(screen)
+                            else:
+                                noSuggesting = "You must either move or make a suggestion."
+                                noSuggestingText = Text((1070, 525), noSuggesting, action_font, action_font, (0,0,0), notification_color)
+                                noSuggestingText.update(screen)
+                            msg = "KEEP SAME PLAYER TURN"
+                            print(msg)
+                            s.send(msg.encode(form))
 
                     if b_end.isOver(pos, button_width_2, button_height):
                         print('ending')
-                        message = "end"
-                        s.send(message.encode())
-                        
-                        # if player_choice == "end":
-                        canTurnEnd = validateEndTurn(p)
-                        print("CAN PLAYER END TURN?")
-                        print(canTurnEnd)
-                        if(canTurnEnd == True):
-                            msg = "\nTurn Over. && " + str(p.canEndTurn)
+                        # canTurnEnd = validateEndTurn(p)
+
+                        # def validateEndTurn(p):
+                        if(p.canEndTurn == True):
+                            p.canSuggest = False
+                            msg = "end \n"
                             print("<<<<!!!!!!!!!!!!<<<<<<<<<<<<<")
                             print(msg)
                             s.send(msg.encode(form))
                             print("<<<<<<<<<<<<<<<<<")
-                            # end = s.recv(1024).decode()
-                            # print(end)
-                            # s.send("END".encode(form))
-                            # playerMoveActive = False
-                            # done = True
+                            pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                            pygame.display.update()
+                                
                         else:
                             if(p.canSuggest and not p.hasMoved):
-                                msg = "\nYou must either move or make a suggestion. && " + str(p.canEndTurn)
+                                # msg = "\nYou must either move or make a suggestion. && " + str(p.canEndTurn)
+                                pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                pygame.display.update()
+                                endMsg1 = "You must either move or make a suggestion."
+                                noEnd1 = Text((1070, 525), endMsg1, action_font, action_font, (0,0,0), notification_color)
+                                noEnd1.update(screen)
                             if(p.canSuggest and p.hasMoved):
-                                msg = "\nYou must make a suggestion. && " + str(p.canEndTurn)
+                                # msg = "\nYou must make a suggestion. && " + str(p.canEndTurn)
+                                pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                pygame.display.update()
+                                endMsg2 = "You must make a suggestion."
+                                noEnd2 = Text((1070, 525), endMsg2, action_font, action_font, (0,0,0), notification_color)
+                                noEnd2.update(screen)
                             if(not p.canSuggest and p.hasMoved):
-                                msg = "\nYou must move to a new location. && " + str(p.canEndTurn)
+                                # msg = "\nYou must move to a new location. && " + str(p.canEndTurn)
+                                pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                pygame.display.update()
+                                endMsg3 = "You are not in a location to suggest."
+                                noEnd3 = Text((1070, 525), endMsg3, action_font, action_font, (0,0,0), notification_color)
+                                noEnd3.update(screen)
                             if(not p.canSuggest and not p.hasMoved):
-                                msg = "\nYou must move to a new location. && " + str(p.canEndTurn)
-                            print(msg.split(" &&")[0])
+                                # msg = "\nYou must move to a new location. && " + str(p.canEndTurn)
+                                pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                pygame.display.update()
+                                endMsg4 = "You must make a move to a new location."
+                                noEnd4 = Text((1055, 525), endMsg4, action_font, action_font, (0,0,0), notification_color)
+                                noEnd4.update(screen)
+                            msg = "KEEP SAME PLAYER TURN"
+                            print(msg)
                             s.send(msg.encode(form))
-                            # end = s.recv(1024).decode()
-                            # s.send("END".encode(form))
-                            playerMoveActive = False
                             print("//////////")
-                            # done = True
+
+                    if b_accuse.isOver(pos, button_width_1, button_height):
+                            print('accusing')
+                            # message = "accuse"
+                            # s.send(message.encode())
+                            # choiceInput = s.recv(1024).decode().split("//")
+                            # print("***********")
+                            # print(choiceInput)
+                            # choice = choiceInput[0]
+                            # player_choice = choice[1:]
+                            # if("," in player_choice):
+                            #     player_choice = player_choice.split(",")[0]
 
 
-                if b_accuse.isOver(pos, button_width_1, button_height):
-                    print('accusing')
-                    message = "accuse"
-                    s.send(message.encode())
-                    choiceInput = s.recv(1024).decode().split("//")
-                    print("***********")
-                    print(choiceInput)
-                    choice = choiceInput[0]
-                    player_choice = choice[1:]
-                    if("," in player_choice):
-                        player_choice = player_choice.split(",")[0]
+                            # # if player_choice == "accuse":
+                            # msg = makeAccusation()
+                            # s.send(msg.encode())
+                            # if(msg == "endConnection for all"):
+                            #     s.close()
+                            # playerMoveActive = False
 
+                elif p.helpingSuggestion == True and gameStarted:
+                    print(currentButtons)
+                    print("HELPING SUGGESTIONS SO CAN CLICK")
+                    suggestionHelp = ""
+                    for button in currentButtons:
+                        if button.isOver(pos, button.rect.width, button.rect.height):
+                            print(button)
+                            suggestionHelp = button.text_input
+                    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                    pygame.display.update()
+                    print("SUGGESTION HELP HERE")
+                    print(suggestionHelp)
+                    s.send(suggestionHelp.encode(form))
+                    print("SENT!")
 
-                    # if player_choice == "accuse":
-                    msg = makeAccusation()
-                    s.send(msg.encode())
-                    if(msg == "endConnection for all"):
-                        s.close()
-                    playerMoveActive = False
-
-                if b_suggest.isOver(pos, button_width_1, button_height):
-                    print('suggesting')
-                    suggestionValidation = validateSuggestion(p)
-                    if(suggestionValidation == True):
-                        suggesting = True
-                        playerButtons = printPlayerButtons()
-                        currentButtons = playerButtons
-                        print("HERE")
-                    # message = "suggest"
-                    # s.send(message.encode())
-
-                if b_show.isOver(pos, button_width_1, button_height):
-                    message = "show"
-
-                if b_end.isOver(pos, button_width_2, button_height):
-                    print('ending')
-                    # message = "end"
-                    # s.send(message.encode())
-                    
-                    # if player_choice == "end":
-                    canTurnEnd = validateEndTurn(p)
-                    print("CAN PLAYER END TURN?")
-                    print(canTurnEnd)
-                    if(canTurnEnd == True):
-                        msg = "end \nTurn Over. && " + str(p.canEndTurn)
-                        print("<<<<!!!!!!!!!!!!<<<<<<<<<<<<<")
-                        print(msg)
-                        s.send(msg.encode(form))
-                        print("<<<<<<<<<<<<<<<<<")
-                        # end = s.recv(1024).decode()
-                        # s.send("END".encode(form))
-                        playerMoveActive = False
-                        # done = True
-    pygame.event.clear()    
 
 pygame.quit()
 s.close()
