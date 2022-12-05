@@ -12,6 +12,14 @@ import queue
 pygame.init()
 pygame.event.clear()
 
+
+mustardChosen = False
+peacockChosen = False
+plumChosen = False
+scarletChosen = False
+whiteChosen = False
+greenChosen = False
+
 class DropDown():
     def __init__(self, x, y, w, h, color, highlight_color, font, option_list, selected = 0):
         self.color = color
@@ -266,13 +274,6 @@ def movePlayer(p, otherPlayerLocations, screen):
         p.hasMoved = True
     return moveInput
     
-mustardChosen = False
-peacockChosen = False
-plumChosen = False
-scarletChosen = False
-whiteChosen = False
-greenChosen = False
-
 # def movePlayer(p, otherPlayerLocations): # break into 2 functions - first populates drop down correctly, second actually does action
     # otherPlayerLocationsList = [h for h in ast.literal_eval(otherPlayerLocations) if ("room" not in h)]
     # playerInRoom = p.playerLocation.__contains__("room")
@@ -804,17 +805,17 @@ t_kitchen.update(screen)
 t_x = vertical + 5
 t_y = 5
 fontHeight = 18
-t_line1 = Text((vertical+5, 5), "INITIAL", notification_font, info_font_bold, notification_color, notification_color)
+t_line1 = Text((vertical+5, 5), "", notification_font, info_font_bold, notification_color, notification_color)
 t_line1.update(screen)
-t_line2 = Text((vertical+5, 5+1*fontHeight), "INITIAL", notification_font, info_font_bold, notification_color, notification_color)
+t_line2 = Text((vertical+5, 5+1*fontHeight), "", notification_font, info_font_bold, notification_color, notification_color)
 t_line2.update(screen)
-t_line3 = Text((vertical+5, 5+2*fontHeight), "INITIAL", notification_font, info_font_bold, notification_color, notification_color)
+t_line3 = Text((vertical+5, 5+2*fontHeight), "", notification_font, info_font_bold, notification_color, notification_color)
 t_line3.update(screen)
-t_line4 = Text((vertical+5, 5+3*fontHeight), "INITIAL", notification_font, info_font_bold, notification_color, notification_color)
+t_line4 = Text((vertical+5, 5+3*fontHeight), "", notification_font, info_font_bold, notification_color, notification_color)
 t_line4.update(screen)
-t_line5 = Text((vertical+5, 5+4*fontHeight), "INITIAL", notification_font, info_font_bold, notification_color, notification_color)
+t_line5 = Text((vertical+5, 5+4*fontHeight), "", notification_font, info_font_bold, notification_color, notification_color)
 t_line5.update(screen)
-t_line6 = Text((vertical+5, 5+5*fontHeight), "INITIAL", notification_font, info_font_bold, notification_color, notification_color)
+t_line6 = Text((vertical+5, 5+5*fontHeight), "", notification_font, info_font_bold, notification_color, notification_color)
 t_line6.update(screen)
 
 
@@ -912,29 +913,58 @@ while not done:
                     secondBoardImage = pygame.image.load("secondStartScreen.png").convert()
                     secondBoardImage = pygame.transform.scale(secondBoardImage, boardSize)
                     screen.blit(secondBoardImage, boardLocation)
-                    if mustardChosen == False:
-                        b_startMustard = Button(button_type_start, (b_x_start, b_y_start), "Colonel Mustard", button_font, button_color, button_greyed_color)
-                        b_startMustard.update(screen)
-                    if peacockChosen == False:
-                        b_startPeacock = Button(button_type_start, (b_x_start+1*(b_width_start+dist_between_buttons), b_y_start), "Mrs. Peacock", button_font, button_color, button_greyed_color)
-                        b_startPeacock.update(screen)
-                    if plumChosen == False:  
-                        b_startPlum = Button(button_type_start, (b_x_start+2*(b_width_start+dist_between_buttons), b_y_start), "Professor Plum", button_font, button_color, button_greyed_color)
-                        b_startPlum.update(screen)
-                    if scarletChosen == False:
-                        b_startScarlet = Button(button_type_start, (b_x_start+3*(b_width_start+dist_between_buttons), b_y_start), "Miss Scarlett", button_font, button_color, button_greyed_color)
-                        b_startScarlet.update(screen)
-                    if whiteChosen == False:
-                        b_startWhite = Button(button_type_start, (b_x_start+4*(b_width_start+dist_between_buttons), b_y_start), "Mrs. White", button_font, button_color, button_greyed_color)
-                        b_startWhite.update(screen)
-                    if greenChosen == False:
-                        b_startGreen = Button(button_type_start, (b_x_start+5*(b_width_start+dist_between_buttons), b_y_start), "Reverend Green", button_font, button_color, button_greyed_color)
-                        b_startGreen.update(screen)
+                    print("mustardChosen: ", mustardChosen)
 
 
             if PLAYER_CHOICE_MESSAGE in readmsg:
                 #readmsg = s.recv(1024).decode() # NEED TO GET RID OF THIS
                 print(readmsg, "\n")
+                if "Mustard" in readmsg:
+                    mustardChosen = False
+                    print("mustard in read message")
+                else:
+                    mustardChosen = True
+                    print("mustard not in read message")
+                if "Peacock" in readmsg:
+                    peacockChosen = False
+                else:
+                    peacockChosen = True
+                if "Plum" in readmsg:
+                    plumChosen = False
+                else:
+                    plumChosen = True
+                if "Scarlet" in readmsg:
+                    scarletChosen = False
+                else:
+                    scarletChosen = True                    
+                if "White" in readmsg:
+                    whiteChosen = False
+                else:
+                    whiteChosen = True
+                if "Green" in readmsg:
+                    greenChosen = False
+                else:
+                    greenChosen = True
+                    
+                if mustardChosen == False:
+                    b_startMustard = Button(button_type_start, (b_x_start, b_y_start), "Colonel Mustard", button_font, button_color, button_greyed_color)
+                    b_startMustard.update(screen)
+                if peacockChosen == False:
+                    b_startPeacock = Button(button_type_start, (b_x_start+1*(b_width_start+dist_between_buttons), b_y_start), "Mrs. Peacock", button_font, button_color, button_greyed_color)
+                    b_startPeacock.update(screen)
+                if plumChosen == False:  
+                    b_startPlum = Button(button_type_start, (b_x_start+2*(b_width_start+dist_between_buttons), b_y_start), "Professor Plum", button_font, button_color, button_greyed_color)
+                    b_startPlum.update(screen)
+                if scarletChosen == False:
+                    b_startScarlet = Button(button_type_start, (b_x_start+3*(b_width_start+dist_between_buttons), b_y_start), "Miss Scarlett", button_font, button_color, button_greyed_color)
+                    b_startScarlet.update(screen)
+                if whiteChosen == False:
+                    b_startWhite = Button(button_type_start, (b_x_start+4*(b_width_start+dist_between_buttons), b_y_start), "Mrs. White", button_font, button_color, button_greyed_color)
+                    b_startWhite.update(screen)
+                if greenChosen == False:
+                    b_startGreen = Button(button_type_start, (b_x_start+5*(b_width_start+dist_between_buttons), b_y_start), "Reverend Green", button_font, button_color, button_greyed_color)
+                    b_startGreen.update(screen)
+                    
                 # message = input(" -> ")
                 #if int(myNumber) == 1: # dummy for now
                 #    message = "Mrs. White"
@@ -1018,9 +1048,13 @@ while not done:
                 
 
             if WIN_MSG in readmsg:
-                pass # dummy right now
+                winning = pygame.image.load("winScreen.png").convert() #load image
+                winning = pygame.transform.scale(winning, boardSize) #transform size
+                screen.blit(winning, boardLocation) ##populate on screen
             if LOSE_MSG in readmsg:
-                pass # dummy right now
+                losing = pygame.image.load("loseScreen.png").convert() #load image
+                losing = pygame.transform.scale(losing, boardSize) #transform size
+                screen.blit(losing, boardLocation) ##populate on screen
                 
             if ((TURN_MSG or MOVE_MSG) in readmsg) or (SUGGESTION in readmsg):
                 suggestionValidation = None
@@ -1101,41 +1135,36 @@ while not done:
                                 
             if second_beginning_screen == True:
                 updateSecondBeginningScreen = False
-                if b_startMustard.isOver(pos, b_width_start, b_height_start):
-                    print("Mustard")
-                    updateSecondBeginningScreen = True
-                    message = ("Colonel Mustard")
-                    mustardChosen = True
-                    
-                if b_startPeacock.isOver(pos, b_width_start, b_height_start):
-                    print("Peacock")
-                    updateSecondBeginningScreen = True
-                    message = "Mrs. Peacock"
-                    peacockChosen = True
-                    
-                if b_startPlum.isOver(pos, b_width_start, b_height_start):
-                    print("Plum")
-                    updateSecondBeginningScreen = True
-                    message = "Professor Plum"
-                    plumChosen = True
-
-                if b_startScarlet.isOver(pos, b_width_start, b_height_start):
-                    print("Scarlet")
-                    updateSecondBeginningScreen = True
-                    message = "Miss Scarlett"
-                    scarletChosen = True
-
-                if b_startWhite.isOver(pos, b_width_start, b_height_start):
-                    print("white")
-                    updateSecondBeginningScreen = True
-                    message = "Mrs. White"
-                    whiteChosen = True
-                    
-                if b_startGreen.isOver(pos, b_width_start, b_height_start):
-                    print("green")  
-                    updateSecondBeginningScreen = True
-                    message = "Reverend Green"
-                    greenChosen = True
+                if mustardChosen == False:
+                    if b_startMustard.isOver(pos, b_width_start, b_height_start):
+                        print("Mustard")
+                        updateSecondBeginningScreen = True
+                        message = ("Colonel Mustard")
+                if peacockChosen == False:    
+                    if b_startPeacock.isOver(pos, b_width_start, b_height_start):
+                        print("Peacock")
+                        updateSecondBeginningScreen = True
+                        message = "Mrs. Peacock"
+                if plumChosen == False:   
+                    if b_startPlum.isOver(pos, b_width_start, b_height_start):
+                        print("Plum")
+                        updateSecondBeginningScreen = True
+                        message = "Professor Plum"
+                if scarletChosen == False:
+                    if b_startScarlet.isOver(pos, b_width_start, b_height_start):
+                        print("Scarlet")
+                        updateSecondBeginningScreen = True
+                        message = "Miss Scarlett"
+                if whiteChosen == False:
+                    if b_startWhite.isOver(pos, b_width_start, b_height_start):
+                        print("white")
+                        updateSecondBeginningScreen = True
+                        message = "Mrs. White"
+                if greenChosen == False:   
+                    if b_startGreen.isOver(pos, b_width_start, b_height_start):
+                        print("green")  
+                        updateSecondBeginningScreen = True
+                        message = "Reverend Green"
                     
                 if updateSecondBeginningScreen == True:
                     first_beginning_screen = False
