@@ -1054,6 +1054,7 @@ first_beginning_screen = False
 second_beginning_screen = False
 gameStarted = False
 gDefined = False
+gameOver = False
 
 playerLocDict = {"Miss Scarlett": "None", "Colonel Mustard": "None", "Mrs. White": "None", "Reverend Green": "None",
                  "Mrs. Peacock": "None", "Professor Plum": "None"}
@@ -1308,37 +1309,61 @@ while not done:
                 boardImage = pygame.transform.scale(boardImage, boardSize)  # transform size
                 screen.blit(boardImage, boardLocation)  ##populate on screen
 
-            if WIN_MSG in readmsg and canClickButtons:
+            if WIN_MSG in readmsg:
+                print("KAT WIN MSG: ", readmsg)
                 accusationStatement = readmsg.split("*****")[1]
                 print(accusationStatement)
-                winning = pygame.image.load("winScreen.png").convert()  # load image
-                winning = pygame.transform.scale(winning, boardSize)  # transform size
-                screen.blit(winning, boardLocation)  ##populate on screen
-                print("You Won!")
+                addNewNotificationLine(accusationStatement[:20]+":")
+                addNewNotificationLine(accusationStatement[21:-2]+".")
+                addNewNotificationLine("The accusation is correct.")
+                print("HERE KAT: ", accusationStatement[7:])
+                if p.playerNumber in accusationStatement:
+                    winning = pygame.image.load("winScreen.png").convert()  # load image
+                    winning = pygame.transform.scale(winning, boardSize)  # transform size
+                    screen.blit(winning, boardLocation)  ##populate on screen
+                    addNewNotificationLine("You won the game!")
+                else:
+                    addNewNotificationLine("Player " + accusationStatement[7]+" has won the game.")
+                    losing = pygame.image.load("loseScreen.png").convert()  # load image
+                    losing = pygame.transform.scale(losing, boardSize)  # transform size
+                    screen.blit(losing, boardLocation)  ##populate on screen
                 msg = "endConnection for all"
+                #s.send(msg.encode())
+                gameOver = True
 
-            if ((LOSE_MSG in readmsg) and canClickButtons) or ((WIN_MSG in readmsg) and (not canClickButtons)):
-                print(readmsg)
+            if ((LOSE_MSG in readmsg) and canClickButtons):# or ((WIN_MSG in readmsg) and (not canClickButtons)):
+                print("KAT, LOSE MSG 1: ", readmsg)
                 accusationStatement = readmsg.split("*****")[1]
+                addNewNotificationLine(accusationStatement[:20]+":")
+                addNewNotificationLine(accusationStatement[21:-2]+".")
                 print(accusationStatement)
                 losing = pygame.image.load("loseScreen.png").convert()  # load image
                 losing = pygame.transform.scale(losing, boardSize)  # transform size
                 screen.blit(losing, boardLocation)  ##populate on screen
+                addNewNotificationLine("The accusation is incorrect.")
+                addNewNotificationLine("You have lost the game.")
                 print("You lost, you can no longer move or suggest.")
                 msg = "endConnection for player"
-                s.send(msg.encode())
+                #s.send(msg.encode())
+                #done = True
+                gameOver = True
 
             if (LOSE_MSG in readmsg) and not canClickButtons:
-                print(readmsg)
+                print("KAT, LOSE MSG 2: ", readmsg)
                 accusationStatement = readmsg.split("*****")[1]
+                addNewNotificationLine(accusationStatement[:20]+":")
+                addNewNotificationLine(accusationStatement[21:-2]+".")
+                addNewNotificationLine("The accusation is incorrect.")
+                addNewNotificationLine("Player " + accusationStatement[7]+" has lost the game.")
                 print(accusationStatement)
 
-            if TURN_MSG in readmsg:
+            if TURN_MSG in readmsg and gameOver == False:
                 # print("-------------------")
                 # print(readmsg)
                 currentPlayerLocations = readmsg.split("|||||")[1]
                 if "Player " + str(p.playerNumber) in readmsg:
                     canClickButtons = True
+                    addNewNotificationLine("It's your turn.")
                 else:
                     canClickButtons = False
                     p.hasMoved = False
@@ -1347,6 +1372,7 @@ while not done:
                     buttonsClicked = False
                     suggesting = False
                     accusing = False
+                    addNewNotificationLine(readmsg.split("|||||")[0][1:])
 
             if "is moving to" in readmsg:
                 print("MOVE MESSAGE:")
