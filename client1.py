@@ -1114,7 +1114,7 @@ while not done:
                 print("CARD TEXT FOR COUNT:")
                 print(cardTextForCount)
                 updateNotifications(playerText, "", readmsg[1:34], "", "", "", "", "", "", "")
-
+                numPlayersInGame = int(readmsg[24])
                 t_card1 = Text((911+5, 33+387), "Click on cards to track what you know.", action_font, action_font, notification_color, notification_color)
                 t_card1.update(screen)
                 t_card2 = Text((911+5, 25+385+2*(fontHeight-2)), "Your "+str(len(cardTextForCount))+" cards are:", action_font, action_font, notification_color, notification_color)
@@ -1267,14 +1267,21 @@ while not done:
                     location = "hallway45"
                 playerLocDict[player] = location
                 movePlayerImages(playerLocDict)
+                
+            if "is suggesting" in readmsg: # add functionality to check if two lines are the same and don't rewrite
+                asking = int(readmsg[-1])
+                playerSuggesting = int(readmsg[7])
+                print(readmsg)
+                print("KAT ^^^^ ASKING: ", readmsg[7])
+                
+                if playerSuggesting+1 == asking or (playerSuggesting == numPlayersInGame and asking == 1):
+                    addNewNotificationLine(readmsg[:22]+":")
+                    tempText = readmsg[23:]
+                    tempText = tempText.split("///")[0]
+                    addNewNotificationLine(tempText[:-2])
             
             if "is suggesting" in readmsg:
                 print("SUGGESTION MESSAGE:")
-                print(readmsg)
-                addNewNotificationLine(readmsg[:23]+":")
-                tempText = readmsg[23:]
-                tempText = tempText.split("///")[0]
-                addNewNotificationLine(tempText[:-2])
 
                 if "Mustard" in readmsg:
                     player = "Colonel Mustard"
