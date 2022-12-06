@@ -288,7 +288,7 @@ def movePlayer(p, otherPlayerLocations):
             return possibleRooms
 
 def printPlayerButtons(action):
-    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+    pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
     pygame.display.update()
     info_font = pygame.font.SysFont('Calibri', 12, False, False)
     info_font_bold = pygame.font.SysFont('Calibri', 12, True, True)
@@ -311,7 +311,7 @@ def printPlayerButtons(action):
     return playerButtons
 
 def printWeaponButtons(action):
-    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+    pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
     pygame.display.update()
     info_font = pygame.font.SysFont('Calibri', 14, False, False)
     info_font_bold = pygame.font.SysFont('Calibri', 14, True, True)
@@ -334,7 +334,7 @@ def printWeaponButtons(action):
     return weaponButtons
 
 def printRoomButtons(action):
-    pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+    pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
     pygame.display.update()
     info_font = pygame.font.SysFont('Calibri', 14, False, False)
     info_font_bold = pygame.font.SysFont('Calibri', 14, True, True)
@@ -509,7 +509,7 @@ def movePlayerImages(playerLocations):
             elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "lounge":
                 roomx = 692
                 roomy = 227-px
-            elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "libary":
+            elif (player == "Colonel Mustard" or player == "Mrs. Peacock" or player == "Professor Plum") and location == "library":
                 roomx = 65
                 roomy = 310
             elif (player == "Miss Scarlett" or player == "Mrs. White" or player == "Reverend Green") and location == "library":
@@ -1219,6 +1219,17 @@ while not done:
             if "is moving to" in readmsg:
                 print("MOVE MESSAGE:")
                 print(readmsg)
+                tempMsg = readmsg
+                tempMsg = tempMsg.replace("room1", "study")
+                tempMsg = tempMsg.replace("room2", "hall")
+                tempMsg = tempMsg.replace("room3", "lounge")
+                tempMsg = tempMsg.replace("room4", "dining room")
+                tempMsg = tempMsg.replace("room5", "kitchen")
+                tempMsg = tempMsg.replace("room6", "ballroom")
+                tempMsg = tempMsg.replace("room7", "conservatory")
+                tempMsg = tempMsg.replace("room8", "library")
+                tempMsg = tempMsg.replace("room9", "billiard room")
+                addNewNotificationLine(tempMsg)
 
                 if "Mustard" in readmsg:
                     player = "Colonel Mustard"
@@ -1281,6 +1292,10 @@ while not done:
             if "is suggesting" in readmsg:
                 print("SUGGESTION MESSAGE:")
                 print(readmsg)
+                addNewNotificationLine(readmsg[:23]+":")
+                tempText = readmsg[23:]
+                tempText = tempText.split("///")[0]
+                addNewNotificationLine(tempText[:-2])
 
                 if "Mustard" in readmsg:
                     player = "Colonel Mustard"
@@ -1758,7 +1773,7 @@ while not done:
                                         personSuggested = clickedButton.text_input
                                         currentButtons = []
                                         buttonsClicked = False
-                                        pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                        pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                         pygame.display.update()
                                         weaponButtons = printWeaponButtons("suggest")
                                         currentButtons = weaponButtons
@@ -1768,7 +1783,7 @@ while not done:
                                         buttonsClicked = False
                                         print("WEAPON SUGGESTED")
                                         print(weaponSuggested)
-                                        pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                        pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                         pygame.display.update()
                                         roomSuggested = p.playerLocation
                                         all = "suggest !!!" + personSuggested + "," + roomSuggested + "," + weaponSuggested
@@ -1786,7 +1801,7 @@ while not done:
                                         personAccused = clickedButton.text_input
                                         currentButtons = []
                                         buttonsClicked = False
-                                        pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                        pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                         pygame.display.update()
                                         weaponButtons = printWeaponButtons("accuse")
                                         currentButtons = weaponButtons
@@ -1794,14 +1809,14 @@ while not done:
                                         weaponAccused = clickedButton.text_input
                                         currentButtons = []
                                         buttonsClicked = False
-                                        pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                        pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                         pygame.display.update()
                                         roomButtons = printRoomButtons("accuse")
                                         currentButtons = roomButtons
                                     if clickedButton.text_input in rooms:
                                         roomAccused = clickedButton.text_input
                                         print("INSIDE ACCUSED WITH ALL ACCUSED ANSWERS")
-                                        pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
+                                        pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                         pygame.display.update()
                                         allAccusations = "accuse !!!" + personAccused + "," + roomAccused + "," + weaponAccused
                                         s.send(allAccusations.encode())
