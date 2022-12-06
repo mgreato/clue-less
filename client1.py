@@ -2173,5 +2173,10 @@ while not done:
         for button in start_char_button_list:
             button.changeColor(pygame.mouse.get_pos())
             button.update(screen)
+    
+    if currentButtons != []:
+        for button in currentButtons:
+            button.changeColor(pygame.mouse.get_pos())
+            button.update(screen)
 pygame.quit()
 s.close()
