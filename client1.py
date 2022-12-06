@@ -290,23 +290,29 @@ def movePlayer(p, otherPlayerLocations):
 def printPlayerButtons(action):
     pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
     pygame.display.update()
-    info_font = pygame.font.SysFont('Calibri', 12, False, False)
-    info_font_bold = pygame.font.SysFont('Calibri', 12, True, True)
+    info_font = pygame.font.SysFont('Calibri', 14, False, False)
+    info_font_bold = pygame.font.SysFont('Calibri', 14, True, True)
     messaging = "Who would you like to " + action + "?"
     who = Text((1075, 525), messaging, info_font, info_font_bold, (0,0,0), info_greyed_color)
     who.update(screen)
-    size = (100, 50)
+    size = (100, 55)
     positions = [(1075, 575), (1190, 575), (1305, 575), (1075, 650), (1190, 650), (1305, 650)]
-    font = pygame.font.SysFont('Calibri', 16, True, False)
+    font = pygame.font.SysFont('Calibri', 14, True, False)
     buttonType = pygame.transform.scale(button_image, size) #transform size
     playerButtons = []
     for i in range(0,len(names)):
         print("SIZES")
         print(positions[i][0])
         print(names[i])
-        playerButton = Button(buttonType, (positions[i]), names[i], font, (0,255,255), (0,50,50))
-        playerButtons.append(playerButton)
-        playerButton.update(screen)
+        if (names[i] == "Reverend Green") or (names[i] == "Colonel Mustard"):
+            font = pygame.font.SysFont('Calibri', 12, True, False)
+            playerButton = Button(buttonType, (positions[i]), names[i], font, (0,255,255), (0,50,50))
+            playerButtons.append(playerButton)
+            playerButton.update(screen)
+        else:
+            playerButton = Button(buttonType, (positions[i]), names[i], font, (0,255,255), (0,50,50))
+            playerButtons.append(playerButton)
+            playerButton.update(screen)
     pygame.display.update()
     return playerButtons
 
@@ -318,7 +324,7 @@ def printWeaponButtons(action):
     messaging = "What weapon would you like to " + action + "?"
     what = Text((1075, 525), messaging, info_font, info_font_bold, (0,0,0), info_greyed_color)
     what.update(screen)
-    size = (100, 50)
+    size = (100, 55)
     positions = [(1075, 575), (1190, 575), (1305, 575), (1075, 650), (1190, 650), (1305, 650)]
     font = pygame.font.SysFont('Calibri', 16, True, False)
     buttonType = pygame.transform.scale(button_image, size) #transform size
@@ -341,8 +347,8 @@ def printRoomButtons(action):
     messaging = "What room do you choose to " + action + "?"
     where = Text((1075, 525), messaging, info_font, info_font_bold, (0,0,0), info_greyed_color)
     where.update(screen)
-    size = (85, 40)
-    positions = [(1075, 575), (1190, 575), (1305, 575), (1075, 630), (1190, 630), (1305, 630), (1075, 685), (1190, 685), (1305, 685)]
+    size = (95, 45)
+    positions = [(1075, 575), (1190, 575), (1305, 575), (1075, 625), (1190, 625), (1305, 625), (1075, 675), (1190, 675), (1305, 675)]
     font = pygame.font.SysFont('Calibri', 16, True, False)
     buttonType = pygame.transform.scale(button_image, size) #transform size
     roomButtons = []
@@ -350,9 +356,15 @@ def printRoomButtons(action):
         print("SIZES")
         print(positions[i][0])
         print(rooms[i])
-        roomButton = Button(buttonType, (positions[i]), rooms[i], font, (0,255,255), (0,50,50))
-        roomButtons.append(roomButton)
-        roomButton.update(screen)
+        if (rooms[i] == "dining room") or (rooms[i] == "conservatory") or (rooms[i] == "billiard room"):
+            font = pygame.font.SysFont('Calibri', 14, True, False)
+            roomButton = Button(buttonType, (positions[i]), rooms[i], font, (0,255,255), (0,50,50))
+            roomButtons.append(roomButton)
+            roomButton.update(screen)
+        else:
+            roomButton = Button(buttonType, (positions[i]), rooms[i], font, (0,255,255), (0,50,50))
+            roomButtons.append(roomButton)
+            roomButton.update(screen)
     pygame.display.update()
     return roomButtons
 
