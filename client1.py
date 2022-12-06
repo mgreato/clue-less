@@ -1054,7 +1054,6 @@ first_beginning_screen = False
 second_beginning_screen = False
 gameStarted = False
 gDefined = False
-gameOver = False
 
 playerLocDict = {"Miss Scarlett": "None", "Colonel Mustard": "None", "Mrs. White": "None", "Reverend Green": "None",
                  "Mrs. Peacock": "None", "Professor Plum": "None"}
@@ -1254,7 +1253,6 @@ while not done:
                 print(cardTextForCount)
                 updateNotifications(playerText, "", readmsg[1:34], "", "", "", "", "", "", "")
 
-                numPlayersInGame = int(readmsg[24])
                 t_card1 = Text((911 + 5, 33 + 387), "Click on cards to track what you know.", action_font, action_font,
                                notification_color, notification_color)
                 t_card1.update(screen)
@@ -1309,61 +1307,37 @@ while not done:
                 boardImage = pygame.transform.scale(boardImage, boardSize)  # transform size
                 screen.blit(boardImage, boardLocation)  ##populate on screen
 
-            if WIN_MSG in readmsg:
-                print("KAT WIN MSG: ", readmsg)
+            if WIN_MSG in readmsg and canClickButtons:
                 accusationStatement = readmsg.split("*****")[1]
                 print(accusationStatement)
-                addNewNotificationLine(accusationStatement[:20]+":")
-                addNewNotificationLine(accusationStatement[21:-2]+".")
-                addNewNotificationLine("The accusation is correct.")
-                print("HERE KAT: ", accusationStatement[7:])
-                if p.playerNumber in accusationStatement:
-                    winning = pygame.image.load("winScreen.png").convert()  # load image
-                    winning = pygame.transform.scale(winning, boardSize)  # transform size
-                    screen.blit(winning, boardLocation)  ##populate on screen
-                    addNewNotificationLine("You won the game!")
-                else:
-                    addNewNotificationLine("Player " + accusationStatement[7]+" has won the game.")
-                    losing = pygame.image.load("loseScreen.png").convert()  # load image
-                    losing = pygame.transform.scale(losing, boardSize)  # transform size
-                    screen.blit(losing, boardLocation)  ##populate on screen
+                winning = pygame.image.load("winScreen.png").convert()  # load image
+                winning = pygame.transform.scale(winning, boardSize)  # transform size
+                screen.blit(winning, boardLocation)  ##populate on screen
+                print("You Won!")
                 msg = "endConnection for all"
-                #s.send(msg.encode())
-                gameOver = True
 
-            if ((LOSE_MSG in readmsg) and canClickButtons):# or ((WIN_MSG in readmsg) and (not canClickButtons)):
-                print("KAT, LOSE MSG 1: ", readmsg)
+            if ((LOSE_MSG in readmsg) and canClickButtons) or ((WIN_MSG in readmsg) and (not canClickButtons)):
+                print(readmsg)
                 accusationStatement = readmsg.split("*****")[1]
-                addNewNotificationLine(accusationStatement[:20]+":")
-                addNewNotificationLine(accusationStatement[21:-2]+".")
                 print(accusationStatement)
                 losing = pygame.image.load("loseScreen.png").convert()  # load image
                 losing = pygame.transform.scale(losing, boardSize)  # transform size
                 screen.blit(losing, boardLocation)  ##populate on screen
-                addNewNotificationLine("The accusation is incorrect.")
-                addNewNotificationLine("You have lost the game.")
                 print("You lost, you can no longer move or suggest.")
                 msg = "endConnection for player"
-                #s.send(msg.encode())
-                #done = True
-                gameOver = True
+                s.send(msg.encode())
 
             if (LOSE_MSG in readmsg) and not canClickButtons:
-                print("KAT, LOSE MSG 2: ", readmsg)
+                print(readmsg)
                 accusationStatement = readmsg.split("*****")[1]
-                addNewNotificationLine(accusationStatement[:20]+":")
-                addNewNotificationLine(accusationStatement[21:-2]+".")
-                addNewNotificationLine("The accusation is incorrect.")
-                addNewNotificationLine("Player " + accusationStatement[7]+" has lost the game.")
                 print(accusationStatement)
 
-            if TURN_MSG in readmsg and gameOver == False:
+            if TURN_MSG in readmsg:
                 # print("-------------------")
                 # print(readmsg)
                 currentPlayerLocations = readmsg.split("|||||")[1]
                 if "Player " + str(p.playerNumber) in readmsg:
                     canClickButtons = True
-                    addNewNotificationLine("It's your turn.")
                 else:
                     canClickButtons = False
                     p.hasMoved = False
@@ -1372,7 +1346,6 @@ while not done:
                     buttonsClicked = False
                     suggesting = False
                     accusing = False
-                    addNewNotificationLine(readmsg.split("|||||")[0][1:])
 
             if "is moving to" in readmsg:
                 print("MOVE MESSAGE:")
@@ -1447,19 +1420,13 @@ while not done:
                 playerLocDict[player] = location
                 movePlayerImages(playerLocDict)
 
-                
-            if "is suggesting" in readmsg: # add functionality to check if two lines are the same and don't rewrite
-                asking = int(readmsg[-1])
-                playerSuggesting = int(readmsg[7])
+            if "is suggesting" in readmsg:
+                print("SUGGESTION MESSAGE:")
                 print(readmsg)
-                print("KAT ^^^^ ASKING: ", readmsg[7])
-                
-                if playerSuggesting+1 == asking or (playerSuggesting == numPlayersInGame and asking == 1):
-                    addNewNotificationLine(readmsg[:22]+":")
-                    tempText = readmsg[23:]
-                    tempText = tempText.split("///")[0]
-                    addNewNotificationLine(tempText[:-2])
-
+                addNewNotificationLine(readmsg[:23] + ":")
+                tempText = readmsg[23:]
+                tempText = tempText.split("///")[0]
+                addNewNotificationLine(tempText[:-2])
 
                 if "Mustard" in readmsg:
                     player = "Colonel Mustard"
