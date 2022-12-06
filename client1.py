@@ -1328,7 +1328,7 @@ while not done:
                     losing = pygame.transform.scale(losing, boardSize)  # transform size
                     screen.blit(losing, boardLocation)  ##populate on screen
                 msg = "endConnection for all"
-                #s.send(msg.encode())
+                s.send(msg.encode())
                 gameOver = True
 
             if ((LOSE_MSG in readmsg) and canClickButtons):# or ((WIN_MSG in readmsg) and (not canClickButtons)):
@@ -1344,7 +1344,7 @@ while not done:
                 addNewNotificationLine("You have lost the game.")
                 print("You lost, you can no longer move or suggest.")
                 msg = "endConnection for player"
-                #s.send(msg.encode())
+                s.send(msg.encode())
                 #done = True
                 gameOver = True
 
