@@ -135,6 +135,14 @@ locations = ["room1", "room2", "room3", "room4", "room5", "room6", "room7", "roo
             "hallway78", "hallway81", "hallway89", "hallway29", "hallway49", "hallway69"]
 roomsToNames = {"room1": "study","room2": "hall","room3": "lounge", "room4": "dining room", 
             "room5": "kitchen", "room6": "ballroom", "room7": "conservatory", "room8": "library", "room9": "billiard room"}
+allRoomsToNames = {"room1": "study","room2": "hall","room3": "lounge", "room4": "dining room", 
+            "room5": "kitchen", "room6": "ballroom", "room7": "conservatory", "room8": "library", "room9": "billiard room", "hallway12": "hallway12", 
+            "hallway23": "hallway23", "hallway34":"hallway34", "hallway45":"hallway45", "hallway56":"hallway56", "hallway67":"hallway67",
+            "hallway78":"hallway78", "hallway81":"hallway81", "hallway89":"hallway89", "hallway29":"hallway29", "hallway49":"hallway49", "hallway69":"hallway69"}
+allNamesToRooms = {"study": "room1","hall":"room2", "lounge":"room3", "dining room": "room4", 
+            "kitchen": "room5", "ballroom": "room6", "conservatory": "room7", "library": "room8", "billiard room": "room9", "hallway12": "hallway12", 
+            "hallway23": "hallway23", "hallway34":"hallway34", "hallway45":"hallway45", "hallway56":"hallway56", "hallway67":"hallway67",
+            "hallway78":"hallway78", "hallway81":"hallway81", "hallway89":"hallway89", "hallway29":"hallway29", "hallway49":"hallway49", "hallway69":"hallway69"}
 weapons = ["rope", "candlestick", "dagger", "wrench", "lead pipe", "revolver"]
 # playerStartLocations = {"Miss Scarlett": "hallway23", "Colonel Mustard": "hallway34", "Mrs. White": "hallway56", "Mr. Green": "hallway67",
 #             "Mrs. Peacock": "hallway78", "Professor Plum": "hallway81"}
@@ -214,6 +222,7 @@ def moveOptionButtons(moveOptions):
     y = 250
     buttonCount = 1
     for option in moveOptions:
+        option = allRoomsToNames.get(option)
         print("PRINTING OPTION")
         print(option)
         if buttonCount % 2 == 1:
@@ -281,8 +290,8 @@ def movePlayer(p, otherPlayerLocations):
 def printPlayerButtons(action):
     pygame.draw.rect(screen, WHITE, [1013, 516, 350, 201])
     pygame.display.update()
-    info_font = pygame.font.SysFont('Calibri', 14, False, False)
-    info_font_bold = pygame.font.SysFont('Calibri', 14, True, True)
+    info_font = pygame.font.SysFont('Calibri', 12, False, False)
+    info_font_bold = pygame.font.SysFont('Calibri', 12, True, True)
     messaging = "Who would you like to " + action + "?"
     who = Text((1075, 525), messaging, info_font, info_font_bold, (0,0,0), info_greyed_color)
     who.update(screen)
@@ -984,7 +993,6 @@ while not done:
     for event in pygame.event.get():  # User did something
         if event.type == pygame.QUIT:  # If user closes window
             done = True  # Flag to exit the loop
-                  
         
         if event.type == SERVER_MESSAGE: # If the server sends a message
             readmsg = event.message
@@ -996,6 +1004,10 @@ while not done:
             
             if("CLOSE ALL CONNECTION" in readmsg):
                 readmsg = readmsg.split(",")
+                # print("PRINTING READ MSG IN CLOSE ALL CONNECTION")
+                # print(readmsg)
+                # accusationStatement = readmsg[3]
+                # print(accusationStatement)
                 print(readmsg)
                 if(readmsg[1]) and (int(readmsg[1]) == int(p.playerNumber)):
                     defaultWon = readmsg[2]
@@ -1165,6 +1177,8 @@ while not done:
                 
 
             if WIN_MSG in readmsg and canClickButtons:
+                accusationStatement = readmsg.split("*****")[1]
+                print(accusationStatement)
                 winning = pygame.image.load("winScreen.png").convert() #load image
                 winning = pygame.transform.scale(winning, boardSize) #transform size
                 screen.blit(winning, boardLocation) ##populate on screen
@@ -1172,13 +1186,20 @@ while not done:
                 msg = "endConnection for all"
 
             if ((LOSE_MSG in readmsg) and canClickButtons) or ((WIN_MSG in readmsg) and (not canClickButtons)):
+                print(readmsg)
+                accusationStatement = readmsg.split("*****")[1]
+                print(accusationStatement)
                 losing = pygame.image.load("loseScreen.png").convert() #load image
                 losing = pygame.transform.scale(losing, boardSize) #transform size
                 screen.blit(losing, boardLocation) ##populate on screen
                 print("You lost, you can no longer move or suggest.")
                 msg = "endConnection for player"
                 s.send(msg.encode())
-
+            
+            if (LOSE_MSG in readmsg) and not canClickButtons:
+                print(readmsg)
+                accusationStatement = readmsg.split("*****")[1]
+                print(accusationStatement)
                 
             if TURN_MSG in readmsg:
                 # print("-------------------")
@@ -1318,6 +1339,7 @@ while not done:
                     p.hasSuggested = True
                     p.hasMoved = True
                     p.canEndTurn = True
+                    suggesting = False
                     msg = "KEEP SAME PLAYER TURN"
                     print(msg)
                     s.send(msg.encode(form))
@@ -1335,6 +1357,7 @@ while not done:
                     print(msg)
                     s.send(msg.encode(form))
                     print("Another player is suggesting that [" + str(suggestionHelpMessage[0]) + "] is not in the solution")
+                    suggesting = False
                     p.hasSuggested = True
                     p.hasMoved = True
                     p.canEndTurn = True
@@ -1706,7 +1729,7 @@ while not done:
                                 print(buttonList)
                                 currentButtons = buttonList
                         else: 
-                            updateNotifications("", "You can only move once per turn.", "", "", "", "")
+                            updateNotifications("", "You can only move once per turn.", "", "", "", "", "", "","","")
                             pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                             pygame.display.update()
                             noDoubleMove = "You can only move once per turn."
@@ -1792,7 +1815,7 @@ while not done:
                                 print("PRINTING BUTTON TEXT INPUT")
                                 print(clickedButton.text_input)
                                 # print(choiceInput)
-                                moveInput = clickedButton.text_input
+                                moveInput = allNamesToRooms.get(clickedButton.text_input)
                                 print("PRINTING MOVE INPUT HERE")
                                 print(moveInput)
                                 if "room" not in moveInput:
@@ -1844,6 +1867,10 @@ while not done:
                                 noSuggesting = "You are not in a location to suggest."
                                 noSuggestingText = Text((1070, 525), noSuggesting, action_font, action_font, (0,0,0), notification_color)
                                 noSuggestingText.update(screen)
+                            elif not p.hasMoved:
+                                noSuggesting = "You must move before you can suggest."
+                                noSuggestingText = Text((1060, 525), noSuggesting, action_font, action_font, (0,0,0), notification_color)
+                                noSuggestingText.update(screen)
                             else:
                                 noSuggesting = "You must either move or make a suggestion."
                                 noSuggestingText = Text((1070, 525), noSuggesting, action_font, action_font, (0,0,0), notification_color)
@@ -1855,7 +1882,7 @@ while not done:
                     if b_end.isOver(pos, button_width_2, button_height):
                         print('ending')
                         # canTurnEnd = validateEndTurn(p)
-
+                        print(p.canEndTurn)
                         # def validateEndTurn(p):
                         if(p.canEndTurn == True):
                             p.canSuggest = False
@@ -1868,6 +1895,7 @@ while not done:
                             pygame.display.update()
                                 
                         else:
+                            print(p.canSuggest)
                             if(p.canSuggest and not p.hasMoved):
                                 # msg = "\nYou must either move or make a suggestion. && " + str(p.canEndTurn)
                                 pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
@@ -1875,21 +1903,21 @@ while not done:
                                 endMsg1 = "You must either move or make a suggestion."
                                 noEnd1 = Text((1070, 525), endMsg1, action_font, action_font, (0,0,0), notification_color)
                                 noEnd1.update(screen)
-                            if(p.canSuggest and p.hasMoved):
+                            elif(p.canSuggest and p.hasMoved):
                                 # msg = "\nYou must make a suggestion. && " + str(p.canEndTurn)
                                 pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                 pygame.display.update()
                                 endMsg2 = "You must make a suggestion."
                                 noEnd2 = Text((1070, 525), endMsg2, action_font, action_font, (0,0,0), notification_color)
                                 noEnd2.update(screen)
-                            if(not p.canSuggest and p.hasMoved):
-                                # msg = "\nYou must move to a new location. && " + str(p.canEndTurn)
-                                pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
-                                pygame.display.update()
-                                endMsg3 = "You are not in a location to suggest."
-                                noEnd3 = Text((1070, 525), endMsg3, action_font, action_font, (0,0,0), notification_color)
-                                noEnd3.update(screen)
-                            if(not p.canSuggest and not p.hasMoved):
+                            # elif(not p.canSuggest and p.hasMoved):
+                            #     # msg = "\nYou must move to a new location. && " + str(p.canEndTurn)
+                            #     pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
+                            #     pygame.display.update()
+                            #     endMsg3 = "You are not in a location to suggest."
+                            #     noEnd3 = Text((1070, 525), endMsg3, action_font, action_font, (0,0,0), notification_color)
+                            #     noEnd3.update(screen)
+                            elif(not p.canSuggest and not p.hasMoved):
                                 # msg = "\nYou must move to a new location. && " + str(p.canEndTurn)
                                 pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
                                 pygame.display.update()
