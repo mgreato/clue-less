@@ -1159,16 +1159,29 @@ while not done:
                 
                 print("boardSize: ", boardSize)
                 print("boardLocation: ", boardLocation)
-                boardImage = pygame.image.load("gameboard.png").convert() #load image
-                boardImage = pygame.transform.scale(boardImage, boardSize) #transform size
-                screen.blit(boardImage, boardLocation) ##populate on screen 
-                
 
-            if WIN_MSG in readmsg and canClickButtons:
-                winning = pygame.image.load("winScreen.png").convert() #load image
-                winning = pygame.transform.scale(winning, boardSize) #transform size
-                screen.blit(winning, boardLocation) ##populate on screen
-                print("You Won!")
+                boardImage = pygame.image.load("gameboard.png").convert()  # load image
+                boardImage = pygame.transform.scale(boardImage, boardSize)  # transform size
+                screen.blit(boardImage, boardLocation)  ##populate on screen
+
+            if WIN_MSG in readmsg:
+                print("KAT WIN MSG: ", readmsg)
+                accusationStatement = readmsg.split("*****")[1]
+                print(accusationStatement)
+                addNewNotificationLine(accusationStatement[:20]+":")
+                addNewNotificationLine(accusationStatement[21:-2]+".")
+                addNewNotificationLine("The accusation is correct.")
+                print("HERE KAT: ", accusationStatement[7:])
+                if p.playerNumber in accusationStatement:
+                    winning = pygame.image.load("winScreen.png").convert()  # load image
+                    winning = pygame.transform.scale(winning, boardSize)  # transform size
+                    screen.blit(winning, boardLocation)  ##populate on screen
+                    addNewNotificationLine("You won the game!")
+                else:
+                    addNewNotificationLine("Player " + accusationStatement[7]+" has won the game.")
+                    losing = pygame.image.load("loseScreen.png").convert()  # load image
+                    losing = pygame.transform.scale(losing, boardSize)  # transform size
+                    screen.blit(losing, boardLocation)  ##populate on screen
                 msg = "endConnection for all"
 
             if ((LOSE_MSG in readmsg) and canClickButtons) or ((WIN_MSG in readmsg) and (not canClickButtons)):
