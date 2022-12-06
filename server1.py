@@ -129,126 +129,138 @@ while gameOn:
         currentPlayer = who_plays_next(currentPlayer, False)
         while winner==0:
             print("Current player: ", currentPlayer)
-            msg = "\nNext Turn: Player "+str(currentPlayer)+"."
+            print("UP HERE")
+            msg = "\nNext Turn: Player "+str(currentPlayer)+". |||||" +  str(list(g.playerLocations.values()))
             send_message(msg, clients)
 
             playerTurn = True
             while playerTurn:
                 moveMsg = clients[currentPlayer-1].recv(1024)
-                playerMoveMsg = str(currentPlayer) + moveMsg.decode(form) + "//" + str(list(g.playerLocations.values()))
+                playerMoveMsg = str(currentPlayer) + "..." +  moveMsg.decode(form) + "//" + str(list(g.playerLocations.values()))
+                print("PLAYER TURN MOVE MESSAGE HERE IN SERVER")
+                print(playerMoveMsg)
+
+                if "KEEP SAME PLAYER TURN" in moveMsg.decode(form):
+                    currentPlayer = currentPlayer
+                    playerTurn = False
 
                 if (MOVE_MSG in playerMoveMsg) or ("moving" in playerMoveMsg):
-                    send_message(playerMoveMsg,clients)
-                    moveMessage = clients[currentPlayer-1].recv(1024).decode()
-
-                    if("," in moveMessage):
-                        moveOptions = moveMessage.split(",")
-                        moveChoice = moveOptions[0]
-                        movePlayer = moveOptions[1]
-                    else:
-                        moveOptions = moveMessage
-
-                    if(moveOptions == "You can only move once per turn."):
-                        moveMessage = "Player cannot move again."
-                        print(moveMessage)
-                    else:
-                        moveMessage = str(movePlayer) + " is moving to " + str(moveChoice) + "."
-                        print(moveMessage)
-                    
-                    send_message(moveMessage, clients)
-                    msg = clients[currentPlayer-1].recv(1024).decode()
-                    if("Move" in msg):
-                        print(msg)
+                    print("IN MOVING THIS IS THE PLAYER MOVE MSG")
+                    print(playerMoveMsg)
+                    movePlayer = playerMoveMsg.split("...")[1].split("---")[1]
+                    print("MOVE PLAYER")
+                    print(movePlayer)
+                    moveChoice = playerMoveMsg.split("...")[1].split("---")[2].split("//")[0]
+                    print("MOVE CHOICE")
+                    print(moveChoice)
                     g.playerLocations[movePlayer] = moveChoice
+                    moveMessage = str(movePlayer) + " is moving to " + str(moveChoice) + "."
+                    print(moveMessage)
+                    send_message(moveMessage, clients)
                     currentPlayer = currentPlayer
                     playerTurn = False
                     
                 if SUGGESTION_MSG in playerMoveMsg:
-                    send_message(playerMoveMsg,clients)
-                    suggestionMessage = clients[currentPlayer-1].recv(1024).decode()
-                    if "cannot" in suggestionMessage:
-                        falseSuggestion = "You are not in a room so you cannot make a suggestion \n"
-                        send_message(falseSuggestion, clients)
-                        currentPlayer = currentPlayer
-                        playerTurn = False
-                    else:
-                        goodSuggestion = "Player is able to make a suggestion \n"
-                        clientsToValidate = []
-                        clientsToValidate.extend(clients)
-                        clientsToValidate.pop(currentPlayer-1)
-                        send_message(goodSuggestion, clientsToValidate)
-                        suggestion = suggestionMessage.split(",")
-                        person = suggestion[0]
-                        room = roomsToNames.get(suggestion[1])
-                        weapon = suggestion[2]
-                        playerToPass = who_plays_next(currentPlayer, True)
-                        suggestionHelpMade = False
-                        playerSuggest = currentPlayer
-                        suggestCheckCount = 0
-                        while (suggestionHelpMade != True):
-                            suggestionPass = person + " in the " + room + " with the " + weapon
-                            printMessage = "Player " + str(currentPlayer) + " is suggesting " + suggestionPass + ".\n"
-                            print(printMessage)
-                            suggestionMessage = printMessage + " ///"
-                            if(playerSuggest == numPlayers):
-                                fullSuggestion = person + "," + room + "," + weapon + "," + str(1)
-                            else:
-                                fullSuggestion = person + "," + room + "," + weapon + "," + str(playerSuggest+1)
-                            send_message(suggestionMessage + fullSuggestion, clients)
-                            g.playerLocations[person] = suggestion[1]
-                            if(playerSuggest == numPlayers) and (suggestCheckCount != numPlayers-1): 
-                                suggestionHelp = clients[0].recv(1024).decode()
-                            else:
-                                if(suggestCheckCount == numPlayers-1):
-                                    noSuggestionsMessage = "No player has cards that match your suggestion"
-                                    print("No player had cards that matched the suggestion.")
-                                    clientToSend = []
-                                    clientToSend.append(clients[currentPlayer-1])
-                                    send_message(noSuggestionsMessage, clientToSend)
-                                    suggestionHelpMade = True
-                                else:
-                                    suggestionHelp = clients[playerSuggest].recv(1024).decode()
-                            if "No matches" in suggestionHelp:
-                                print("No Matches for this client, moving to the next player.")
-                                playerSuggest = who_plays_next(playerSuggest, True)
-                                suggestCheckCount = suggestCheckCount + 1
-                                
-                            else:
+                    print("INSIDE SUGGESTION")
+                    print(playerMoveMsg)
+                    print("PRINTING SUGGESTION MESSAGE HERE")
+                    suggestionMessage = playerMoveMsg.split("//")[0].split("!!!")[1]
+                    print(suggestionMessage)
+                    clientsToValidate = []
+                    clientsToValidate.extend(clients)
+                    clientsToValidate.pop(currentPlayer-1)
+                    # send_message(goodSuggestion, clientsToValidate)
+                    suggestion = suggestionMessage.split(",")
+                    print("HERE!!!!!!!s")
+                    person = suggestion[0]
+                    room = roomsToNames.get(suggestion[1])
+                    weapon = suggestion[2]
+                    playerToPass = who_plays_next(currentPlayer, True)
+                    suggestionHelpMade = False
+                    playerSuggest = currentPlayer
+                    suggestCheckCount = 0
+                    while (suggestionHelpMade != True):
+                        suggestionPass = person + " in the " + room + " with the " + weapon
+                        printMessage = "Player " + str(currentPlayer) + " is suggesting " + suggestionPass + ".\n"
+                        print(printMessage)
+                        suggestionMessage = printMessage + " ///"
+                        if(playerSuggest == numPlayers):
+                            fullSuggestion = person + "," + room + "," + weapon + "," + str(1)
+                        else:
+                            fullSuggestion = person + "," + room + "," + weapon + "," + str(playerSuggest+1)
+                        print("SUGGESTION MESSAGE PLUS FULL SUGGESTION BELOW")
+                        print(suggestionMessage + fullSuggestion)
+                        send_message(suggestionMessage + fullSuggestion, clients)
+
+                        g.playerLocations[person] = suggestion[1]
+                        print("HERE")
+                        print(playerSuggest)
+                        print(numPlayers)
+                        print(suggestCheckCount)
+                        if(playerSuggest == numPlayers) and (suggestCheckCount != numPlayers-1): 
+                            print("THIS IS THE PART FOR A PLAYER TO SUGGEST")
+                            suggestionHelp = clients[0].recv(1024).decode()
+                        else:
+                            if(suggestCheckCount == numPlayers-1):
+                                noSuggestionsMessage = "No player has cards that match your suggestion ///suggestionHelpMade\n"
+                                print("No player had cards that matched the suggestion.")
                                 clientToSend = []
                                 clientToSend.append(clients[currentPlayer-1])
-                                send_message(suggestionHelp + " ///\n", clientToSend)
-                                if(playerSuggest == numPlayers):
-                                    print("Player 1 is showing [" + suggestionHelp + "] to disprove the suggestion.")
-                                else:
-                                    print("Player " + str(playerSuggest+1) + " is showing [" + suggestionHelp + "] to disprove the suggestion.")
-                                msg = clients[currentPlayer-1].recv(1024).decode()
+                                send_message(noSuggestionsMessage, clientToSend)
                                 suggestionHelpMade = True
-                        nextMessage = "Move " + person + " to " + room + ".\n"
-                        print(nextMessage)
-                        currentPlayer = currentPlayer
-                        playerTurn = False
+                            else:
+                                waitForHelp = True
+                                print("THIS IS WHERE THE HOLD UP IS")
+                                print(playerSuggest)
+                                suggestionHelp = clients[playerSuggest].recv(1024).decode()
+                                print(suggestionHelp)
+                                while waitForHelp:
+                                    if suggestionHelp == "":
+                                        suggestionHelp = clients[playerSuggest].recv(1024).decode()
+                                    else:
+                                        waitForHelp = False
+                                print("GETTING THIS SUGGESTION HELP")
+                                print(suggestionHelp)
+                        if "No matches" in suggestionHelp:
+                            print("No Matches for this client, moving to the next player.")
+                            playerSuggest = who_plays_next(playerSuggest, True)
+                            suggestCheckCount = suggestCheckCount + 1
+                            
+                        else:
+                            clientToSend = []
+                            clientToSend.append(clients[currentPlayer-1])
+                            send_message(suggestionHelp + " ///suggestionHelpMade\n", clientToSend)
+                            if(playerSuggest == numPlayers):
+                                print("Player 1 is showing [" + suggestionHelp + "] to disprove the suggestion.")
+                            else:
+                                print("Player " + str(playerSuggest+1) + " is showing [" + suggestionHelp + "] to disprove the suggestion.")
+                            suggestionHelpMade = True
+                    nextMessage = "Move " + person + " to " + room + ".\n"
+                    print(nextMessage)
+                    currentPlayer = currentPlayer
+                    playerTurn = False
 
                 if ACCUSATION_MSG in playerMoveMsg:
                     send_message(playerMoveMsg,clients)
-                    accusationClientMesssage = clients[currentPlayer-1].recv(1024).decode()
-                    accuse = accusationClientMesssage.split(",")
+                    accuse = playerMoveMsg.split(" !!!")[1].split("//")[0].split(",")
                     personAccuse = accuse[0]
                     roomAccuse = accuse[1]
                     weaponAccuse = accuse[2]
+                    print("PRINTING ACCUSE HERE")
+                    print(accuse)
                     accusation = personAccuse + " in the " + roomAccuse + " with the " + weaponAccuse
                     accusationMessage = "Player " + str(currentPlayer) + " is accusing " + accusation + " \n"
-                    send_message(accusationMessage, clients)
-                    time.sleep(1)
+                    print("ACCUSE MESSAGE HERE!!!!")
                     if((personAccuse == solutionName) and (roomAccuse == solutionLocation) and (weaponAccuse == solutionWeapon)):
-                        wonMessage = "Player " + str(currentPlayer) + " won! \n"
+                        wonMessage = "Player " + str(currentPlayer) + " won! \n *****" + accusationMessage
                         print(wonMessage)
                         send_message(wonMessage, clients)
                     else:
-                        lostMessage = "Player " + str(currentPlayer) + " lost the game. \n"
+                        lostMessage = "Player " + str(currentPlayer) + " lost the game. \n *****" + accusationMessage
                         print(lostMessage)
                         send_message(lostMessage, clients)
-                    msg = clients[currentPlayer-1].recv(1024).decode()
-                    if "player" in msg:
+                    # msg = clients[currentPlayer-1].recv(1024).decode()
+                    if "Player" in msg:
                         playerToEnd = currentPlayer
                         currentPlayer = who_plays_next(currentPlayer, False)
                         activePlayerNumbers.remove(playerToEnd)
@@ -264,20 +276,12 @@ while gameOn:
                         send_message("CLOSE ALL CONNECTION", clients)
                         s.close()
                     playerTurn = False
-                if (END_MSG in playerMoveMsg) and ("end connection" not in playerMoveMsg):
-                    playerMoveMsg = str(currentPlayer) + moveMsg.decode(form) + ","+ str(currentPlayer)+ "//" + str(list(g.playerLocations.values()))
-                    send_message(playerMoveMsg,clients)
-                    msg = clients[currentPlayer-1].recv(1024).decode()
-                    validation = msg.split("&& ")
-                    if(eval(validation[1]) == True):
-                        print("Player " + str(currentPlayer) + " chose to end their turn.")
-                        send_message(validation[1], clients)
-                        msg = clients[currentPlayer-1].recv(1024).decode()
-                        currentPlayer = who_plays_next(currentPlayer, False)
-                        playerTurn = False
-                    elif(eval(validation[1]) == False):
-                        currentPlayer = currentPlayer
-                        send_message(validation[1], clients)
-                        msg = clients[currentPlayer-1].recv(1024).decode()
-                        playerTurn = False 
+                    
+                if (END_MSG in playerMoveMsg) and ("end connection" not in playerMoveMsg) and ("rend") not in playerMoveMsg:
+                    print("IN END AND HERE IS THE MOVE MESSSAGE")
+                    print(moveMsg.decode(form))
+                    print("Player " + str(currentPlayer) + " chose to end their turn.")
+                    currentPlayer = who_plays_next(currentPlayer, False)
+                    playerTurn = False
+
 s.close()

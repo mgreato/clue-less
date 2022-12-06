@@ -3,7 +3,7 @@ from game import Game
 class Player: 
 
     # Player initialization
-    def __init__(self,number,name,location, cards, hasMoved, hasSuggested, canEndTurn, canSuggest):
+    def __init__(self,number,name,location, cards, hasMoved, hasSuggested, canEndTurn, canSuggest, helpingSuggestion):
         self.playerNumber = number
         self.playerName = name
         self.playerLocation = location
@@ -12,5 +12,6 @@ class Player:
         self.hasSuggested = hasSuggested
         self.canEndTurn = canEndTurn
         self.canSuggest = canSuggest
+        self.helpingSuggestion = helpingSuggestion
 
 

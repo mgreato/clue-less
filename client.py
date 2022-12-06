@@ -268,6 +268,8 @@ while True:
                         msg = "\nTurn Over. && " + str(p.canEndTurn)
                         s.send(msg.encode(form))
                         end = s.recv(1024).decode()
+                        print("PRINTING END HERE!!!!")
+                        print(end)
                         s.send("END".encode(form))
                         playerMoveActive = False
                     else:
@@ -279,9 +281,13 @@ while True:
                             msg = "\nYou must move to a new location. && " + str(p.canEndTurn)
                         if(not p.canSuggest and not p.hasMoved):
                             msg = "\nYou must move to a new location. && " + str(p.canEndTurn)
+                        print("PRINTING MSG HERE!!!!")
+                        print(msg)
                         print(msg.split(" &&")[0])
                         s.send(msg.encode(form))
                         end = s.recv(1024).decode()
+                        print("PRINTING END HERE!!!!")
+                        print(end)
                         s.send("END".encode(form))
                         playerMoveActive = False
 
