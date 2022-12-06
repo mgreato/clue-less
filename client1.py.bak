@@ -120,6 +120,7 @@ not_text8 = ""
 not_text9 = ""
 not_text10 = ""
 
+
 # possible messages from server
 CONNECTED_MSG = "Connection established"
 BEGINNING_MSG = "Game is beginning"
@@ -130,11 +131,12 @@ CARDS_MSG = "Your cards are"
 WIN_MSG = "won!"
 LOSE_MSG = "lost the game"
 PLAYER_CHOICE_MESSAGE = "What player would you like to be?"
-currentPlayer = 0
+
 
 # names, locations, and weapons that can be indexed. This code is identical in the server.py file
 names = ["Miss Scarlett", "Colonel Mustard", "Mrs. White", "Reverend Green", "Mrs. Peacock", "Professor Plum"]
 locations = ["room1", "room2", "room3", "room4", "room5", "room6", "room7", "room8", "room9",
+
              "hallway12", "hallway23", "hallway34", "hallway45", "hallway56", "hallway67",
              "hallway78", "hallway81", "hallway89", "hallway29", "hallway49", "hallway69"]
 roomsToNames = {"room1": "study", "room2": "hall", "room3": "lounge", "room4": "dining room",
@@ -165,6 +167,7 @@ rooms = ["study", "hall", "lounge", "dining room", "kitchen", "ballroom", "conse
 # connect to server
 port = 5050
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
 s.connect((socket.gethostname(), port))
 form = 'utf-8'
 playerChosen = False
@@ -206,6 +209,7 @@ q = queue.Queue()
 SocketListener(s, q).start()
 
 
+
 def can_take_secret_passage(playerRoom):
     boolean = False
     diagonal_room_name = ""
@@ -215,14 +219,15 @@ def can_take_secret_passage(playerRoom):
     if playerRoom == "room3":
         diagonal_room_name = "room7"
         boolean = True
+
     if playerRoom == "room5":
         diagonal_room_name = "room1"
         boolean = True
     if playerRoom == "room7":
+
         diagonal_room_name = "room3"
         boolean = True
     return boolean, diagonal_room_name
-
 
 def moveOptionButtons(moveOptions):
     pygame.draw.rect(screen, WHITE, [1011, 512, 350, 187])
@@ -298,6 +303,7 @@ def movePlayer(p, otherPlayerLocations):
                 return possibleHallways
     else:
         if (p.playerLocation.__contains__("hallway")):
+
             hallwayRooms = p.playerLocation.split("hallway")[1]
             roomChoices = list(hallwayRooms)
             roomChoice1 = "room" + roomChoices[0]
@@ -422,9 +428,9 @@ def validateSuggestion(p):
     else:
         return False
 
-
 ################################
 # End Class Definition
+
 # Note that a bulk of definition and updates outside of the gameplay loop
 # As few as possible items will have to be updated during gameplay
 ################################
@@ -436,12 +442,15 @@ BLUE = (13, 69, 214)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 
+
 # Define board areas
+
 width = 1366
 height = 768
 size = (width, height)
 screen = pygame.display.set_mode(size)
 # Define the sectors for each section
+
 vertical = 2 * width / 3  # = 911
 hLeft = 3 * height / 4  # = 576
 hRight = 2 * height / 3  # = 512
@@ -458,6 +467,7 @@ screen.fill(WHITE)  # background color
 ################################# Boardgame Image
 # Define sizes and locations of images
 # Board
+
 boardSize = (911, 768)  # set size of board image
 boardLocation = (0, 0)
 
@@ -638,12 +648,14 @@ def movePlayerImages(playerLocations):
 # for each of the images ....
 # playerImage = pygame.image.load("player_image.png").convert() #load image
 # boardImage = pygame.transform.scale(boardImage, boardSize) #transform size
+
 #### screen.blit will have to happen in the loop
 
 
 ################################
 # Make all of the Buttons Here
 ################################
+
 # Declare all variables
 button_font = pygame.font.SysFont('Calibri', 16, True, False)
 button_color = (255, 249, 242)
@@ -673,6 +685,7 @@ button_x_shift = (150)  # y-shift (spacing) of buttons PLAY WITH THIS
 # Move Button
 b_x = width - 455 + (button_width_1 / 2)
 b_y = 512 + button_height / 2
+
 b_move = Button(button_type_1, (b_x, b_y), "Move", button_font, button_color, button_greyed_color)
 b_move.update(screen)
 # Suggest Button
@@ -685,11 +698,13 @@ b_y = b_y + button_y_shift
 b_accuse = Button(button_type_1, (b_x, b_y), "Accuse", button_font, button_color, button_greyed_color)
 b_accuse.update(screen)
 # Show Button
+
 # b_y = b_y + button_y_shift
 # b_show = Button(button_type_1, (b_x, b_y), "Show", button_font, button_color, button_greyed_color)
 # b_show.update(screen)
 # End Button
 b_x = width - (button_width_2 / 2)
+
 b_y = b_y + button_y_shift
 b_end = Button(button_type_2, (b_x, b_y), "End Turn", button_font, button_color, button_greyed_color)
 b_end.update(screen)
@@ -720,10 +735,12 @@ info_title_color = (133, 105, 73)
 info_greyed_color = (133, 105, 73)
 notification_color = BLACK  ##UPDATE
 
+
 # Initialize and update TEXTs: (self, position, text_input, font_input, bold_input, base_color, greyed_color)
 ################################
 # Info Board
 ################################
+
 # Print instrucdtions for how to use the info panel
 
 # Names
@@ -732,6 +749,7 @@ t_y_1 = 192 + (info_height / 2)
 t_y = t_y_1
 t_names = Button(button_type_3, (t_x, t_y), "NAMES", info_font, info_color, info_greyed_color)
 # t_names = Text((t_x, t_y), "NAMES", info_font, info_font_bold, info_title_color, info_greyed_color)
+
 t_names.update(screen)
 # NOTE the following could be done in a loop like "for names in names_list", but I don't know how to create objects of unique names doing so
 
@@ -787,10 +805,12 @@ t_green.update(screen)
 t_x = t_x + info_width  # shift to the right for a new "column"
 t_y = t_y_1
 t_weapons = Button(button_type_3, (t_x, t_y), "WEAPONS", info_font, info_color, info_greyed_color)
+
 t_weapons.update(screen)
 
 # Candlestick
 t_y = t_y + info_y_shift
+
 t_candle = Button(button_type_3, (t_x, t_y), "Candlestick", info_font, info_color, info_greyed_color)
 t_candle.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
@@ -841,10 +861,12 @@ t_revolver.update(screen)
 t_x = t_x + info_width  # shift to the right for a new "column"
 t_y = t_y_1
 t_rooms = Button(button_type_3, (t_x, t_y), "ROOMS", info_font, info_color, info_greyed_color)
+
 t_rooms.update(screen)
 
 # Study
 t_y = t_y + info_y_shift
+
 t_study = Button(button_type_3, (t_x, t_y), "Study", info_font, info_color, info_greyed_color)
 t_study.update(screen)
 ##ADD LOGIC FOR ITEM TO BOLD IF USER HAS CARD
@@ -894,6 +916,7 @@ t_dining.update(screen)
 # Conservatory
 t_y = t_y + info_y_shift
 t_conservatory = Button(button_type_3, (t_x, t_y), "Conservatory", info_font, info_color, info_greyed_color)
+
 t_conservatory.update(screen)
 
 # Ballroom

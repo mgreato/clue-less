@@ -1059,6 +1059,25 @@ gameOver = False
 playerLocDict = {"Miss Scarlett": "None", "Colonel Mustard": "None", "Mrs. White": "None", "Reverend Green": "None",
                  "Mrs. Peacock": "None", "Professor Plum": "None"}
 
+t_x_notification2 = t_x
+t_y_notification2 = t_y + 3*notification_y_shift
+t_notification2= Text((t_x_notification2, t_y_notification2), "Initial", notification_font, info_font_bold, notification_color, notification_color)
+t_notification2.update(screen)
+
+def updateNotifications(text1, text2, text3, text4):
+    pygame.draw.rect(screen, WHITE, [0, hLeft, vertical, height])
+    pygame.draw.rect(screen, RED, [0, hLeft, vertical, height], 2)
+    t_you = Text((t_x_you, t_y_you), text1, notification_font, info_font_bold, notification_color, notification_color)
+    t_you.update(screen)
+    t_cards = Text((t_x_cards, t_y_cards), text2, notification_font, info_font_bold, notification_color, notification_color)
+    t_cards.update(screen)
+    t_notification= Text((t_x_notification, t_y_notification), text3, notification_font, info_font_bold, notification_color, notification_color)
+    t_notification.update(screen)
+    t_notification2= Text((t_x_notification2, t_y_notification2), text4, notification_font, info_font_bold, notification_color, notification_color)
+    t_notification2.update(screen)
+
+playerText = ""
+cardText = ""
 canClickButtons = False
 done = False
 clock = pygame.time.Clock()
