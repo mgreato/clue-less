@@ -1590,6 +1590,7 @@ while not done:
                     print(nextMessage)
                     playerMoveActive = False
 
+
         if event.type == pygame.MOUSEBUTTONDOWN:
             pos = pygame.mouse.get_pos()
 

@@ -1323,7 +1323,7 @@ while not done:
                     screen.blit(winning, boardLocation)  ##populate on screen
                     addNewNotificationLine("You won the game!")
                 else:
-                    addNewNotificationLine("Player " + accusationStatement[9]+" has won the game.")
+                    addNewNotificationLine("Player " + accusationStatement[7]+" has won the game.")
                     losing = pygame.image.load("loseScreen.png").convert()  # load image
                     losing = pygame.transform.scale(losing, boardSize)  # transform size
                     screen.blit(losing, boardLocation)  ##populate on screen
