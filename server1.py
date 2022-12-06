@@ -246,8 +246,11 @@ while gameOn:
                     personAccuse = accuse[0]
                     roomAccuse = accuse[1]
                     weaponAccuse = accuse[2]
+                    print("PRINTING ACCUSE HERE")
+                    print(accuse)
                     accusation = personAccuse + " in the " + roomAccuse + " with the " + weaponAccuse
                     accusationMessage = "Player " + str(currentPlayer) + " is accusing " + accusation + " \n"
+                    print("ACCUSE MESSAGE HERE!!!!")
                     if((personAccuse == solutionName) and (roomAccuse == solutionLocation) and (weaponAccuse == solutionWeapon)):
                         wonMessage = "Player " + str(currentPlayer) + " won! \n *****" + accusationMessage
                         print(wonMessage)
@@ -256,8 +259,8 @@ while gameOn:
                         lostMessage = "Player " + str(currentPlayer) + " lost the game. \n *****" + accusationMessage
                         print(lostMessage)
                         send_message(lostMessage, clients)
-                    msg = clients[currentPlayer-1].recv(1024).decode()
-                    if "player" in msg:
+                    # msg = clients[currentPlayer-1].recv(1024).decode()
+                    if "Player" in msg:
                         playerToEnd = currentPlayer
                         currentPlayer = who_plays_next(currentPlayer, False)
                         activePlayerNumbers.remove(playerToEnd)
