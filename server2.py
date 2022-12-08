@@ -254,6 +254,9 @@ while gameOn:
                         wonMessage = "Player " + str(currentPlayer) + " won! \n"
                         print(wonMessage)
                         send_message(wonMessage, clients)
+                        currentPlayer = currentPlayer
+                        playerTurn = False
+                        gameOn = False
                     else:
                         lostMessage = "Player " + str(currentPlayer) + " lost the game. \n"
                         print(lostMessage)
@@ -265,9 +268,10 @@ while gameOn:
                         activePlayerNumbers.remove(playerToEnd)
                         if(len(activePlayerNumbers) == 1):
                             activePlayerNumbers.clear()
-                            closeConnectionMessage = "CLOSE ALL CONNECTION," + str(currentPlayer) + ",You are the only player left so you win!"
+                            closeConnectionMessage = ",CLOSE ALL CONNECTION," + str(currentPlayer) + ",You are the only player left so you win!"
                             send_message(closeConnectionMessage, clients)
-                            s.close()
+                            gameOn = False
+                            # s.close()
                     # if "all" in msg:
                     #     print("Connection should be ended for all.")
                     #     activePlayerNumbers.clear()
@@ -283,4 +287,4 @@ while gameOn:
                     currentPlayer = who_plays_next(currentPlayer, False)
                     playerTurn = False
 
-s.close()
+# s.close()
